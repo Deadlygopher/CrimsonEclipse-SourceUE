@@ -12,6 +12,9 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "CrimsonEclipse/Items/Weapon.h"
+#include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
 
 
 ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
@@ -60,9 +63,26 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	CombatComponent->SetIsReplicated(true);
 }
 
+void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION(ACrimsonEclipseCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
+
+void ACrimsonEclipseCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (CombatComponent)
+	{
+		CombatComponent->Character = this;
+	}
+}
 
 void ACrimsonEclipseCharacter::Tick(float DeltaSeconds)
 {
@@ -82,6 +102,38 @@ void ACrimsonEclipseCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+
+
+void ACrimsonEclipseCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(true);
+	}
+	if (LastWeapon)
+	{
+		LastWeapon->ShowPickupWidget(false);
+	}
+}
+
+void ACrimsonEclipseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(false);
+	}
+
+	OverlappingWeapon = Weapon;
+	if (IsLocallyControlled())
+	{
+		if (OverlappingWeapon)
+		{
+			OverlappingWeapon->ShowPickupWidget(true);
+		}
+	}
+
+}
+
 void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -91,6 +143,8 @@ void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 	PlayerInputComponent->BindAxis("CameraRotationAxis", this, &ACrimsonEclipseCharacter::ChangeCameraAngle);
 	PlayerInputComponent->BindAxis("CameraZoom", this, &ACrimsonEclipseCharacter::CameraZoom);
+
+	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ACrimsonEclipseCharacter::EquipButtonPressed);
 }
 
 void ACrimsonEclipseCharacter::CameraRotateON()
@@ -118,5 +172,28 @@ void ACrimsonEclipseCharacter::CameraZoom(float Value)
 		float CameraArmLength = CameraBoom->TargetArmLength;
 		float NewCameraArmLength = FMath::Clamp(CameraArmLength + Value*30, 400.f, 1600.f);  // Dont forget get rid of hardcoding
 		CameraBoom->TargetArmLength = NewCameraArmLength;
+	}
+}
+
+void ACrimsonEclipseCharacter::EquipButtonPressed()
+{
+	if (CombatComponent)
+	{
+		if (HasAuthority())
+		{
+			CombatComponent->EquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			ServerEquipButtonPressed();
+		}
+	}
+}
+
+void ACrimsonEclipseCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if (CombatComponent)
+	{
+		CombatComponent->EquipWeapon(OverlappingWeapon);
 	}
 }
