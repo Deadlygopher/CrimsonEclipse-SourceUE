@@ -7,6 +7,7 @@
 
 #include "CrimsonEclipseCharacter.generated.h"
 
+
 UCLASS(Blueprintable)
 class ACrimsonEclipseCharacter : public ACharacter
 {

@@ -15,6 +15,8 @@
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
+#include "InventoryComponent.h"
+
 
 
 ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()

@@ -16,6 +16,7 @@ public class CrimsonEclipse : ModuleRules
 															"NavigationSystem",
 															"AIModule",
                                                             "OnlineSubsystem",
-                                                            "OnlineSubsystemSteam" });
+                                                            "OnlineSubsystemSteam",
+															"InventorySystem", });
     }
 }
