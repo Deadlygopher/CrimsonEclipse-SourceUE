@@ -17,6 +17,10 @@ public class CrimsonEclipse : ModuleRules
 															"AIModule",
                                                             "OnlineSubsystem",
                                                             "OnlineSubsystemSteam",
-															"InventorySystem", });
+															"InventorySystem",
+															"HTTP",
+															"Json",
+															"JsonUtilities",
+															/*"UMG"*/});
     }
 }
