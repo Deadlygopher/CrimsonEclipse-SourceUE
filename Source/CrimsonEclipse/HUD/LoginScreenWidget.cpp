@@ -4,7 +4,9 @@
 #include "LoginScreenWidget.h"
 #include "Components/EditableTextBox.h"
 #include "Components/Button.h"
-#include "Components/EditableTextBox.h"
+#include "Components/TextBlock.h"
+#include "RegistrationScreenWidget.h"
+
 
 bool ULoginScreenWidget::Initialize()
 {
@@ -19,18 +21,22 @@ bool ULoginScreenWidget::Initialize()
 	{
 		LoginButton->OnClicked.AddDynamic(this, &ULoginScreenWidget::LoginButtonClicked);
 	}
+	if (RegistrationButton)
+	{
+		RegistrationButton->OnClicked.AddDynamic(this, &ULoginScreenWidget::RegistrationButtonClicked);
+	}
+	RegistrationWidget = CreateWidget<URegistrationScreenWidget>(GetWorld(), WidgetForRegister);
 
 	return true;
 }
 
 void ULoginScreenWidget::LoginButtonClicked()
 {
-
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(
 			-1, 15.f, FColor::Red,
-			FString(TEXT("Button")));
+			FString(TEXT("Login Button Pressed")));
 	}
 
 	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
@@ -56,28 +62,31 @@ void ULoginScreenWidget::LoginButtonClicked()
 	Request->ProcessRequest();
 }
 
+void ULoginScreenWidget::RegistrationButtonClicked()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1, 15.f, FColor::Red,
+			FString(TEXT("RegistrationButtonPressed")));
+	}
+	if (RegistrationWidget)
+	{
+		RegistrationWidget->AddToViewport();
+		RegistrationWidget->SetLoginWidget(this);
+		SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
 void ULoginScreenWidget::OnGetLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccesfully)
 {
 	if (Response)
 	{
-
+		FString Resp = Response->GetContentAsString();
+		ResponseText->SetText(FText::FromString(Resp));
 		if (Response->GetResponseCode() == 200)
 		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1, 15.f, FColor::Emerald,
-					FString(TEXT("Welcome")));
-			}
-		}
-		else
-		{
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(
-					-1, 15.f, FColor::Emerald,
-					FString(TEXT("No responce")));
-			}
+			GetWorld()->ServerTravel("/Game/TopDownCPP/Maps/TopDownExampleMap");
 		}
 	}
 	else
@@ -89,4 +98,21 @@ void ULoginScreenWidget::OnGetLoginResponse(FHttpRequestPtr Request, FHttpRespon
 				FString(TEXT("No connect")));
 		}
 	}
+}
+
+void ULoginScreenWidget::BeginDestroy()
+{
+	Super::BeginDestroy();
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1, 15.f, FColor::Red,
+			FString(TEXT("Widget Destroyed !")));
+	}
+}
+
+void ULoginScreenWidget::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+{
+	RemoveFromParent();
+	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
 }

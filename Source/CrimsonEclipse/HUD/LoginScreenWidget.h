@@ -22,7 +22,19 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void LoginButtonClicked();
 
+	UFUNCTION(BlueprintCallable)
+	void RegistrationButtonClicked();
+
+	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
+
 	void OnGetLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccesfully);
+
+	virtual void BeginDestroy() override;
+
+protected:
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* ResponseText;
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableTextBox* LoginTextBox;
@@ -34,9 +46,13 @@ protected:
 	class UButton* LoginButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* RegistrationButton;
+	UButton* RegistrationButton;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> WidgetForRegister;
 
 private:
 
 	FHttpModule* Http;
+	class URegistrationScreenWidget* RegistrationWidget;
 };
