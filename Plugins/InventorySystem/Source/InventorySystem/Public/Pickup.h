@@ -21,19 +21,25 @@ public:
 
 	void OnPickupDataReceived() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Pickup")
+	UFUNCTION(BlueprintCallable, Category = Pickup)
 	void SetPickupData(UItemInstance* InItemInstance, int32 InQuantity);
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnPickupDataReceived"), Category = "Pickup")
 	void K2_OnPickupDataReceived();
 
-	UPROPERTY(BlueprintReadWrite, Category = "Pickup")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	UItemInstance* ItemInstance;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Pickup")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	int32 Quantity;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true), Category = "Pickup")
 	UStaticMeshComponent* PickupMesh;
+
+	//Initialize in open world items
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	TSubclassOf<UItemInstance> InitItemInstance;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	int32 InitQuantity;
 };

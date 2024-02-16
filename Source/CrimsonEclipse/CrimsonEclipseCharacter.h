@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CrimsonEclipse/Interfaces/HitDetectInterface.h"
 
 #include "CrimsonEclipseCharacter.generated.h"
 
 
 UCLASS(Blueprintable)
-class ACrimsonEclipseCharacter : public ACharacter
+class ACrimsonEclipseCharacter : public ACharacter, public IHitDetectInterface
 {
 	GENERATED_BODY()
 
@@ -43,6 +44,9 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
 
+	UPROPERTY(VisibleAnywhere)
+	float TraceRadius = 40.f;
+
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
@@ -54,6 +58,9 @@ private:
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
+
+	UFUNCTION()
+	virtual void OnHitDetect() override;
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

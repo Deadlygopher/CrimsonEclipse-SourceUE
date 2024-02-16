@@ -12,7 +12,7 @@ APickup::APickup()
 	RootComponent = PickupMesh;
 
 	PickupMesh->SetSimulatePhysics(true);
-	PickupMesh->SetMassOverrideInKg(NAME_None, 100.0f, true);
+	//PickupMesh->SetMassOverrideInKg(EName::NAME_None, 100.0f, true);
 	PickupMesh->SetEnableGravity(true);
 	PickupMesh->SetConstraintMode(EDOFMode::Default);
 	PickupMesh->SetGenerateOverlapEvents(true);
@@ -40,8 +40,11 @@ void APickup::OnPickupDataReceived() const
 
 void APickup::SetPickupData(UItemInstance* InItemInstance, const int32 InQuantity)
 {
-	ItemInstance = InItemInstance;
-	Quantity = InQuantity;
+	if (InItemInstance)
+	{
+		ItemInstance = InItemInstance;
+		Quantity = InQuantity;
+	}
 
 	OnPickupDataReceived();
 	K2_OnPickupDataReceived();

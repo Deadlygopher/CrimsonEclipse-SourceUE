@@ -52,7 +52,7 @@ void URegistrationScreenWidget::RegisterButtonClicked()
 	FJsonSerializer::Serialize(registrationData.ToSharedRef(), Writer);
 
 	Request->OnProcessRequestComplete().BindUObject(this, &URegistrationScreenWidget::OnGetRegistrationResponse);
-	Request->SetURL("http://192.168.1.182:5199/api/User/register");
+	Request->SetURL("https://021b-178-214-250-28.ngrok-free.app/api/User/register");
 	Request->SetVerb("POST");
 
 	Request->SetHeader("User-Agent", "X-UnrealEngine-Agent");

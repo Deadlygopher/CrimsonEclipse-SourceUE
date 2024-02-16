@@ -15,7 +15,10 @@
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
-#include "InventoryComponent.h"
+//#include "InventoryComponent.h"
+//#include "Components/SceneComponent.h"
+// #include "Components/SphereComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 
@@ -134,6 +137,27 @@ void ACrimsonEclipseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 		}
 	}
 
+}
+
+void ACrimsonEclipseCharacter::OnHitDetect()
+{
+	FVector SocketLocation = GetMesh()->GetSocketLocation("RightHandSocket");
+	UWorld* World = GetWorld();
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
+	QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+
+	FHitResult HitResult;
+
+	if (World)
+	{
+		UKismetSystemLibrary::SphereTraceSingleForObjects(World, SocketLocation, SocketLocation, 
+			TraceRadius, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+	}
 }
 
 void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
