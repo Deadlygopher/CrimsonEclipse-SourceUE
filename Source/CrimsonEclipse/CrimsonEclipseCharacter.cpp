@@ -15,7 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
-//#include "InventoryComponent.h"
+#include "InventoryComponent.h"
 //#include "Components/SceneComponent.h"
 // #include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -71,6 +71,8 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
+
+	InventoryComponent1 = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
 }
 
 void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

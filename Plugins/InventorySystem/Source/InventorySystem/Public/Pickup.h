@@ -27,6 +27,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnPickupDataReceived"), Category = "Pickup")
 	void K2_OnPickupDataReceived();
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	UItemInstance* ItemInstance;
 
@@ -42,4 +43,14 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	int32 InitQuantity;
+
+	UPROPERTY(VisibleAnywhere)
+	class USphereComponent* SphereComponent;
+
+protected:
+	UFUNCTION()
+	virtual void OnOverlapComponent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
+
 };

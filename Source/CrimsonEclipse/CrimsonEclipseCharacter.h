@@ -47,22 +47,29 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	float TraceRadius = 40.f;
 
-	UFUNCTION()
-	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
-
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* CombatComponent;
+
+
+
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 
+
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UInventoryComponent* InventoryComponent1;
+
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
 	UFUNCTION()
 	virtual void OnHitDetect() override;
 
 protected:
+
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	void CameraRotateON();
 	void CameraRotateOFF();

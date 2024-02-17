@@ -1169,7 +1169,17 @@ bool UInventoryComponent::DropItemOnSlot(const FSlot& Slot)
 
 bool UInventoryComponent::LootItem(APickup* Pickup, int32& LootedQuantity)
 {
-	LootedQuantity = 0;
+
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1, 15.f, FColor::Red,
+			FString(TEXT("Loooooot")));
+	}
+
+
+	//LootedQuantity = 0;
 	
 	if (Pickup == nullptr)
 	{

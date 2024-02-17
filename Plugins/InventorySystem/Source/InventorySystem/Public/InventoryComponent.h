@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "InventoryInterface.h"
 #include "InventoryComponent.generated.h"
 
 class UItem;
@@ -213,8 +214,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryEquipmentEvent, UItem*, I
 /**
  * UInventoryComponent
  */
-UCLASS(Abstract, Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class INVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
+UCLASS(/*Abstract,*/ Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class INVENTORYSYSTEM_API UInventoryComponent : public UActorComponent, public IInventoryInterface
 {
 	GENERATED_BODY()
 
@@ -294,7 +295,7 @@ public:
 	bool DropItemOnSlot(const FSlot& Slot);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool LootItem(class APickup* Pickup, int32& LootedQuantity);
+	virtual bool LootItem(class APickup* Pickup, int32& LootedQuantity) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void SpawnItem(const UItem* Item, int32 Quantity, const FTransform& Transform);
