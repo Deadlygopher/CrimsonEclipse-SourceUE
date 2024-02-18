@@ -77,9 +77,9 @@ public:
 	FString UnitSuffix;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
-	bool bCanBeStacked = true;
+	bool bCanBeStacked = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, ClampMin = 2, UIMin = 2), Category = "Item")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, ClampMin = 1, UIMin = 1, EditCondition = "bCanBeStacked"), Category = "Item")
 	int32 MaxStackSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")

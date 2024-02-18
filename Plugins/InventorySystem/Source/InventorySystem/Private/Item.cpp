@@ -15,7 +15,7 @@ UItem::UItem()
 	bCanBeStacked = false;
 
 	Weight = 0.0f;
-	MaxStackSize = 2;
+	MaxStackSize = 1;
 
 	Size = FPoint2D(1, 1);
 

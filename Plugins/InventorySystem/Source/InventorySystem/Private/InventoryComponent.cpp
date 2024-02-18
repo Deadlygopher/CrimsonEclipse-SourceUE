@@ -1047,49 +1047,22 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 		return;
 	}
 
-	const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
-	const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
 
-	if (PrimarySlot.Data.IsEmpty())
+
+	switch (Slot.ItemInstance->Item->GetItemType())
 	{
-		const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
-
-		EquipmentSlots[EquipmentSlotIndex].Data = Slot;
-		EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
-		
-		NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-		K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-		Slots.Remove(Slot);
-
-		NotifyInventoryUpdated();
-		NotifyInventoryWeightChanged();
-	}
-	else if (SecondarySlot.IsValid() && SecondarySlot.Data.IsEmpty())
+	case EItemType::Weapon:
 	{
-		const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
+		const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
 
-		EquipmentSlots[EquipmentSlotIndex].Data = Slot;
-		EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
-		
-		NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-		K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-		Slots.Remove(Slot);
-
-		NotifyInventoryUpdated();
-		NotifyInventoryWeightChanged();
-	}
-	else if (PrimarySlot.Data.IsOccupied())
-	{
-		const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
-
-		int32 AddedQuantity = 0;
-		const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
-
-		if (bIsAdded)
+		if (PrimarySlot.Data.IsEmpty())
 		{
+			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+
 			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
-			
+
 			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
 			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
 			Slots.Remove(Slot);
@@ -1097,6 +1070,100 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			NotifyInventoryUpdated();
 			NotifyInventoryWeightChanged();
 		}
+		else if (SecondarySlot.IsValid() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
+			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
+
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+			Slots.Remove(Slot);
+
+			NotifyInventoryUpdated();
+			NotifyInventoryWeightChanged();
+		}
+		else if (PrimarySlot.Data.IsOccupied())
+		{
+			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded)
+			{
+				EquipmentSlots[EquipmentSlotIndex].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
+
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+				Slots.Remove(Slot);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
+		}
+		break;
+	}
+
+	case EItemType::Armor:
+	{
+		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
+		//const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
+
+		if (PrimarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+
+			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
+			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
+
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+			Slots.Remove(Slot);
+
+			NotifyInventoryUpdated();
+			NotifyInventoryWeightChanged();
+		}
+		/*
+		else if (SecondarySlot.IsValid() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
+			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
+
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+			Slots.Remove(Slot);
+
+			NotifyInventoryUpdated();
+			NotifyInventoryWeightChanged();
+		}
+		*/
+		else if (PrimarySlot.Data.IsOccupied())
+		{
+			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded)
+			{
+				EquipmentSlots[EquipmentSlotIndex].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
+
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
+				Slots.Remove(Slot);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
+		}
+		break;
+	}
 	}
 }
 
@@ -1258,14 +1325,6 @@ void UInventoryComponent::UseItemOnSlot(const FSlot& Slot)
 	if (Slot.Quantity < Slot.ItemInstance->Item->GetItemConsumedQuantityPerUsage())
 	{
 		return;
-	}
-
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 15.f, FColor::Red,
-			FString(TEXT("Useeee")));
 	}
 
 	UItemInstance* UsedItemInstance = Slot.ItemInstance;

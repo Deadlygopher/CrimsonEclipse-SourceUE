@@ -161,7 +161,7 @@ UENUM(BlueprintType)
 enum class EItemType : uint8
 {
 	None								UMETA(DisplayName = "None"),
-	Equipment							UMETA(DisplayName = "Equipment"),
+	Weapon								UMETA(DisplayName = "Weapon"),
 	Consumable							UMETA(DisplayName = "Consumable"),
 	Ammunition							UMETA(DisplayName = "Ammunition"),
 	Armor								UMETA(DysplayName = "Armor"),
@@ -177,6 +177,7 @@ enum class EEquipmentSlotType : uint8
 	PrimaryWeapon						UMETA(DisplayName = "PrimaryWeapon"),
 	SecondaryWeapon						UMETA(DisplayName = "SecondaryWeapon"),
 	ArmorChest							UMETA(DisplayName = "ArmorChest"),
+	ArmorHead							UMETA(DisplayName = "ArmorHead"),
 };
 
 /**
