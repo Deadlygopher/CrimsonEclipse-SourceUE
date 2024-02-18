@@ -72,7 +72,7 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
 
-	InventoryComponent1 = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
 }
 
 void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

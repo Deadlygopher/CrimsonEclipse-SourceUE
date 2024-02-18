@@ -44,8 +44,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Item")
 	float GetScaledWeight() const;
-	
-	
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	FPrimaryAssetType AssetType;
 	
@@ -115,4 +115,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	FVector PickupStaticMeshScale;
 	
+
+	public:
 };

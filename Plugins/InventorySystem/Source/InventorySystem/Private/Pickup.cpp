@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "InventoryInterface.h"
 #include "Pickup.h"
+#include "InventoryInterface.h"
 #include "ItemInstance.h"
 #include "Item.h"
 #include "Components/SphereComponent.h"

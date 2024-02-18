@@ -175,7 +175,6 @@ enum class EEquipmentSlotType : uint8
 	None								UMETA(DisplayName = "None"),
 	PrimaryWeapon						UMETA(DisplayName = "PrimaryWeapon"),
 	SecondaryWeapon						UMETA(DisplayName = "SecondaryWeapon"),
-
 };
 
 /**
@@ -303,6 +302,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void UseItemOnSlot(const FSlot& Slot);
 
+	/*
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddMoney(int32 Value);
 
@@ -311,6 +311,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
 	int32 GetMoney() const;
+	*/
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
 	bool IsValidEquipmentSlots();
@@ -331,8 +332,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Inventory Initialized"), Category = "Inventory")
 	void K2_OnInventoryInitialized();
 
+	/*
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Money Changed"), Category = "Inventory")
 	void K2_OnMoneyChanged();
+	*/
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Inventory Updated"), Category = "Inventory")
 	void K2_OnInventoryUpdated();
@@ -380,14 +383,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 1.0f, UIMin = 1.0f, EditCondition = "!bUseScaledMaxWeight"), Category = "Inventory")
 	float MaxWeight;
 
+	/*
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0, UIMin = 0), Category = "Inventory")
 	int32 DefaultMoney;
+	*/
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 1, UIMin = 1), Category = "Inventory")
 	float PickupSpawnRadiusFromPlayer;
 
+	/*
 	UPROPERTY(BlueprintReadOnly, meta = (ClampMin = 0, UIMin = 0), Category = "Inventory")
 	int32 Money;
+	*/
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
 	TArray<FStartupItem> StartupItems;
@@ -413,8 +420,10 @@ public:
 	UPROPERTY(BlueprintAssignable)	
 	FInventoryItemEvent OnItemRemoved;
 
+	/*
 	UPROPERTY(BlueprintAssignable)
 	FInventoryEvent OnMoneyChanged;
+	*/
 
 	UPROPERTY(BlueprintAssignable)
 	FInventoryEquipmentEvent OnItemEquipped;
@@ -432,9 +441,8 @@ public:
 	void NotifyInventoryWeightChanged();
 	void NotifyInventoryItemAdded(UItem* InItem, int32 InQuantity);
 	void NotifyInventoryItemRemoved(UItem* InItem, int32 InQuantity);
-	void NotifyMoneyChanged();
 	void NotifyInventoryItemEquipped(UItem* InItem, int32 InQuantity);
 	void NotifyInventoryItemUnequipped(UItem* InItem, int32 InQuantity);
 	void NotifyInventoryItemUsed(UItem* InItem, int32 InQuantity);
-	
+	//void NotifyMoneyChanged();
 };

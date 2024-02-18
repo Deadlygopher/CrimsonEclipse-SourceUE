@@ -13,9 +13,7 @@ class UInventoryInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
+
 class INVENTORYSYSTEM_API IInventoryInterface
 {
 	GENERATED_BODY()

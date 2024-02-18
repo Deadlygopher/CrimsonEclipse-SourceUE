@@ -97,9 +97,11 @@ UInventoryComponent::UInventoryComponent()
 	GridSize = FPoint2D(1, 1);
 	CellSize = 50.0f;
 	
+	/*
 	DefaultMoney = 100;
 	Money = 0;
-	
+	*/
+
 	CurrentWeight = 0.0f;
 	MaxWeight = 0.0f;
 
@@ -327,8 +329,7 @@ void UInventoryComponent::AddStartupItems()
 		int32 AddedQuantity = 0;
 		AddNewItem(StartupItem.Item, StartupItem.Quantity, AddedQuantity);
 	}
-
-	AddMoney(DefaultMoney);
+	//AddMoney(DefaultMoney);
 }
 
 bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& AddedQuantity)
@@ -1169,16 +1170,6 @@ bool UInventoryComponent::DropItemOnSlot(const FSlot& Slot)
 
 bool UInventoryComponent::LootItem(APickup* Pickup, int32& LootedQuantity)
 {
-
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 15.f, FColor::Red,
-			FString(TEXT("Loooooot")));
-	}
-
-
 	//LootedQuantity = 0;
 	
 	if (Pickup == nullptr)
@@ -1269,18 +1260,30 @@ void UInventoryComponent::UseItemOnSlot(const FSlot& Slot)
 		return;
 	}
 
-	UItemInstance* UsedItemInstance = Slot.ItemInstance;
-	const int32 UsedQuantity = UsedItemInstance->Item->ConsumedQuantityPerUsage;
 
-	int32 RemovedQuantity = 0;
-	const bool bIsConsumed = RemoveItemOnSlot(Slot, Slot.ItemInstance->Item->ConsumedQuantityPerUsage, RemovedQuantity);
-	if (bIsConsumed)
+	if (GEngine)
 	{
-		UsedItemInstance->OnUsed();
-		NotifyInventoryItemUsed(UsedItemInstance->Item, UsedQuantity);
+		GEngine->AddOnScreenDebugMessage(
+			-1, 15.f, FColor::Red,
+			FString(TEXT("Useeee")));
+	}
+
+	UItemInstance* UsedItemInstance = Slot.ItemInstance;
+	if (UsedItemInstance)
+	{
+		const int32 UsedQuantity = UsedItemInstance->Item->ConsumedQuantityPerUsage;
+
+		int32 RemovedQuantity = 0;
+		const bool bIsConsumed = RemoveItemOnSlot(Slot, Slot.ItemInstance->Item->ConsumedQuantityPerUsage, RemovedQuantity);
+		if (bIsConsumed)
+		{
+			UsedItemInstance->OnUsed();
+			NotifyInventoryItemUsed(UsedItemInstance->Item, UsedQuantity);
+		}
 	}
 }
 
+/*
 void UInventoryComponent::AddMoney(const int32 Value)
 {
 	if (Value > 0)
@@ -1303,6 +1306,7 @@ int32 UInventoryComponent::GetMoney() const
 {
 	return Money;
 }
+*/
 
 bool UInventoryComponent::IsValidEquipmentSlots()
 {
@@ -1619,11 +1623,13 @@ void UInventoryComponent::NotifyInventoryItemRemoved(UItem* InItem, const int32 
 	K2_OnInventoryItemRemoved(InItem, InQuantity);
 }
 
+/*
 void UInventoryComponent::NotifyMoneyChanged()
 {
 	OnMoneyChanged.Broadcast();
 	K2_OnMoneyChanged();
 }
+*/
 
 void UInventoryComponent::NotifyInventoryItemEquipped(UItem* InItem, const int32 InQuantity)
 {

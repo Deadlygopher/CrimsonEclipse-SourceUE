@@ -61,7 +61,7 @@ private:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UInventoryComponent* InventoryComponent1;
+	class UInventoryComponent* InventoryComponent;
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
