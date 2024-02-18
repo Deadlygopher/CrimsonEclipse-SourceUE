@@ -65,7 +65,7 @@ public:
 	TSubclassOf<UItemInstance> ItemInstanceClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
-	uint8 bCanBeDropped : 1;
+	bool bCanBeDropped = true;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "bCanBeDropped"), Category = "Item")
 	TSubclassOf<APickup> PickupClass;
@@ -77,7 +77,7 @@ public:
 	FString UnitSuffix;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
-	uint8 bCanBeStacked : 1;
+	bool bCanBeStacked = true;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, ClampMin = 2, UIMin = 2), Category = "Item")
 	int32 MaxStackSize;
@@ -86,16 +86,16 @@ public:
 	FPoint2D Size;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
-	uint8 bUseScaledWeight : 1;
+	bool bUseScaledWeight = true;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, ClampMin = 0.0f, UIMin = 0.0f, EditCondition = "!bUseScaledWeight"), Category = "Item")
 	float Weight;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
-	uint8 bCanBeRotated : 1;
+	bool bCanBeRotated = true;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "!bCanBeConsumed"), Category = "Item")
-	uint8 bCanBeEquipped : 1;
+	bool bCanBeEquipped = false;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "bCanBeEquipped && !bCanBeConsumed"), Category = "Item")
 	EEquipmentSlotType PrimaryEquipmentSlot;
@@ -104,7 +104,7 @@ public:
 	EEquipmentSlotType SecondaryEquipmentSlot;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "!bCanBeEquipped"), Category = "Item")
-	uint8 bCanBeConsumed : 1;
+	bool bCanBeConsumed = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "bCanBeConsumed", ClampMin = 1, UIMin = 1), Category = "Item")
 	int32 ConsumedQuantityPerUsage;
@@ -116,5 +116,70 @@ public:
 	FVector PickupStaticMeshScale;
 	
 
-	public:
+public:
+	UFUNCTION(BlueprintCallable)
+	FText GetItemName() const { return Name; }
+
+	UFUNCTION(BlueprintCallable)
+	FText GetItemDescription() const { return Description; }
+
+	UFUNCTION(BlueprintCallable)
+	FSlateBrush GetItemImage() const { return Image; }
+
+	UFUNCTION(BlueprintCallable)
+	EItemType GetItemType() const { return Type; }
+
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<UItemInstance> GetItemInstanceClass() const { return ItemInstanceClass; }
+
+	UFUNCTION(BlueprintCallable)
+	bool GetItemCanBeDropped() const { return bCanBeDropped; }
+
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<APickup> GetItemPickupClass() const { return PickupClass; }
+
+	UFUNCTION(BlueprintCallable)
+	FString GetUnitPrefix() const { return UnitPrefix; }
+
+	UFUNCTION(BlueprintCallable)
+	FString GetUnitSuffix() const { return UnitSuffix; }
+
+	UFUNCTION(BlueprintCallable)
+	bool GetItemCanBeStacked() const { return bCanBeStacked; }
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetItemMaxStackSize() const { return MaxStackSize; }
+
+	UFUNCTION(BlueprintCallable)
+	FPoint2D GetItemSize() const { return Size; }
+
+	UFUNCTION(BlueprintCallable)
+	bool GetItemUseScaledWeight() const { return bUseScaledWeight; }
+
+	UFUNCTION(BlueprintCallable)
+	float GetItemWeight() const { return Weight; }
+
+	//UFUNCTION(BlueprintCallable)
+	//bool GetItemCanBeRotated() const { return bCanBeRotated; }
+
+	UFUNCTION(BlueprintCallable)
+	bool GetItemCanBeEquipped() const { return bCanBeEquipped; }
+
+	UFUNCTION(BlueprintCallable)
+	EEquipmentSlotType GetItemPrimaryEquipmentSlotType() const { return PrimaryEquipmentSlot; }
+
+	UFUNCTION(BlueprintCallable)
+	EEquipmentSlotType GetItemSecondaryEquipmentSlotType() const { return SecondaryEquipmentSlot; }
+
+	UFUNCTION(BlueprintCallable)
+	bool GetItemCanBeConsumed() const { return bCanBeConsumed; }
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetItemConsumedQuantityPerUsage() const { return ConsumedQuantityPerUsage; }
+
+	UFUNCTION(BlueprintCallable)
+	UStaticMesh* GetItemPickupStaticMesh() const { return PickupStaticMesh; }
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetItemPickupStaticMeshScale() const { return PickupStaticMeshScale; }
 };

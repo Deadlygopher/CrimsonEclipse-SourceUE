@@ -10,7 +10,7 @@ UItemInstance::UItemInstance()
 
 void UItemInstance::NativeOnConstruct()
 {
-	Size = Item->Size;
+	Size = Item->GetItemSize();
 	bIsRotated = false;
 	SizeInCells = Item->GetSizeInCells();
 }
@@ -24,7 +24,7 @@ void UItemInstance::Rotate()
 
 	if (bIsRotated)
 	{
-		Size = Item->Size;
+		Size = Item->GetItemSize();
 		bIsRotated = false;
 		SizeInCells = Item->GetSizeInCells();
 
@@ -33,7 +33,7 @@ void UItemInstance::Rotate()
 	}
 
 	SizeInCells.Empty();
-	Size = FPoint2D(Item->Size.Y, Item->Size.X);
+	Size = FPoint2D(Item->GetItemSize().Y, Item->GetItemSize().X);
 
 	for (const FPoint2D& Point: Item->GetSizeInCells())
 	{
@@ -51,7 +51,7 @@ bool UItemInstance::IsRotated() const
 
 void UItemInstance::ResetRotation()
 {
-	Size = Item->Size;
+	Size = Item->GetItemSize();
 	bIsRotated = false;
 	SizeInCells = Item->GetSizeInCells();
 }

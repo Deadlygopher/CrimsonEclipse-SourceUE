@@ -164,6 +164,7 @@ enum class EItemType : uint8
 	Equipment							UMETA(DisplayName = "Equipment"),
 	Consumable							UMETA(DisplayName = "Consumable"),
 	Ammunition							UMETA(DisplayName = "Ammunition"),
+	Armor								UMETA(DysplayName = "Armor"),
 };
 
 /**
@@ -175,6 +176,7 @@ enum class EEquipmentSlotType : uint8
 	None								UMETA(DisplayName = "None"),
 	PrimaryWeapon						UMETA(DisplayName = "PrimaryWeapon"),
 	SecondaryWeapon						UMETA(DisplayName = "SecondaryWeapon"),
+	ArmorChest							UMETA(DisplayName = "ArmorChest"),
 };
 
 /**

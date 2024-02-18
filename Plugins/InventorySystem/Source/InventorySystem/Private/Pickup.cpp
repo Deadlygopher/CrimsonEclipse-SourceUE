@@ -46,9 +46,9 @@ void APickup::BeginPlay()
 
 void APickup::OnPickupDataReceived() const
 {
-	if (ItemInstance->Item->PickupStaticMesh)
+	if (ItemInstance->Item->GetItemPickupStaticMesh())
 	{
-		PickupMesh->SetStaticMesh(ItemInstance->Item->PickupStaticMesh);
+		PickupMesh->SetStaticMesh(ItemInstance->Item->GetItemPickupStaticMesh());
 	}
 }
 

@@ -13,9 +13,9 @@ bool FSlot::IsOnMaxStackSize() const
 		return false;
 	}
 
-	if (ItemInstance->Item->bCanBeStacked)
+	if (ItemInstance->Item->GetItemCanBeStacked())
 	{
-		if (Quantity >= ItemInstance->Item->MaxStackSize)
+		if (Quantity >= ItemInstance->Item->GetItemMaxStackSize())
 		{
 			return true;
 		}
@@ -33,9 +33,9 @@ int32 FSlot::GetMissingStackQuantity() const
 		return 0;
 	}
 
-	if (ItemInstance->Item->bCanBeStacked)
+	if (ItemInstance->Item->GetItemCanBeStacked())
 	{
-		return ItemInstance->Item->MaxStackSize - Quantity;
+		return ItemInstance->Item->GetItemMaxStackSize() - Quantity;
 	}
 
 	return 0;
@@ -48,9 +48,9 @@ void FSlot::SetQuantity(const int32 InQuantity)
 		return;
 	}
 	
-	if (ItemInstance->Item->bCanBeStacked)
+	if (ItemInstance->Item->GetItemCanBeStacked())
 	{
-		Quantity = FMath::Clamp(InQuantity, 0, ItemInstance->Item->MaxStackSize);
+		Quantity = FMath::Clamp(InQuantity, 0, ItemInstance->Item->GetItemMaxStackSize());
 	}
 	else
 	{
@@ -65,9 +65,9 @@ void FSlot::UpdateQuantity(const int32 InQuantity)
 		return;
 	}
 	
-	if (ItemInstance->Item->bCanBeStacked)
+	if (ItemInstance->Item->GetItemCanBeStacked())
 	{
-		Quantity = FMath::Clamp(Quantity + InQuantity, 0, ItemInstance->Item->MaxStackSize);
+		Quantity = FMath::Clamp(Quantity + InQuantity, 0, ItemInstance->Item->GetItemMaxStackSize());
 	}
 	else
 	{
@@ -130,7 +130,7 @@ UItemInstance* UInventoryComponent::CreateItemInstance(const TSubclassOf<UItemIn
 		UE_LOG(LogTemp, Warning, TEXT("Invalid Item data asset. Please select an item data asset in %s"), *GetNameSafe(ItemInstance));
 	}
 
-	if (ItemInstance->Item && ItemInstance->Item->ItemInstanceClass == nullptr)
+	if (ItemInstance->Item && ItemInstance->Item->GetItemInstanceClass() == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid ItemInstance class. Please select an ItemInstance class in %s"), *GetNameSafe(ItemInstance->Item));
 	}
@@ -281,13 +281,13 @@ bool UInventoryComponent::CanCarryItem(const UItem* Item, const int32 Quantity) 
 {
 	float EstimatedWeight;
 
-	if (Item->bUseScaledWeight)
+	if (Item->GetItemUseScaledWeight())
 	{
 		EstimatedWeight = Quantity * Item->GetScaledWeight();
 	}
 	else
 	{
-		EstimatedWeight = Quantity * Item->Weight;
+		EstimatedWeight = Quantity * Item->GetItemWeight();
 	}
 
 	return (CurrentWeight + EstimatedWeight <= MaxWeight);
@@ -354,7 +354,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 	
 	int32 RemainingQuantity = Quantity;
 
-	if (Item->bCanBeStacked)
+	if (Item->GetItemCanBeStacked())
 	{
 		if (DoesItemExist(Item))
 		{
@@ -398,21 +398,21 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 			}
 		}
 
-		while (RemainingQuantity >= Item->MaxStackSize)
+		while (RemainingQuantity >= Item->GetItemMaxStackSize())
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 
 			FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
-			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->MaxStackSize))
+			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
 				
-				FSlot NewSlot = FSlot(NewItemInstance, Item->MaxStackSize, this);
+				FSlot NewSlot = FSlot(NewItemInstance, Item->GetItemMaxStackSize(), this);
 				Slots.Add(NewSlot);
 
-				AddedQuantity += Item->MaxStackSize;
-				RemainingQuantity -= Item->MaxStackSize;
+				AddedQuantity += Item->GetItemMaxStackSize();
+				RemainingQuantity -= Item->GetItemMaxStackSize();
 			}
 			else
 			{
@@ -422,15 +422,15 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 					NewItemInstance->Rotate();
 					FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 
-					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->MaxStackSize))
+					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 					{
 						NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFitRotated;
 
-						FSlot NewSlot = FSlot(NewItemInstance, Item->MaxStackSize, this);
+						FSlot NewSlot = FSlot(NewItemInstance, Item->GetItemMaxStackSize(), this);
 						Slots.Add(NewSlot);
 
-						AddedQuantity += Item->MaxStackSize;
-						RemainingQuantity -= Item->MaxStackSize;
+						AddedQuantity += Item->GetItemMaxStackSize();
+						RemainingQuantity -= Item->GetItemMaxStackSize();
 					}
 					else
 					{
@@ -450,7 +450,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 		
 		if (RemainingQuantity > 0)
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 
 			const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -517,7 +517,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 
 	while (RemainingQuantity > 0)
 	{
-		UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+		UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 		check(NewItemInstance != nullptr);
 
 		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -590,7 +590,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 	
 	int32 RemainingQuantity = Quantity;
 	
-	if (Item->bCanBeStacked)
+	if (Item->GetItemCanBeStacked())
 	{
 		if (DoesItemExist(Item))
 		{
@@ -634,21 +634,21 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 			}
 		}
 	
-		while (RemainingQuantity >= Item->MaxStackSize)
+		while (RemainingQuantity >= Item->GetItemMaxStackSize())
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 	
 			FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
-			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->MaxStackSize))
+			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
 				
-				FSlot NewSlot = FSlot(NewItemInstance, Item->MaxStackSize, this);
+				FSlot NewSlot = FSlot(NewItemInstance, Item->GetItemMaxStackSize(), this);
 				Slots.Add(NewSlot);
 	
-				AddedQuantity += Item->MaxStackSize;
-				RemainingQuantity -= Item->MaxStackSize;
+				AddedQuantity += Item->GetItemMaxStackSize();
+				RemainingQuantity -= Item->GetItemMaxStackSize();
 			}
 			else
 			{
@@ -658,15 +658,15 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 					NewItemInstance->Rotate();
 					FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
-					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->MaxStackSize))
+					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 					{
 						NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFitRotated;
 	
-						FSlot NewSlot = FSlot(NewItemInstance, Item->MaxStackSize, this);
+						FSlot NewSlot = FSlot(NewItemInstance, Item->GetItemMaxStackSize(), this);
 						Slots.Add(NewSlot);
 	
-						AddedQuantity += Item->MaxStackSize;
-						RemainingQuantity -= Item->MaxStackSize;
+						AddedQuantity += Item->GetItemMaxStackSize();
+						RemainingQuantity -= Item->GetItemMaxStackSize();
 					}
 					else
 					{
@@ -686,7 +686,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 		
 		if (RemainingQuantity > 0)
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 	
 			const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -753,7 +753,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 	
 	while (RemainingQuantity > 0)
 	{
-		UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+		UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 		check(NewItemInstance != nullptr);
 	
 		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -847,7 +847,7 @@ bool UInventoryComponent::RemoveItem(UItem* Item, const int32 Quantity, int32& R
 		return true;
 	}
 
-	if (Item->bCanBeStacked)
+	if (Item->GetItemCanBeStacked())
 	{
 		for (auto It = Slots.CreateIterator(); It; ++It)
 		{
@@ -968,7 +968,7 @@ void UInventoryComponent::StackItemStackOnSlot(const FSlot& Slot, const FPoint2D
 	const int32 DestinationIndex = Slots.Find(DestinationSlot);
 	const int32 SourceIndex = Slots.Find(Slot);
 
-	if (Slot.ItemInstance->Item != DestinationSlot.ItemInstance->Item || !DestinationSlot.ItemInstance->Item->bCanBeStacked)
+	if (Slot.ItemInstance->Item != DestinationSlot.ItemInstance->Item || !DestinationSlot.ItemInstance->Item->GetItemCanBeStacked())
 	{
 		return;
 	}
@@ -1032,7 +1032,7 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 		return;
 	}
 
-	if (!Slot.ItemInstance->Item->bCanBeEquipped)
+	if (!Slot.ItemInstance->Item->GetItemCanBeEquipped())
 	{
 		return;
 	}
@@ -1047,8 +1047,8 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 		return;
 	}
 
-	const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->PrimaryEquipmentSlot);
-	const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->SecondaryEquipmentSlot);
+	const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
+	const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
 
 	if (PrimarySlot.Data.IsEmpty())
 	{
@@ -1133,12 +1133,12 @@ void UInventoryComponent::UnequipItem(const EEquipmentSlotType EquipmentSlot)
 
 bool UInventoryComponent::DropItemOnSlot(const FSlot& Slot)
 {
-	if (!Slot.ItemInstance->Item->bCanBeDropped)
+	if (!Slot.ItemInstance->Item->GetItemCanBeDropped())
 	{
 		return false;
 	}
 
-	if (!Slot.ItemInstance->Item->PickupClass)
+	if (!Slot.ItemInstance->Item->GetItemPickupClass())
 	{
 		return false;
 	}
@@ -1154,10 +1154,10 @@ bool UInventoryComponent::DropItemOnSlot(const FSlot& Slot)
     	FActorSpawnParameters SpawnParams;
     	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    	APickup* SpawnedPickup = GetWorld()->SpawnActor<APickup>(DataCopy.ItemInstance->Item->PickupClass, SpawnLocation, FRotator(), SpawnParams);
+    	APickup* SpawnedPickup = GetWorld()->SpawnActor<APickup>(DataCopy.ItemInstance->Item->GetItemPickupClass(), SpawnLocation, FRotator(), SpawnParams);
     	if (SpawnedPickup)
     	{
-    		SpawnedPickup->SetActorScale3D(DataCopy.ItemInstance->Item->PickupStaticMeshScale);
+    		SpawnedPickup->SetActorScale3D(DataCopy.ItemInstance->Item->GetItemPickupStaticMeshScale());
     		SpawnedPickup->SetPickupData(DataCopy.ItemInstance, DataCopy.Quantity);
     		return true;
     	}
@@ -1216,12 +1216,12 @@ void UInventoryComponent::SpawnItem(const UItem* Item, const int32 Quantity, con
 		return;
 	}
 
-	if (!Item->bCanBeDropped)
+	if (!Item->GetItemCanBeDropped())
 	{
 		return;
 	}
 
-	if (!Item->PickupClass)
+	if (!Item->GetItemPickupClass())
 	{
 		return;
 	}
@@ -1229,16 +1229,16 @@ void UInventoryComponent::SpawnItem(const UItem* Item, const int32 Quantity, con
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	UItemInstance* ItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+	UItemInstance* ItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 	if (ItemInstance == nullptr)
 	{
 		return;
 	}
 	
-	APickup* SpawnedPickup = GetWorld()->SpawnActor<APickup>(Item->PickupClass, Transform.GetLocation(), Transform.GetRotation().Rotator(), SpawnParams);
+	APickup* SpawnedPickup = GetWorld()->SpawnActor<APickup>(Item->GetItemPickupClass(), Transform.GetLocation(), Transform.GetRotation().Rotator(), SpawnParams);
 	if (SpawnedPickup)
 	{
-		SpawnedPickup->SetActorScale3D(Item->PickupStaticMeshScale);
+		SpawnedPickup->SetActorScale3D(Item->GetItemPickupStaticMeshScale());
 		SpawnedPickup->SetPickupData(ItemInstance, Quantity);
 	}
 }
@@ -1250,12 +1250,12 @@ void UInventoryComponent::UseItemOnSlot(const FSlot& Slot)
 		return;
 	}
 	
-	if (!Slot.ItemInstance->Item->bCanBeConsumed)
+	if (!Slot.ItemInstance->Item->GetItemCanBeConsumed())
 	{
 		return;
 	}
 
-	if (Slot.Quantity < Slot.ItemInstance->Item->ConsumedQuantityPerUsage)
+	if (Slot.Quantity < Slot.ItemInstance->Item->GetItemConsumedQuantityPerUsage())
 	{
 		return;
 	}
@@ -1271,10 +1271,10 @@ void UInventoryComponent::UseItemOnSlot(const FSlot& Slot)
 	UItemInstance* UsedItemInstance = Slot.ItemInstance;
 	if (UsedItemInstance)
 	{
-		const int32 UsedQuantity = UsedItemInstance->Item->ConsumedQuantityPerUsage;
+		const int32 UsedQuantity = UsedItemInstance->Item->GetItemConsumedQuantityPerUsage();
 
 		int32 RemovedQuantity = 0;
-		const bool bIsConsumed = RemoveItemOnSlot(Slot, Slot.ItemInstance->Item->ConsumedQuantityPerUsage, RemovedQuantity);
+		const bool bIsConsumed = RemoveItemOnSlot(Slot, Slot.ItemInstance->Item->GetItemConsumedQuantityPerUsage(), RemovedQuantity);
 		if (bIsConsumed)
 		{
 			UsedItemInstance->OnUsed();
@@ -1396,7 +1396,7 @@ bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInst
 	
 	int32 RemainingQuantity = Quantity;
 	
-	if (Item->bCanBeStacked)
+	if (Item->GetItemCanBeStacked())
 	{
 		if (DoesItemExist(Item))
 		{
@@ -1435,21 +1435,21 @@ bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInst
 			}
 		}
 	
-		while (RemainingQuantity >= Item->MaxStackSize)
+		while (RemainingQuantity >= Item->GetItemMaxStackSize())
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 	
 			FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
-			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->MaxStackSize))
+			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
 				
-				FSlot NewSlot = FSlot(NewItemInstance, Item->MaxStackSize, this);
+				FSlot NewSlot = FSlot(NewItemInstance, Item->GetItemMaxStackSize(), this);
 				Slots.Add(NewSlot);
 	
-				AddedQuantity += Item->MaxStackSize;
-				RemainingQuantity -= Item->MaxStackSize;
+				AddedQuantity += Item->GetItemMaxStackSize();
+				RemainingQuantity -= Item->GetItemMaxStackSize();
 			}
 			else
 			{
@@ -1459,15 +1459,15 @@ bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInst
 					NewItemInstance->Rotate();
 					FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
-					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->MaxStackSize))
+					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 					{
 						NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFitRotated;
 	
-						FSlot NewSlot = FSlot(NewItemInstance, Item->MaxStackSize, this);
+						FSlot NewSlot = FSlot(NewItemInstance, Item->GetItemMaxStackSize(), this);
 						Slots.Add(NewSlot);
 	
-						AddedQuantity += Item->MaxStackSize;
-						RemainingQuantity -= Item->MaxStackSize;
+						AddedQuantity += Item->GetItemMaxStackSize();
+						RemainingQuantity -= Item->GetItemMaxStackSize();
 					}
 					else
 					{
@@ -1485,7 +1485,7 @@ bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInst
 		
 		if (RemainingQuantity > 0)
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 	
 			const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -1538,7 +1538,7 @@ bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInst
 	
 	while (RemainingQuantity > 0)
 	{
-		UItemInstance* NewItemInstance = CreateItemInstance(Item->ItemInstanceClass);
+		UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 		check(NewItemInstance != nullptr);
 	
 		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
