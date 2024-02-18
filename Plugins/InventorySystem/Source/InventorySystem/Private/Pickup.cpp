@@ -5,6 +5,7 @@
 #include "ItemInstance.h"
 #include "Item.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
 
 
 APickup::APickup()
@@ -29,7 +30,10 @@ APickup::APickup()
 	SphereComponent->SetupAttachment(RootComponent);
 	//SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	//SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapComponent);
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapComponentStart);
+
+	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Pickup Text"));
+	PickupWidget->SetupAttachment(RootComponent);
 }
 
 void APickup::BeginPlay()
@@ -38,9 +42,15 @@ void APickup::BeginPlay()
 
 	if (HasAuthority())
 	{
-		//SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		//SphereComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-		SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapComponent);
+		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		SphereComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+		SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapComponentStart);
+		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &APickup::OnOverlapComponentEnd);
+	}
+
+	if (PickupWidget)
+	{
+		PickupWidget->SetVisibility(false);
 	}
 }
 
@@ -64,21 +74,13 @@ void APickup::SetPickupData(UItemInstance* InItemInstance, const int32 InQuantit
 	K2_OnPickupDataReceived();
 }
 
-void APickup::OnOverlapComponent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
-{
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1, 15.f, FColor::Green,
-			FString(TEXT("Loooooot")));
-	}
-
-	
+{	
 	IInventoryInterface* InventoryInterface = nullptr;
-	int32& QuantityRef = Quantity;
 	auto Components = OtherActor->GetComponents();
+
 	for (auto Component : Components)
 	{
 		InventoryInterface = Cast<IInventoryInterface>(Component);
@@ -87,10 +89,15 @@ void APickup::OnOverlapComponent(UPrimitiveComponent* OverlappedComponent, AActo
 			break;
 		}
 	}
-
-	//IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(OtherActor);
+	/*
 	if (InventoryInterface)
 	{
 		InventoryInterface->LootItem(this, Quantity);
 	}
+	*/
+}
+
+void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+
 }

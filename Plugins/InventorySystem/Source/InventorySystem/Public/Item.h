@@ -45,7 +45,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Item")
 	float GetScaledWeight() const;
 
-
+private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	FPrimaryAssetType AssetType;
 	

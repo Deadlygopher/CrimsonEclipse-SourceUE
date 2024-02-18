@@ -5,6 +5,8 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "CrimsonEclipseCharacter.h"
 #include "Engine/World.h"
+#include "Pickup.h"
+#include "InventoryInterface.h"
 
 ACrimsonEclipsePlayerController::ACrimsonEclipsePlayerController()
 {
@@ -31,6 +33,7 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACrimsonEclipsePlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACrimsonEclipsePlayerController::OnSetDestinationReleased);
 
+	InputComponent->BindAction("PickupItem", IE_Pressed, this, &ACrimsonEclipsePlayerController::PickupItem);
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &ACrimsonEclipsePlayerController::MoveToTouchLocation);
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &ACrimsonEclipsePlayerController::MoveToTouchLocation);
@@ -47,6 +50,37 @@ void ACrimsonEclipsePlayerController::MoveToMouseCursor()
 		// We hit something, move there
 		RequestSetNewMoveDestination(Hit.ImpactPoint);
 		//SetNewMoveDestination(Hit.ImpactPoint);
+	}
+}
+
+void ACrimsonEclipsePlayerController::PickupItem()
+{
+	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
+	QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Visibility));
+	FHitResult Hit;
+
+	GetHitResultUnderCursorForObjects(QueryArray, true, Hit);
+	APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
+	if (ActorToPickup)
+	{
+		ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
+		if (ControlledCharacter)
+		{
+			IInventoryInterface* InventoryInterface = nullptr;
+			auto Components = ControlledCharacter->GetComponents();
+			for (auto Component : Components)
+			{
+				InventoryInterface = Cast<IInventoryInterface>(Component);
+				if (InventoryInterface)
+				{
+					break;
+				}
+			}
+			if (InventoryInterface)
+			{
+				InventoryInterface->LootItem(ActorToPickup, ActorToPickup->Quantity);
+			}
+		}
 	}
 }
 
@@ -71,6 +105,8 @@ void ACrimsonEclipsePlayerController::RequestSetNewMoveDestination(const FVector
 	ClientSetNewMoveDestination(DestLocation);
 	ServerSetNewMoveDestination(DestLocation);
 }
+
+
 
 // Requests a destination set for the client (Comes first, since client calls it by clicking).
 void ACrimsonEclipsePlayerController::ClientSetNewMoveDestination_Implementation(const FVector DestLocation)

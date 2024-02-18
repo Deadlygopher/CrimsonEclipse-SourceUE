@@ -8,6 +8,16 @@
 
 class UItemInstance;
 
+UENUM(BlueprintType)
+enum class EPickupState : uint8
+{
+	EWS_Initial UMETA(DisplayName = "Initial State"),
+	EWS_Looted UMETA(DisplayName = "Looted"),
+	EWS_Dropped UMETA(DisplayName = "Dropped"),
+
+	EWS_MAX UMETA(DisplayName = "DefaultMax")
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class INVENTORYSYSTEM_API APickup : public AActor
 {
@@ -49,8 +59,15 @@ public:
 
 protected:
 	UFUNCTION()
-	virtual void OnOverlapComponent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	virtual void OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	virtual void OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Pickup Widget")
+	class UWidgetComponent* PickupWidget;
 
 };

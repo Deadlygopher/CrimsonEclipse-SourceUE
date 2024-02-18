@@ -40,7 +40,7 @@ bool UInventoryFunctionLibrary::DoesItemHaveValidEquipmentSlot(const UItem* Item
 		return false;
 	}
 	
-	if (Item->PrimaryEquipmentSlot == EEquipmentSlotType::None)
+	if (Item->GetItemPrimaryEquipmentSlotType() == EEquipmentSlotType::None)
 	{
 		return false;
 	}
