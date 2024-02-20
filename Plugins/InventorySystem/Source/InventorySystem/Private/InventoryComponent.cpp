@@ -1720,10 +1720,10 @@ void UInventoryComponent::OverlappingItemToArray(APickup* LastPickup)
 	OverlappingItems.AddUnique(LastPickup);
 }
 
-void UInventoryComponent::RemoveItemFromOverlapping(APickup* NotPickup)
+void UInventoryComponent::RemoveItemFromOverlapping(APickup* PickupToRemove)
 {
-	NotPickup->SetWidgetVisibility(false);
-	OverlappingItems.RemoveSingle(NotPickup);
+	PickupToRemove->SetWidgetVisibility(false);
+	OverlappingItems.RemoveSingle(PickupToRemove);
 }
 
 void UInventoryComponent::SwitchItemWidgetVisibility(bool bShowWidget)

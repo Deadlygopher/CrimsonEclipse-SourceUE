@@ -59,6 +59,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ShowPickupWidget();
 
+	UFUNCTION(Server, Reliable)
+	void ServerPickupButtonPressed();
+
+	void PickupButtonPressed();
+
+
 private:
 	bool bShowWidget = false;
 };

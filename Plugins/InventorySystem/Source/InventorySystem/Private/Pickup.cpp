@@ -30,9 +30,9 @@ APickup::APickup()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SphereComponent->SetupAttachment(RootComponent);
-	//SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	//SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapComponentStart);
+	SphereComponent->SetSphereRadius(500);
+	SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Pickup Text"));
 	PickupWidget->SetupAttachment(RootComponent);
@@ -41,7 +41,7 @@ APickup::APickup()
 void APickup::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (HasAuthority())
 	{
 		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -98,7 +98,7 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 {	
 	//SweepResult.Actor
 	IInventoryInterface* InventoryInterface = nullptr;
-	auto Components = SweepResult.Actor->GetComponents();
+	auto Components = OtherActor->GetComponents();
 
 	for (auto Component : Components)
 	{
@@ -113,8 +113,8 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 		int32 SizeArray = InventoryInterface->GetOverlappingItems().Num();
 		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
 
-		TSharedPtr<APickup, ESPMode::ThreadSafe> PickupPtr = TSharedPtr<APickup, ESPMode::ThreadSafe>(this);
-		InventoryInterface->OverlappingItemToArray(PickupPtr);
+		InventoryInterface->LootItem(this, Quantity);
+		InventoryInterface->OverlappingItemToArray(this);
 		SizeArray = InventoryInterface->GetOverlappingItems().Num();
 		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
 	}
@@ -136,7 +136,6 @@ void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AA
 	}
 	if (InventoryInterface)
 	{
-		//TSharedPtr<APickup, ESPMode::ThreadSafe> PickupPtr = TSharedPtr<APickup, ESPMode::ThreadSafe>(this);
 		InventoryInterface->RemoveItemFromOverlapping(this);
 	}
 }

@@ -459,7 +459,7 @@ public:
 public:
 	virtual TArray<APickup*> GetOverlappingItems() override { return OverlappingItems; }
 	virtual void OverlappingItemToArray(APickup* LastPickup) override;
-	virtual void RemoveItemFromOverlapping(APickup* NotPickup) override;
+	virtual void RemoveItemFromOverlapping(APickup* PickupToRemove) override;
 	virtual void SwitchItemWidgetVisibility(bool bShowWidget) override;
 
 protected:

@@ -34,7 +34,7 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACrimsonEclipsePlayerController::OnSetDestinationReleased);
 
 	// set key for pickup items from inventory component
-	InputComponent->BindAction("PickupItem", IE_Pressed, this, &ACrimsonEclipsePlayerController::PickupItem);
+	InputComponent->BindAction("PickupItem", IE_Pressed, this, &ACrimsonEclipsePlayerController::PickupButtonPressed);
 
 	// set key for show/hide pickup widget
 	InputComponent->BindAction("ShowPickupWidget", IE_Pressed, this, &ACrimsonEclipsePlayerController::ShowPickupWidget);
@@ -81,20 +81,32 @@ void ACrimsonEclipsePlayerController::PickupItem()
 					auto ItemsToLoot = InventoryInterface->GetOverlappingItems();
 					if (ItemsToLoot.Contains(ActorToPickup))
 					{
-						if (InventoryInterface->LootItem(ActorToPickup, ActorToPickup->Quantity))
-						{
-							break;
-						}
-						else
-						{
-							continue;
-						}
+						InventoryInterface->LootItem(ActorToPickup, ActorToPickup->Quantity);
+						break;
 					}
 				}
 			}
 		}
 	}
 }
+
+void ACrimsonEclipsePlayerController::ServerPickupButtonPressed_Implementation()
+{
+	PickupItem();
+}
+
+void ACrimsonEclipsePlayerController::PickupButtonPressed()
+{
+	if (HasAuthority())
+	{
+		PickupItem();
+	}
+	else
+	{
+		ServerPickupButtonPressed();
+	}
+}
+
 
 void ACrimsonEclipsePlayerController::ShowPickupWidget()
 {
@@ -111,8 +123,6 @@ void ACrimsonEclipsePlayerController::ShowPickupWidget()
 		}
 	}
 }
-
-
 
 void ACrimsonEclipsePlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
