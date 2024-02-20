@@ -55,6 +55,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void PickupItem();
+
+	UFUNCTION(BlueprintCallable)
+	void ShowPickupWidget();
+
+private:
+	bool bShowWidget = false;
 };
 
 

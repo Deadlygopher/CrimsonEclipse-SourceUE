@@ -8,6 +8,7 @@
 #include "InventoryComponent.generated.h"
 
 class UItem;
+class APickup;
 class UItemInstance;
 class UInventoryComponent;
 
@@ -297,7 +298,7 @@ public:
 	bool DropItemOnSlot(const FSlot& Slot);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	virtual bool LootItem(class APickup* Pickup, int32& LootedQuantity) override;
+	virtual bool LootItem(APickup* Pickup, int32& LootedQuantity) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void SpawnItem(const UItem* Item, int32 Quantity, const FTransform& Transform);
@@ -448,4 +449,23 @@ public:
 	void NotifyInventoryItemUnequipped(UItem* InItem, int32 InQuantity);
 	void NotifyInventoryItemUsed(UItem* InItem, int32 InQuantity);
 	//void NotifyMoneyChanged();
+
+
+
+
+
+
+
+public:
+	virtual TArray<APickup*> GetOverlappingItems() override { return OverlappingItems; }
+	virtual void OverlappingItemToArray(APickup* LastPickup) override;
+	virtual void RemoveItemFromOverlapping(APickup* NotPickup) override;
+	virtual void SwitchItemWidgetVisibility(bool bShowWidget) override;
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+	TArray<APickup*> OverlappingItems;
+
 };

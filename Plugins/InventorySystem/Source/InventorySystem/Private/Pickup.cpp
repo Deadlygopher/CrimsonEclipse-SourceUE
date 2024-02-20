@@ -6,11 +6,13 @@
 #include "Item.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 APickup::APickup()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickupMesh"));
 	RootComponent = PickupMesh;
@@ -26,7 +28,7 @@ APickup::APickup()
 	PickupMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	PickupMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>("Collision");
+	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SphereComponent->SetupAttachment(RootComponent);
 	//SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	//SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -62,6 +64,14 @@ void APickup::OnPickupDataReceived() const
 	}
 }
 
+/*
+void APickup::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APickup, PickupWidget);
+}*/
+
 void APickup::SetPickupData(UItemInstance* InItemInstance, const int32 InQuantity)
 {
 	if (InItemInstance)
@@ -74,10 +84,45 @@ void APickup::SetPickupData(UItemInstance* InItemInstance, const int32 InQuantit
 	K2_OnPickupDataReceived();
 }
 
+void APickup::SetWidgetVisibility(bool bVisible)
+{
+	if (PickupWidget)
+	{
+		PickupWidget->SetVisibility(bVisible);
+	}
+}
+
 void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {	
+	//SweepResult.Actor
+	IInventoryInterface* InventoryInterface = nullptr;
+	auto Components = SweepResult.Actor->GetComponents();
+
+	for (auto Component : Components)
+	{
+		InventoryInterface = Cast<IInventoryInterface>(Component);
+		if (InventoryInterface)
+		{
+			break;
+		}
+	}
+	if (InventoryInterface)
+	{
+		int32 SizeArray = InventoryInterface->GetOverlappingItems().Num();
+		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
+
+		TSharedPtr<APickup, ESPMode::ThreadSafe> PickupPtr = TSharedPtr<APickup, ESPMode::ThreadSafe>(this);
+		InventoryInterface->OverlappingItemToArray(PickupPtr);
+		SizeArray = InventoryInterface->GetOverlappingItems().Num();
+		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
+	}
+}
+
+void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
 	IInventoryInterface* InventoryInterface = nullptr;
 	auto Components = OtherActor->GetComponents();
 
@@ -89,15 +134,9 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 			break;
 		}
 	}
-	/*
 	if (InventoryInterface)
 	{
-		InventoryInterface->LootItem(this, Quantity);
+		//TSharedPtr<APickup, ESPMode::ThreadSafe> PickupPtr = TSharedPtr<APickup, ESPMode::ThreadSafe>(this);
+		InventoryInterface->RemoveItemFromOverlapping(this);
 	}
-	*/
-}
-
-void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-
 }

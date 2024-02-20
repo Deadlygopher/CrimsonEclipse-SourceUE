@@ -9,3 +9,22 @@ bool IInventoryInterface::LootItem(APickup* Pickup, int32& LootedQuantity)
 {
 	return false;
 }
+
+void IInventoryInterface::OverlappingItemToArray(APickup* LastPickup)
+{
+
+}
+
+void IInventoryInterface::RemoveItemFromOverlapping(APickup* NotPickup)
+{
+
+}
+
+TArray<APickup*> IInventoryInterface::GetOverlappingItems()
+{
+	return TArray<APickup*>();
+}
+
+void IInventoryInterface::SwitchItemWidgetVisibility(bool bShowWidget)
+{
+}

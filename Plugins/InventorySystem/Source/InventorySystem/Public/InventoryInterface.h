@@ -21,4 +21,12 @@ class INVENTORYSYSTEM_API IInventoryInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual bool LootItem(class APickup* Pickup, int32& LootedQuantity);
+
+	virtual void OverlappingItemToArray(APickup* LastPickup);
+
+	virtual void RemoveItemFromOverlapping(APickup* NotItem);
+
+	virtual TArray<APickup*> GetOverlappingItems();
+
+	virtual void SwitchItemWidgetVisibility(bool bShowWidget);
 };

@@ -31,6 +31,8 @@ public:
 
 	void OnPickupDataReceived() const;
 
+	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UFUNCTION(BlueprintCallable, Category = Pickup)
 	void SetPickupData(UItemInstance* InItemInstance, int32 InQuantity);
 
@@ -57,6 +59,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class USphereComponent* SphereComponent;
 
+	UFUNCTION(/*Client, Reliable*/)
+	void SetWidgetVisibility(bool bVisible);
+
 protected:
 	UFUNCTION()
 	virtual void OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -69,5 +74,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Pickup Widget")
 	class UWidgetComponent* PickupWidget;
+
 
 };

@@ -5,6 +5,7 @@
 #include "ItemInstance.h"
 #include "Item.h"
 #include "Pickup.h"
+#include "Net/UnrealNetwork.h"
 
 bool FSlot::IsOnMaxStackSize() const
 {
@@ -1706,4 +1707,39 @@ void UInventoryComponent::NotifyInventoryItemUsed(UItem* InItem, const int32 InQ
 {
 	OnItemUsed.Broadcast(InItem, InQuantity);
 	K2_OnInventoryItemUsed(InItem, InQuantity);
+}
+
+
+
+
+
+
+
+void UInventoryComponent::OverlappingItemToArray(APickup* LastPickup)
+{
+	OverlappingItems.AddUnique(LastPickup);
+}
+
+void UInventoryComponent::RemoveItemFromOverlapping(APickup* NotPickup)
+{
+	NotPickup->SetWidgetVisibility(false);
+	OverlappingItems.RemoveSingle(NotPickup);
+}
+
+void UInventoryComponent::SwitchItemWidgetVisibility(bool bShowWidget)
+{
+	for (auto OverlapItem : OverlappingItems)
+	{
+		OverlapItem->SetWidgetVisibility(bShowWidget);
+	}
+}
+
+
+
+void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//DOREPLIFETIME(UInventoryComponent, LastOverlappingItem);
+	//DOREPLIFETIME(UInventoryComponent, OverlappingItems);
 }

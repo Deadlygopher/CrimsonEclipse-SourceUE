@@ -33,7 +33,12 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACrimsonEclipsePlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACrimsonEclipsePlayerController::OnSetDestinationReleased);
 
+	// set key for pickup items from inventory component
 	InputComponent->BindAction("PickupItem", IE_Pressed, this, &ACrimsonEclipsePlayerController::PickupItem);
+
+	// set key for show/hide pickup widget
+	InputComponent->BindAction("ShowPickupWidget", IE_Pressed, this, &ACrimsonEclipsePlayerController::ShowPickupWidget);
+
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &ACrimsonEclipsePlayerController::MoveToTouchLocation);
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &ACrimsonEclipsePlayerController::MoveToTouchLocation);
@@ -71,18 +76,43 @@ void ACrimsonEclipsePlayerController::PickupItem()
 			for (auto Component : Components)
 			{
 				InventoryInterface = Cast<IInventoryInterface>(Component);
-				if (InventoryInterface)
+				if (InventoryInterface != nullptr)
 				{
-					break;
+					auto ItemsToLoot = InventoryInterface->GetOverlappingItems();
+					if (ItemsToLoot.Contains(ActorToPickup))
+					{
+						if (InventoryInterface->LootItem(ActorToPickup, ActorToPickup->Quantity))
+						{
+							break;
+						}
+						else
+						{
+							continue;
+						}
+					}
 				}
-			}
-			if (InventoryInterface)
-			{
-				InventoryInterface->LootItem(ActorToPickup, ActorToPickup->Quantity);
 			}
 		}
 	}
 }
+
+void ACrimsonEclipsePlayerController::ShowPickupWidget()
+{
+	bShowWidget = !bShowWidget;
+	ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
+	IInventoryInterface* InventoryInterface = nullptr;
+	auto Components = ControlledCharacter->GetComponents();
+	for (auto Component : Components)
+	{
+		InventoryInterface = Cast<IInventoryInterface>(Component);
+		if (InventoryInterface != nullptr)
+		{
+			InventoryInterface->SwitchItemWidgetVisibility(bShowWidget);
+		}
+	}
+}
+
+
 
 void ACrimsonEclipsePlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
@@ -148,3 +178,4 @@ void ACrimsonEclipsePlayerController::OnSetDestinationReleased()
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
+
