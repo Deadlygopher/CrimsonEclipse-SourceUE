@@ -28,7 +28,6 @@ public:
 	APickup();
 	
 	virtual void BeginPlay() override;
-
 	void OnPickupDataReceived() const;
 
 	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -80,4 +79,11 @@ protected:
 
 	UPROPERTY()
 	TSubclassOf<UPickupWidget> WidgetClass;
+
+public:
+	UFUNCTION()
+	void OnCursorStartOverlap(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void OnCursorEndOverlap(UPrimitiveComponent* TouchedComponent);
 };

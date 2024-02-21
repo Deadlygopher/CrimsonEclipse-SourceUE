@@ -21,13 +21,14 @@ APickup::APickup()
 	PickupMesh->SetSimulatePhysics(true);
 	//PickupMesh->SetMassOverrideInKg(EName::NAME_None, 100.0f, true);
 	PickupMesh->SetEnableGravity(true);
-	PickupMesh->SetConstraintMode(EDOFMode::Default);
+	PickupMesh->SetConstraintMode(EDOFMode::None);
 	PickupMesh->SetGenerateOverlapEvents(true);
 	PickupMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	PickupMesh->SetCollisionObjectType(ECC_WorldDynamic);
 	PickupMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PickupMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	PickupMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	PickupMesh->SetGenerateOverlapEvents(true);
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SphereComponent->SetupAttachment(RootComponent);
@@ -46,10 +47,16 @@ void APickup::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		//SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		SphereComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 		SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnOverlapComponentStart);
 		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &APickup::OnOverlapComponentEnd);
+	}
+
+	if (!ItemInstance && InitItemInstance)
+	{
+		ItemInstance = NewObject<UItemInstance>(this, InitItemInstance);
 	}
 
 	if (PickupWidgetComponent)
@@ -61,8 +68,10 @@ void APickup::BeginPlay()
 		}
 		PickupWidgetComponent->SetVisibility(false);
 	}
-}
 
+	PickupMesh->OnBeginCursorOver.AddDynamic(this, &APickup::OnCursorStartOverlap);
+	PickupMesh->OnEndCursorOver.AddDynamic(this, &APickup::OnCursorEndOverlap);
+}
 
 
 void APickup::OnPickupDataReceived() const
@@ -105,10 +114,8 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {	
-	//SweepResult.Actor
 	IInventoryInterface* InventoryInterface = nullptr;
 	auto Components = OtherActor->GetComponents();
-
 	for (auto Component : Components)
 	{
 		InventoryInterface = Cast<IInventoryInterface>(Component);
@@ -147,4 +154,16 @@ void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		InventoryInterface->RemoveItemFromOverlapping(this);
 	}
+}
+
+void APickup::OnCursorStartOverlap(UPrimitiveComponent* TouchedComponent)
+{
+	Cast<UStaticMeshComponent>(TouchedComponent)->SetScalarParameterValueOnMaterials(FName("Value"), 5.f);
+	SetWidgetVisibility(true);
+}
+
+void APickup::OnCursorEndOverlap(UPrimitiveComponent* TouchedComponent)
+{
+	Cast<UStaticMeshComponent>(TouchedComponent)->SetScalarParameterValueOnMaterials(FName("Value"), 0.f);
+	SetWidgetVisibility(false);
 }

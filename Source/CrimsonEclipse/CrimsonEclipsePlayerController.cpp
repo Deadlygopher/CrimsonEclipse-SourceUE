@@ -113,6 +113,7 @@ void ACrimsonEclipsePlayerController::ShowPickupWidget()
 	bShowWidget = !bShowWidget;
 	ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
 	IInventoryInterface* InventoryInterface = nullptr;
+	
 	auto Components = ControlledCharacter->GetComponents();
 	for (auto Component : Components)
 	{
