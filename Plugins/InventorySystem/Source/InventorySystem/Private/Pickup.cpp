@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "InventorySystem/Widgets/PickupWidget.h"
 
 
 APickup::APickup()
@@ -34,8 +35,9 @@ APickup::APickup()
 	SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Pickup Text"));
-	PickupWidget->SetupAttachment(RootComponent);
+	PickupWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Pickup Text"));
+	PickupWidgetComponent->SetWidgetClass(WidgetClass);
+	PickupWidgetComponent->SetupAttachment(RootComponent);
 }
 
 void APickup::BeginPlay()
@@ -50,11 +52,18 @@ void APickup::BeginPlay()
 		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &APickup::OnOverlapComponentEnd);
 	}
 
-	if (PickupWidget)
+	if (PickupWidgetComponent)
 	{
-		PickupWidget->SetVisibility(false);
+		PickupWidget = Cast<UPickupWidget>(PickupWidgetComponent->GetWidget());
+		if (PickupWidget)
+		{
+			PickupWidget->SetPickupText(ItemInstance->Item->GetItemName());
+		}
+		PickupWidgetComponent->SetVisibility(false);
 	}
 }
+
+
 
 void APickup::OnPickupDataReceived() const
 {
@@ -86,9 +95,9 @@ void APickup::SetPickupData(UItemInstance* InItemInstance, const int32 InQuantit
 
 void APickup::SetWidgetVisibility(bool bVisible)
 {
-	if (PickupWidget)
+	if (PickupWidgetComponent)
 	{
-		PickupWidget->SetVisibility(bVisible);
+		PickupWidgetComponent->SetVisibility(bVisible);
 	}
 }
 
@@ -113,7 +122,7 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 		int32 SizeArray = InventoryInterface->GetOverlappingItems().Num();
 		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
 
-		InventoryInterface->LootItem(this, Quantity);
+		//InventoryInterface->LootItem(this, Quantity);
 		InventoryInterface->OverlappingItemToArray(this);
 		SizeArray = InventoryInterface->GetOverlappingItems().Num();
 		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);

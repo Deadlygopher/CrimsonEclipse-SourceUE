@@ -73,7 +73,11 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Pickup Widget")
-	class UWidgetComponent* PickupWidget;
+	class UWidgetComponent* PickupWidgetComponent;
 
+	UPROPERTY()
+	class UPickupWidget* PickupWidget;
 
+	UPROPERTY()
+	TSubclassOf<UPickupWidget> WidgetClass;
 };
