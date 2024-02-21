@@ -39,6 +39,9 @@ APickup::APickup()
 	PickupWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Pickup Text"));
 	PickupWidgetComponent->SetWidgetClass(WidgetClass);
 	PickupWidgetComponent->SetupAttachment(RootComponent);
+	PickupWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	PickupWidgetComponent->SetDrawSize(FVector2D(50.f, 100.f));
+	PickupWidgetComponent->SetPivot(FVector2D(0.5f, 1.0f));
 }
 
 void APickup::BeginPlay()
