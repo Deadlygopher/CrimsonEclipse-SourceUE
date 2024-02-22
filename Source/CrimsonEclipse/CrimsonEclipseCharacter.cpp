@@ -16,6 +16,7 @@
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
 #include "InventoryComponent.h"
+#include "Item.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -71,6 +72,13 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 	CombatComponent->SetIsReplicated(true);
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
+	InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
+}
+
+void ACrimsonEclipseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	//InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
 }
 
 void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -219,6 +227,15 @@ void ACrimsonEclipseCharacter::EquipButtonPressed()
 		{
 			ServerEquipButtonPressed();
 		}
+	}
+}
+
+void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, int32 InQuantity)
+{
+	if (InItem->GetWeaponType())
+	{
+		FActorSpawnParameters WeaponSpawnParameters;
+		CombatComponent->EquipWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
 	}
 }
 

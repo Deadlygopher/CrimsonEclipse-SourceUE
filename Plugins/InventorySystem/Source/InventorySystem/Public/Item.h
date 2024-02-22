@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "InventoryComponent.h"
 #include "Engine/DataAsset.h"
-#include "CrimsonEclipse/Items/Weapon.h"
 
 #include "Item.generated.h"
 
@@ -64,7 +63,7 @@ private:
 	EItemType Type;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::Weapon"), Category = "Item")
-	AWeapon* WeaponType;
+	TSubclassOf<AActor> WeaponType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	TSubclassOf<UItemInstance> ItemInstanceClass;
@@ -187,4 +186,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FVector GetItemPickupStaticMeshScale() const { return PickupStaticMeshScale; }
+
+	UFUNCTION(BlueprintCallable)
+	TSubclassOf<AActor> GetWeaponType() const { return WeaponType; };
 };

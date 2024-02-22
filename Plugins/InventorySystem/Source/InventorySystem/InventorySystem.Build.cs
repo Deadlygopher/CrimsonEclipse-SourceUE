@@ -40,7 +40,6 @@ public class InventorySystem : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UMG",
-                "CrimsonEclipse",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

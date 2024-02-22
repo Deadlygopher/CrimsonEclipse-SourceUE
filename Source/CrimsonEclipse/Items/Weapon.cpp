@@ -51,6 +51,8 @@ void AWeapon::BeginPlay()
 		AreaSphere->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnSphereEndOverlap);
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("WEAPON SPAWNED"));
+
 	if (PickupWidget)
 	{
 		PickupWidget->SetVisibility(false);

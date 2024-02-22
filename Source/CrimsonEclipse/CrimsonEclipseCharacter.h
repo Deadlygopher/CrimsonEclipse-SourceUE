@@ -17,6 +17,8 @@ class ACrimsonEclipseCharacter : public ACharacter, public IHitDetectInterface
 public:
 	ACrimsonEclipseCharacter();
 
+	virtual void BeginPlay() override;
+
 	virtual void Tick(float DeltaSeconds) override;
 
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
@@ -50,8 +52,6 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* CombatComponent;
 
-
-
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
@@ -77,5 +77,10 @@ protected:
 	void CameraZoom(float Value);
 	void EquipButtonPressed();
 	
+
+
+public:
+	UFUNCTION()
+	void OnItemEquip(class UItem* InItem, int32 InQuantity);
 };
 
