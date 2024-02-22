@@ -62,4 +62,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	class UWidgetComponent* PickupWidget;
 
+
+
+public:
+
+	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
 };

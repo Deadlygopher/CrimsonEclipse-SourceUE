@@ -29,4 +29,10 @@ private:
 	ACrimsonEclipseCharacter* Character;
 	AWeapon* EquippedWeapon;
 
+
+
+public:
+
+	UFUNCTION()
+	virtual void HitTracing();
 };

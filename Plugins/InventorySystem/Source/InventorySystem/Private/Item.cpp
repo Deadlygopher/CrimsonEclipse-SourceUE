@@ -24,7 +24,7 @@ UItem::UItem()
 
 	ConsumedQuantityPerUsage = 1;
 
-	PickupStaticMeshScale = FVector(0.25f);
+	PickupStaticMeshScale = FVector(1.f);
 }
 
 FPrimaryAssetId UItem::GetPrimaryAssetId() const

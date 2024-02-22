@@ -16,8 +16,6 @@
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
 #include "InventoryComponent.h"
-//#include "Components/SceneComponent.h"
-// #include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -143,6 +141,11 @@ void ACrimsonEclipseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 
 void ACrimsonEclipseCharacter::OnHitDetect()
 {
+	if (CombatComponent)
+	{
+		CombatComponent->HitTracing();
+	}
+	/*
 	FVector SocketLocation = GetMesh()->GetSocketLocation("RightHandSocket");
 	UWorld* World = GetWorld();
 
@@ -160,6 +163,7 @@ void ACrimsonEclipseCharacter::OnHitDetect()
 			TraceRadius, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
 			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 	}
+	*/
 }
 
 void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

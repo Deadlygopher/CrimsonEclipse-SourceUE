@@ -32,7 +32,7 @@ APickup::APickup()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SphereComponent->SetupAttachment(RootComponent);
-	SphereComponent->SetSphereRadius(500);
+	SphereComponent->SetSphereRadius(200);
 	SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 

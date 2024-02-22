@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "InventoryComponent.h"
 #include "Engine/DataAsset.h"
+#include "CrimsonEclipse/Items/Weapon.h"
+
 #include "Item.generated.h"
 
 class UItemInstance;
@@ -60,6 +62,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	EItemType Type;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::Weapon"), Category = "Item")
+	AWeapon* WeaponType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	TSubclassOf<UItemInstance> ItemInstanceClass;
