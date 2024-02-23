@@ -19,7 +19,14 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	friend class ACrimsonEclipseCharacter;
 
-	void EquipWeapon(AWeapon* WeaponToEquip);
+	void EquipRightWeapon(AWeapon* WeaponToEquip);
+	void EquipLeftWeapon(AWeapon* WeaponToEquip);
+
+	void UnequipRightWeapon();
+	void UnequipLeftWeapon();
+
+	virtual AWeapon* GetRightHandWeapon();
+	virtual AWeapon* GetLeftHandWeapon();
 
 protected:
 	virtual void BeginPlay() override;
@@ -27,9 +34,8 @@ protected:
 private:
 	
 	ACrimsonEclipseCharacter* Character;
-	AWeapon* EquippedWeapon;
-
-
+	AWeapon* RightHandEquippedWeapon;
+	AWeapon* LeftHandEquippedWeapon;
 
 public:
 

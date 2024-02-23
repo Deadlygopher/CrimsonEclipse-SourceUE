@@ -81,6 +81,9 @@ protected:
 
 public:
 	UFUNCTION()
-	void OnItemEquip(class UItem* InItem, int32 InQuantity);
+	void OnItemEquip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+
+	UFUNCTION()
+	void OnItemUnequip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 };
 

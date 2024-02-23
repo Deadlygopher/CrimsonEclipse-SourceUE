@@ -73,6 +73,7 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
 	InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
+	InventoryComponent->OnItemUnequipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemUnequip);
 }
 
 void ACrimsonEclipseCharacter::BeginPlay()
@@ -221,7 +222,7 @@ void ACrimsonEclipseCharacter::EquipButtonPressed()
 	{
 		if (HasAuthority())
 		{
-			CombatComponent->EquipWeapon(OverlappingWeapon);
+			CombatComponent->EquipRightWeapon(OverlappingWeapon);
 		}
 		else
 		{
@@ -230,19 +231,72 @@ void ACrimsonEclipseCharacter::EquipButtonPressed()
 	}
 }
 
-void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, int32 InQuantity)
-{
-	if (InItem->GetWeaponType())
-	{
-		FActorSpawnParameters WeaponSpawnParameters;
-		CombatComponent->EquipWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
-	}
-}
-
 void ACrimsonEclipseCharacter::ServerEquipButtonPressed_Implementation()
 {
 	if (CombatComponent)
 	{
-		CombatComponent->EquipWeapon(OverlappingWeapon);
+		CombatComponent->EquipRightWeapon(OverlappingWeapon);
+	}
+}
+
+void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+{
+	switch (Type)
+	{
+	case EEquipmentSlotType::PrimaryWeapon:
+	{
+		if (InItem->GetWeaponType())
+		{
+			FActorSpawnParameters WeaponSpawnParameters;
+			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			UE_LOG(LogTemp, Warning, TEXT("Primary Weapon"));
+		}
+		break;
+	}
+	case EEquipmentSlotType::SecondaryWeapon:
+	{
+		if (InItem->GetWeaponType())
+		{
+			FActorSpawnParameters WeaponSpawnParameters;
+			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			UE_LOG(LogTemp, Warning, TEXT("Secondary Weapon"));
+		}
+		break;
+	}
+	default:
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Default EQUIP case"));
+		break;
+	}
+	}
+}
+
+void ACrimsonEclipseCharacter::OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+{
+	switch (Type)
+	{
+	case EEquipmentSlotType::PrimaryWeapon:
+	{
+		if (CombatComponent->GetRightHandWeapon())
+		{
+			CombatComponent->UnequipRightWeapon();
+			UE_LOG(LogTemp, Warning, TEXT("Unequip Primary Weapon"));
+		}
+		break;
+	}
+	case EEquipmentSlotType::SecondaryWeapon:
+	{
+		if (CombatComponent->GetLeftHandWeapon())
+		{
+			CombatComponent->UnequipLeftWeapon();
+			UE_LOG(LogTemp, Warning, TEXT("Unequip Secondary Weapon"));
+		}
+		break;
+	}
+	default:
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Default UNEQUIP case"));
+		break;
+	}
 	}
 }
