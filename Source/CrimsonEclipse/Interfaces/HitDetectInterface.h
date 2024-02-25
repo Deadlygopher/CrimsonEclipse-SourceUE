@@ -24,4 +24,6 @@ class CRIMSONECLIPSE_API IHitDetectInterface
 public:
 
 	virtual void OnHitDetect();
+
+	virtual void ResetTracingVectors();
 };

@@ -9,3 +9,7 @@ void IHitDetectInterface::OnHitDetect()
 {
 
 }
+
+void IHitDetectInterface::ResetTracingVectors()
+{
+}

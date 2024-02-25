@@ -145,35 +145,17 @@ void ACrimsonEclipseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 			OverlappingWeapon->ShowPickupWidget(true);
 		}
 	}
-
 }
 
+/*
 void ACrimsonEclipseCharacter::OnHitDetect()
 {
 	if (CombatComponent)
 	{
-		CombatComponent->HitTracing();
+		CombatComponent->SimpleRightHandAttack();
 	}
-	/*
-	FVector SocketLocation = GetMesh()->GetSocketLocation("RightHandSocket");
-	UWorld* World = GetWorld();
-
-	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
-	QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-
-	FHitResult HitResult;
-
-	if (World)
-	{
-		UKismetSystemLibrary::SphereTraceSingleForObjects(World, SocketLocation, SocketLocation, 
-			TraceRadius, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
-	}
-	*/
 }
+*/
 
 void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

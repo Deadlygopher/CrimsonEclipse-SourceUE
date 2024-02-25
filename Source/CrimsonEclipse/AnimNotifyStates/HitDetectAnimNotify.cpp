@@ -5,9 +5,28 @@
 
 void UHitDetectAnimNotify::DetectHitOnTick(USkeletalMeshComponent* MeshComp)
 {
-	IHitDetectInterface* HitInterface = Cast<IHitDetectInterface>(MeshComp->GetOwner());
-	if (HitInterface)
+	auto Interfaces = MeshComp->GetOwner()->GetComponents();
+	for (auto Interface : Interfaces)
 	{
-		HitInterface->OnHitDetect();
+		if (auto HitInterface = Cast<IHitDetectInterface>(Interface))
+		{
+			HitInterface->OnHitDetect();
+			break;
+		}
+	}
+}
+
+void UHitDetectAnimNotify::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
+{
+	Super::NotifyBegin(MeshComp, Animation, TotalDuration);
+
+	auto Interfaces = MeshComp->GetOwner()->GetComponents();
+	for (auto Interface : Interfaces)
+	{
+		if (auto HitInterface = Cast<IHitDetectInterface>(Interface))
+		{
+			HitInterface->ResetTracingVectors();
+			break;
+		}
 	}
 }

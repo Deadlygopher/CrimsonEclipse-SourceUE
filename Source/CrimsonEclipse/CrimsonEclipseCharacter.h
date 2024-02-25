@@ -10,7 +10,7 @@
 
 
 UCLASS(Blueprintable)
-class ACrimsonEclipseCharacter : public ACharacter, public IHitDetectInterface
+class ACrimsonEclipseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -65,8 +65,10 @@ public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
 
+	/*
 	UFUNCTION()
 	virtual void OnHitDetect() override;
+	*/
 
 protected:
 

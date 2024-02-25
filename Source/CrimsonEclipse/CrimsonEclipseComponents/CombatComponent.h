@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "CrimsonEclipse/Interfaces/HitDetectInterface.h"
+
 #include "CombatComponent.generated.h"
 
 class AWeapon;
 class ACrimsonEclipseCharacter;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class CRIMSONECLIPSE_API UCombatComponent : public UActorComponent
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class CRIMSONECLIPSE_API UCombatComponent : public UActorComponent, public IHitDetectInterface
 {
 	GENERATED_BODY()
 
@@ -31,14 +33,28 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	/*
+	UFUNCTION()
+	virtual void HitRightHandTracing();
+	*/
+
+	UFUNCTION()
+	virtual void ResetTracingVectors() override;
+
 private:
 	
 	ACrimsonEclipseCharacter* Character;
 	AWeapon* RightHandEquippedWeapon;
 	AWeapon* LeftHandEquippedWeapon;
 
+	FVector HalfSize{ 5.f, 5.f, 5.f };
+	FVector PrevStartSocketLocation;
+	FVector CurrentStartSocketLocation;
+
 public:
+	UFUNCTION()
+	virtual void OnHitDetect() override;
 
 	UFUNCTION()
-	virtual void HitTracing();
+	void SimpleRightHandAttack();
 };

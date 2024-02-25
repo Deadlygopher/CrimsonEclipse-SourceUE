@@ -65,11 +65,19 @@ void UCombatComponent::EquipLeftWeapon(AWeapon* WeaponToEquip)
 	LeftHandEquippedWeapon->SetOwner(Character);
 }
 
-void UCombatComponent::HitTracing()
+void UCombatComponent::ResetTracingVectors()
+{
+	if (!RightHandEquippedWeapon) { return; }
+	PrevStartSocketLocation = CurrentStartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
+}
+
+void UCombatComponent::OnHitDetect()
 {
 	if(RightHandEquippedWeapon)
 	{
-		FVector SocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
+		FVector StartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
+		FVector EndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
+		FRotator StartSocketOrientation = StartSocketLocation.ToOrientationRotator();
 		UWorld* World = GetWorld();
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
@@ -79,14 +87,43 @@ void UCombatComponent::HitTracing()
 		ActorsToIgnore.Add(GetOwner());
 
 		FHitResult HitResult;
+		TArray<FHitResult> MultiHitResult;
 
+		if (World)
+		{
+			CurrentStartSocketLocation = StartSocketLocation;
+
+			UKismetSystemLibrary::BoxTraceMultiForObjects(World, StartSocketLocation, EndSocketLocation,
+				HalfSize, StartSocketOrientation, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+
+			if(CurrentStartSocketLocation == PrevStartSocketLocation)
+			{
+				PrevStartSocketLocation = CurrentStartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
+			}
+			else 
+			{
+				UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevStartSocketLocation, CurrentStartSocketLocation,
+					QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+					MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+				PrevStartSocketLocation = CurrentStartSocketLocation;
+			}
+		}
+		/* //Shere Trace
 		if (World)
 		{
 			UKismetSystemLibrary::SphereTraceSingleForObjects(World, SocketLocation, SocketLocation,
 				50.f, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
 				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 		}
+		*/
 	}
+}
+
+void UCombatComponent::SimpleRightHandAttack()
+{
+	//ResetTracingVectors();
+	//HitRightHandTracing();
 }
 
 

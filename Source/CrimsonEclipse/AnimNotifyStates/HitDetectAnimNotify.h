@@ -19,5 +19,6 @@ private:
 
 	UFUNCTION(BlueprintCallable)
 	void DetectHitOnTick(USkeletalMeshComponent* MeshComp);
-	
+
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
 };
