@@ -72,7 +72,8 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 	CombatComponent->SetIsReplicated(true);
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
-	InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
+	//InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
+	InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::EquipWeapon);
 	InventoryComponent->OnItemUnequipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemUnequip);
 }
 
@@ -147,16 +148,6 @@ void ACrimsonEclipseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
 	}
 }
 
-/*
-void ACrimsonEclipseCharacter::OnHitDetect()
-{
-	if (CombatComponent)
-	{
-		CombatComponent->SimpleRightHandAttack();
-	}
-}
-*/
-
 void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -167,7 +158,7 @@ void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	PlayerInputComponent->BindAxis("CameraRotationAxis", this, &ACrimsonEclipseCharacter::ChangeCameraAngle);
 	PlayerInputComponent->BindAxis("CameraZoom", this, &ACrimsonEclipseCharacter::CameraZoom);
 
-	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ACrimsonEclipseCharacter::EquipButtonPressed);
+	//PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ACrimsonEclipseCharacter::EquipButtonPressed);
 }
 
 void ACrimsonEclipseCharacter::CameraRotateON()
@@ -198,27 +189,31 @@ void ACrimsonEclipseCharacter::CameraZoom(float Value)
 	}
 }
 
-void ACrimsonEclipseCharacter::EquipButtonPressed()
+void ACrimsonEclipseCharacter::EquipWeapon(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
 {
-	if (CombatComponent)
-	{
+	//if (CombatComponent)
+	//{
 		if (HasAuthority())
 		{
-			CombatComponent->EquipRightWeapon(OverlappingWeapon);
+			UE_LOG(LogTemp, Warning, TEXT("HasAuthority"));
+			OnItemEquip(InItem, Type, InQuantity);
 		}
 		else
 		{
-			ServerEquipButtonPressed();
+			UE_LOG(LogTemp, Warning, TEXT("NOTHasAuthority"));
+			ServerEquipWeapon(InItem, Type, InQuantity);
 		}
-	}
+	//}
 }
 
-void ACrimsonEclipseCharacter::ServerEquipButtonPressed_Implementation()
+void ACrimsonEclipseCharacter::ServerEquipWeapon_Implementation(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
 {
-	if (CombatComponent)
-	{
-		CombatComponent->EquipRightWeapon(OverlappingWeapon);
-	}
+	//if (CombatComponent)
+	//{
+		OnItemEquip(InItem, Type, InQuantity);
+		UE_LOG(LogTemp, Warning, TEXT("ServerEquip"));
+		//CombatComponent->EquipRightWeapon(OverlappingWeapon);
+	//}
 }
 
 void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
@@ -227,7 +222,7 @@ void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Typ
 	{
 	case EEquipmentSlotType::PrimaryWeapon:
 	{
-		if (InItem->GetWeaponType())
+		if (InItem->GetWeaponType() && CombatComponent)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
 			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
@@ -237,7 +232,7 @@ void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Typ
 	}
 	case EEquipmentSlotType::SecondaryWeapon:
 	{
-		if (InItem->GetWeaponType())
+		if (InItem->GetWeaponType() && CombatComponent)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
 			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));

@@ -11,6 +11,7 @@
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	SetIsReplicated(true);
 }
 
 
@@ -40,14 +41,19 @@ void UCombatComponent::EquipRightWeapon(AWeapon* WeaponToEquip)
 	if (Character == nullptr || WeaponToEquip == nullptr) return;
 
 	RightHandEquippedWeapon = WeaponToEquip;
-	RightHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 
-	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
-	if (HandSocket)
-	{
-		HandSocket->AttachActor(RightHandEquippedWeapon, Character->GetMesh());
+	if (RightHandEquippedWeapon) {
+		RightHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+
+		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+		if (HandSocket)
+		{
+			HandSocket->AttachActor(RightHandEquippedWeapon, Character->GetMesh());
+		}
+		RightHandEquippedWeapon->SetOwner(Character);
+		RightHandEquippedWeapon->SetActorLocationAndRotation(RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("HandleSocket"),
+			RightHandEquippedWeapon->GetWeaponMesh()->GetSocketRotation("HandleSocket"));
 	}
-	RightHandEquippedWeapon->SetOwner(Character);
 }
 
 void UCombatComponent::EquipLeftWeapon(AWeapon* WeaponToEquip)
@@ -55,20 +61,28 @@ void UCombatComponent::EquipLeftWeapon(AWeapon* WeaponToEquip)
 	if (Character == nullptr || WeaponToEquip == nullptr) return;
 
 	LeftHandEquippedWeapon = WeaponToEquip;
-	LeftHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 
-	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("LeftHandSocket"));
-	if (HandSocket)
+	if (LeftHandEquippedWeapon)
 	{
-		HandSocket->AttachActor(LeftHandEquippedWeapon, Character->GetMesh());
+		LeftHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+
+		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("LeftHandSocket"));
+		if (HandSocket)
+		{
+			HandSocket->AttachActor(LeftHandEquippedWeapon, Character->GetMesh());
+		}
+		LeftHandEquippedWeapon->SetOwner(Character);
+		LeftHandEquippedWeapon->SetActorLocationAndRotation(LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("HandleSocket"),
+			LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketRotation("HandleSocket"));
 	}
-	LeftHandEquippedWeapon->SetOwner(Character);
 }
 
 void UCombatComponent::ResetTracingVectors()
 {
 	if (!RightHandEquippedWeapon) { return; }
 	PrevStartSocketLocation = CurrentStartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
+	PrevMiddleSocketLocation = CurrentMiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
+	PrevEndSocketLocation = CurrentEndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
 }
 
 void UCombatComponent::OnHitDetect()
@@ -76,8 +90,9 @@ void UCombatComponent::OnHitDetect()
 	if(RightHandEquippedWeapon)
 	{
 		FVector StartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
+		FVector MiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
 		FVector EndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
-		FRotator StartSocketOrientation = StartSocketLocation.ToOrientationRotator();
+		//FRotator StartSocketOrientation = StartSocketLocation.ToOrientationRotator();
 		UWorld* World = GetWorld();
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
@@ -92,31 +107,27 @@ void UCombatComponent::OnHitDetect()
 		if (World)
 		{
 			CurrentStartSocketLocation = StartSocketLocation;
+			CurrentMiddleSocketLocation = MiddleSocketLocation;
+			CurrentEndSocketLocation = EndSocketLocation;
 
-			UKismetSystemLibrary::BoxTraceMultiForObjects(World, StartSocketLocation, EndSocketLocation,
-				HalfSize, StartSocketOrientation, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevStartSocketLocation, CurrentStartSocketLocation,
+				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevMiddleSocketLocation, CurrentMiddleSocketLocation,
+				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevEndSocketLocation, CurrentEndSocketLocation,
+				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
 				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 
-			if(CurrentStartSocketLocation == PrevStartSocketLocation)
-			{
-				PrevStartSocketLocation = CurrentStartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
-			}
-			else 
-			{
-				UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevStartSocketLocation, CurrentStartSocketLocation,
-					QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-					MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
-				PrevStartSocketLocation = CurrentStartSocketLocation;
-			}
+			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevEndSocketLocation, CurrentStartSocketLocation,
+				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+
+			PrevStartSocketLocation = CurrentStartSocketLocation;
+			PrevMiddleSocketLocation = CurrentMiddleSocketLocation;
+			PrevEndSocketLocation = CurrentEndSocketLocation;
 		}
-		/* //Shere Trace
-		if (World)
-		{
-			UKismetSystemLibrary::SphereTraceSingleForObjects(World, SocketLocation, SocketLocation,
-				50.f, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
-		}
-		*/
 	}
 }
 

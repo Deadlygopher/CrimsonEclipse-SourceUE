@@ -47,9 +47,19 @@ private:
 	AWeapon* RightHandEquippedWeapon;
 	AWeapon* LeftHandEquippedWeapon;
 
+	//Tracing Sockets for weapon
 	FVector HalfSize{ 5.f, 5.f, 5.f };
+
 	FVector PrevStartSocketLocation;
 	FVector CurrentStartSocketLocation;
+
+	FVector PrevMiddleSocketLocation;
+	FVector CurrentMiddleSocketLocation;
+
+	FVector PrevEndSocketLocation;
+	FVector CurrentEndSocketLocation;
+
+	//GetSocket
 
 public:
 	UFUNCTION()
