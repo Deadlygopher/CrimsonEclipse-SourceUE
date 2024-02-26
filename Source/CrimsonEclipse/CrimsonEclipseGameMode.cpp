@@ -2,7 +2,7 @@
 
 #include "CrimsonEclipseGameMode.h"
 #include "CrimsonEclipsePlayerController.h"
-#include "CrimsonEclipseCharacter.h"
+#include "Character/CrimsonEclipseCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACrimsonEclipseGameMode::ACrimsonEclipseGameMode()

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "CEBaseCharacter.h"
 #include "CrimsonEclipse/Interfaces/HitDetectInterface.h"
 
 #include "CrimsonEclipseCharacter.generated.h"
 
 
 UCLASS(Blueprintable)
-class ACrimsonEclipseCharacter : public ACharacter
+class ACrimsonEclipseCharacter : public ACEBaseCharacter
 {
 	GENERATED_BODY()
 

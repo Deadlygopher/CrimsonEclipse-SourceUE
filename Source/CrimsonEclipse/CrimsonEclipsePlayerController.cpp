@@ -3,7 +3,7 @@
 #include "CrimsonEclipsePlayerController.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
-#include "CrimsonEclipseCharacter.h"
+#include "Character/CrimsonEclipseCharacter.h"
 #include "Engine/World.h"
 #include "Pickup.h"
 #include "InventoryInterface.h"

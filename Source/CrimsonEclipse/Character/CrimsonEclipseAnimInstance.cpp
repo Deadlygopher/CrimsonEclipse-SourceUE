@@ -2,7 +2,7 @@
 
 
 #include "CrimsonEclipseAnimInstance.h"
-#include "CrimsonEclipse/CrimsonEclipseCharacter.h"
+#include "CrimsonEclipse/Character/CrimsonEclipseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UCrimsonEclipseAnimInstance::NativeInitializeAnimation()

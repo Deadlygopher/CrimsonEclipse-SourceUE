@@ -3,7 +3,7 @@
 
 #include "CombatComponent.h"
 #include "CrimsonEclipse/Items/Weapon.h"
-#include "CrimsonEclipse/CrimsonEclipseCharacter.h"
+#include "CrimsonEclipse/Character/CrimsonEclipseCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
