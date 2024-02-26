@@ -21,7 +21,7 @@ public:
 private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
-	class ACrimsonEclipseCharacter* CrimsonEclipseCharacter;
+	class ACEBaseCharacter* CrimsonEclipseCharacter;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float Speed;

@@ -36,6 +36,11 @@ AWeapon* UCombatComponent::GetLeftHandWeapon()
 	return LeftHandEquippedWeapon;
 }
 
+void UCombatComponent::SetCharacter(ACEBaseCharacter* Char)
+{
+	Character = Char;
+}
+
 void UCombatComponent::EquipRightWeapon(AWeapon* WeaponToEquip)
 {
 	if (Character == nullptr || WeaponToEquip == nullptr) return;

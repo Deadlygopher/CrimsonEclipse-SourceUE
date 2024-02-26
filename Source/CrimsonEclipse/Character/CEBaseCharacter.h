@@ -6,24 +6,35 @@
 #include "GameFramework/Character.h"
 #include "CEBaseCharacter.generated.h"
 
+class UCombatComponent;
+class UHealthComponent;
+
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	ACEBaseCharacter();
+	virtual void PostInitializeComponents() override;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UCombatComponent* CombatComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* OverheadWidgetComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UHealthComponent* HealthComponent;
+
+public:
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	void SetOverheadWidgetInfo(float NewHealth);
 };

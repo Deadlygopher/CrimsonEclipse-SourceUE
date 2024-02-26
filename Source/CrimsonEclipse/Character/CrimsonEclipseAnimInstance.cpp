@@ -9,7 +9,7 @@ void UCrimsonEclipseAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	CrimsonEclipseCharacter = Cast<ACrimsonEclipseCharacter>(TryGetPawnOwner());
+	CrimsonEclipseCharacter = Cast<ACEBaseCharacter>(TryGetPawnOwner());
 }
 
 void UCrimsonEclipseAnimInstance::NativeUpdateAnimation(float DeltaTime)
@@ -18,7 +18,7 @@ void UCrimsonEclipseAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	
 	if (CrimsonEclipseCharacter == nullptr)
 	{
-		CrimsonEclipseCharacter = Cast<ACrimsonEclipseCharacter>(TryGetPawnOwner());
+		CrimsonEclipseCharacter = Cast<ACEBaseCharacter>(TryGetPawnOwner());
 	}
 	if (CrimsonEclipseCharacter == nullptr) return;
 

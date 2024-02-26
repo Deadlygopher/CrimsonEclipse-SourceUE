@@ -58,6 +58,20 @@ void ACrimsonEclipsePlayerController::MoveToMouseCursor()
 	}
 }
 
+void ACrimsonEclipsePlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
+{
+	FVector2D ScreenSpaceLocation(Location);
+
+	// Trace to see what is under the touch location
+	FHitResult HitResult;
+	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
+	if (HitResult.bBlockingHit)
+	{
+		// We hit something, move there
+		SetNewMoveDestination(HitResult.ImpactPoint);
+	}
+}
+
 void ACrimsonEclipsePlayerController::PickupItem()
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
@@ -90,6 +104,23 @@ void ACrimsonEclipsePlayerController::PickupItem()
 	}
 }
 
+void ACrimsonEclipsePlayerController::ShowPickupWidget()
+{
+	bShowWidget = !bShowWidget;
+	ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
+	IInventoryInterface* InventoryInterface = nullptr;
+
+	auto Components = ControlledCharacter->GetComponents();
+	for (auto Component : Components)
+	{
+		InventoryInterface = Cast<IInventoryInterface>(Component);
+		if (InventoryInterface != nullptr)
+		{
+			InventoryInterface->SwitchItemWidgetVisibility(bShowWidget);
+		}
+	}
+}
+
 void ACrimsonEclipsePlayerController::ServerPickupButtonPressed_Implementation()
 {
 	PickupItem();
@@ -107,47 +138,12 @@ void ACrimsonEclipsePlayerController::PickupButtonPressed()
 	}
 }
 
-
-void ACrimsonEclipsePlayerController::ShowPickupWidget()
-{
-	bShowWidget = !bShowWidget;
-	ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
-	IInventoryInterface* InventoryInterface = nullptr;
-	
-	auto Components = ControlledCharacter->GetComponents();
-	for (auto Component : Components)
-	{
-		InventoryInterface = Cast<IInventoryInterface>(Component);
-		if (InventoryInterface != nullptr)
-		{
-			InventoryInterface->SwitchItemWidgetVisibility(bShowWidget);
-		}
-	}
-}
-
-void ACrimsonEclipsePlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	FVector2D ScreenSpaceLocation(Location);
-
-	// Trace to see what is under the touch location
-	FHitResult HitResult;
-	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-	if (HitResult.bBlockingHit)
-	{
-		// We hit something, move there
-		SetNewMoveDestination(HitResult.ImpactPoint);
-	}
-}
-
-
 // Requests a destination set for the client and server.
 void ACrimsonEclipsePlayerController::RequestSetNewMoveDestination(const FVector DestLocation)
 {
 	ClientSetNewMoveDestination(DestLocation);
 	ServerSetNewMoveDestination(DestLocation);
 }
-
-
 
 // Requests a destination set for the client (Comes first, since client calls it by clicking).
 void ACrimsonEclipsePlayerController::ClientSetNewMoveDestination_Implementation(const FVector DestLocation)
@@ -161,7 +157,6 @@ void ACrimsonEclipsePlayerController::ServerSetNewMoveDestination_Implementation
 	SetNewMoveDestination(DestLocation);
 }
 
-
 // Common destination setting and movement implementation.
 void ACrimsonEclipsePlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
@@ -171,7 +166,7 @@ void ACrimsonEclipsePlayerController::SetNewMoveDestination(const FVector DestLo
 		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 120.0f))
+		if ((Distance > 50.0f))
 		{
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
 		}

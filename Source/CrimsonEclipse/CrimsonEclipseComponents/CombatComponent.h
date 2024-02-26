@@ -9,7 +9,7 @@
 #include "CombatComponent.generated.h"
 
 class AWeapon;
-class ACrimsonEclipseCharacter;
+class ACEBaseCharacter;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class CRIMSONECLIPSE_API UCombatComponent : public UActorComponent, public IHitDetectInterface
@@ -19,7 +19,7 @@ class CRIMSONECLIPSE_API UCombatComponent : public UActorComponent, public IHitD
 public:	
 	UCombatComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	friend class ACrimsonEclipseCharacter;
+	friend ACEBaseCharacter;
 
 	void EquipRightWeapon(AWeapon* WeaponToEquip);
 	void EquipLeftWeapon(AWeapon* WeaponToEquip);
@@ -29,6 +29,7 @@ public:
 
 	virtual AWeapon* GetRightHandWeapon();
 	virtual AWeapon* GetLeftHandWeapon();
+	void SetCharacter(ACEBaseCharacter* Char);
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,7 +44,7 @@ protected:
 
 private:
 	
-	ACrimsonEclipseCharacter* Character;
+	ACEBaseCharacter* Character;
 	AWeapon* RightHandEquippedWeapon;
 	AWeapon* LeftHandEquippedWeapon;
 

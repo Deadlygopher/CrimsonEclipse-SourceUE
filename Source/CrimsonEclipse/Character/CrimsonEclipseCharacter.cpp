@@ -11,7 +11,6 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
@@ -65,11 +64,8 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
-	OverheadWidget->SetupAttachment(RootComponent);
-
-	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	CombatComponent->SetIsReplicated(true);
+	//CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	//CombatComponent->SetIsReplicated(true);
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
 	//InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
@@ -80,7 +76,6 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 void ACrimsonEclipseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	//InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
 }
 
 void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -88,15 +83,6 @@ void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ACrimsonEclipseCharacter, OverlappingWeapon, COND_OwnerOnly);
-}
-
-void ACrimsonEclipseCharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-	if (CombatComponent)
-	{
-		CombatComponent->Character = this;
-	}
 }
 
 void ACrimsonEclipseCharacter::Tick(float DeltaSeconds)
@@ -116,8 +102,6 @@ void ACrimsonEclipseCharacter::Tick(float DeltaSeconds)
 		}
 	}
 }
-
-
 
 void ACrimsonEclipseCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {

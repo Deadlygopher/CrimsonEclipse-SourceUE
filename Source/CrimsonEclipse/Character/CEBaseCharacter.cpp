@@ -2,33 +2,63 @@
 
 
 #include "CEBaseCharacter.h"
+#include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
+#include "CrimsonEclipse/CrimsonEclipseComponents/HealthComponent.h"
+#include "Components/WidgetComponent.h"
+#include "CrimsonEclipse/HUD/OverheadWidget.h"
 
-// Sets default values
+
 ACEBaseCharacter::ACEBaseCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	CombatComponent->SetIsReplicated(true);
+
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+
+	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
+	OverheadWidgetComponent->SetupAttachment(RootComponent);
 }
 
-// Called when the game starts or when spawned
 void ACEBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SetOverheadWidgetInfo(HealthComponent->GetHealth());
+
+	HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetOverheadWidgetInfo);
 }
 
-// Called every frame
+void ACEBaseCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (CombatComponent)
+	{
+		CombatComponent->SetCharacter(this);
+	}
+}
+
 void ACEBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
-// Called to bind functionality to input
 void ACEBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
 
+void ACEBaseCharacter::SetOverheadWidgetInfo(float NewHealth)
+{
+	if (OverheadWidgetComponent)
+	{
+		auto Widget = Cast<UOverheadWidget>(OverheadWidgetComponent->GetWidget());
+		//float Health = HealthComponent->GetHealth();
+		float MaxHealth = HealthComponent->GetMaxHealth();
+		Widget->UpdateHealthBar(NewHealth, MaxHealth);
+		UE_LOG(LogTemp, Warning, TEXT("DELEGATE"));
+	}
 }
 
