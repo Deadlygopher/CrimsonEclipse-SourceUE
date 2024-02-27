@@ -18,11 +18,11 @@ void UHealthComponent::BeginPlay()
 void UHealthComponent::IncreaseHealth(float HealthToIncrease)
 {
 	Health = FMath::Clamp(Health + HealthToIncrease, 0.f, MaxHealth);
-	OnHealthChange.Broadcast(Health);
+	OnHealthChange.Broadcast(Health, MaxHealth);
 }
 
 void UHealthComponent::DecreaseHealth(float HealthToDecrease)
 {
 	Health = FMath::Clamp(Health - HealthToDecrease, 0.f, MaxHealth);
-	OnHealthChange.Broadcast(Health);
+	OnHealthChange.Broadcast(Health, MaxHealth);
 }

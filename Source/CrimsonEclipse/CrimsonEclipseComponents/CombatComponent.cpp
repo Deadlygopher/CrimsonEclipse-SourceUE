@@ -7,6 +7,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -88,11 +89,12 @@ void UCombatComponent::ResetTracingVectors()
 	PrevStartSocketLocation = CurrentStartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
 	PrevMiddleSocketLocation = CurrentMiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
 	PrevEndSocketLocation = CurrentEndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
+	ActorsToIgnore.Empty();
 }
 
 void UCombatComponent::OnHitDetect()
 {
-	if(RightHandEquippedWeapon)
+	if (RightHandEquippedWeapon)
 	{
 		FVector StartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
 		FVector MiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
@@ -103,35 +105,43 @@ void UCombatComponent::OnHitDetect()
 		TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
 		QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
-		TArray<AActor*> ActorsToIgnore;
-		ActorsToIgnore.Add(GetOwner());
+		//TArray<AActor*> ActorsToIgnore;
+		//ActorsToIgnore.Add(GetOwner());
 
 		FHitResult HitResult;
 		TArray<FHitResult> MultiHitResult;
-
+		
 		if (World)
 		{
 			CurrentStartSocketLocation = StartSocketLocation;
 			CurrentMiddleSocketLocation = MiddleSocketLocation;
 			CurrentEndSocketLocation = EndSocketLocation;
 
-			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevStartSocketLocation, CurrentStartSocketLocation,
+			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevStartSocketLocation, CurrentStartSocketLocation,
 				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
-			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevMiddleSocketLocation, CurrentMiddleSocketLocation,
-				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
-			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevEndSocketLocation, CurrentEndSocketLocation,
-				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 
-			UKismetSystemLibrary::LineTraceMultiForObjects(World, PrevEndSocketLocation, CurrentStartSocketLocation,
+			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevMiddleSocketLocation, CurrentMiddleSocketLocation,
 				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				MultiHitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+
+			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevEndSocketLocation, CurrentEndSocketLocation,
+				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+
+			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevEndSocketLocation, CurrentStartSocketLocation,
+				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 
 			PrevStartSocketLocation = CurrentStartSocketLocation;
 			PrevMiddleSocketLocation = CurrentMiddleSocketLocation;
 			PrevEndSocketLocation = CurrentEndSocketLocation;
+		}
+		if (HitResult.bBlockingHit)
+		{
+			UGameplayStatics::ApplyDamage(HitResult.GetActor(), RightHandDamage,
+				Cast<APawn>(GetOwner())->GetController(), GetOwner(), UDamageType::StaticClass());
+			ActorsToIgnore.Add(HitResult.GetActor());
 		}
 	}
 }

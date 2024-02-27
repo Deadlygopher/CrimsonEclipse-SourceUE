@@ -69,7 +69,8 @@ protected:
 
 	UFUNCTION()
 	void EquipWeapon(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
-	
+
+	virtual void SetOverheadWidgetInfo(float NewHealth, float MaxHealth) override;
 
 public:
 	UFUNCTION()

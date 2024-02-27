@@ -65,6 +65,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::Weapon"), Category = "Item")
 	TSubclassOf<AActor> WeaponType;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::Weapon"), Category = "Item")
+	float Damage = 0.f;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	TSubclassOf<UItemInstance> ItemInstanceClass;
 
@@ -189,4 +192,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	TSubclassOf<AActor> GetWeaponType() const { return WeaponType; };
+
+	UFUNCTION(BlueprintCallable)
+	float GetWeaponDamage() { return Damage; }
 };

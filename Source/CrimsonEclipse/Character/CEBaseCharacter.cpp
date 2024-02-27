@@ -6,6 +6,7 @@
 #include "CrimsonEclipse/CrimsonEclipseComponents/HealthComponent.h"
 #include "Components/WidgetComponent.h"
 #include "CrimsonEclipse/HUD/OverheadWidget.h"
+//#include "GameFramework/Controller.h"
 
 
 ACEBaseCharacter::ACEBaseCharacter()
@@ -26,9 +27,14 @@ void ACEBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetOverheadWidgetInfo(HealthComponent->GetHealth());
+	SetOverheadWidgetInfo(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
 
 	HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetOverheadWidgetInfo);
+	if (IsPlayerControlled())
+	{
+		OverheadWidgetComponent->SetVisibility(false);
+	}
+	OnTakeAnyDamage.AddDynamic(this, &ACEBaseCharacter::ReceiveDamage);
 }
 
 void ACEBaseCharacter::PostInitializeComponents()
@@ -50,15 +56,20 @@ void ACEBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ACEBaseCharacter::SetOverheadWidgetInfo(float NewHealth)
+void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+	AController* InstigatorController, AActor* DamageCauser)
+{
+	HealthComponent->DecreaseHealth(Damage);
+	UE_LOG(LogTemp, Warning, TEXT("DELEGATE"));
+}
+
+void ACEBaseCharacter::SetOverheadWidgetInfo(float NewHealth, float MaxHealth)
 {
 	if (OverheadWidgetComponent)
 	{
 		auto Widget = Cast<UOverheadWidget>(OverheadWidgetComponent->GetWidget());
-		//float Health = HealthComponent->GetHealth();
-		float MaxHealth = HealthComponent->GetMaxHealth();
+		//float MaxHealth = HealthComponent->GetMaxHealth();
 		Widget->UpdateHealthBar(NewHealth, MaxHealth);
-		UE_LOG(LogTemp, Warning, TEXT("DELEGATE"));
 	}
 }
 

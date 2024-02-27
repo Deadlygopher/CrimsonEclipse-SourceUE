@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChange, float Health)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float Health, float MaxHealth)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CRIMSONECLIPSE_API UHealthComponent : public UActorComponent

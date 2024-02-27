@@ -31,13 +31,12 @@ public:
 	virtual AWeapon* GetLeftHandWeapon();
 	void SetCharacter(ACEBaseCharacter* Char);
 
+	//Damage
+	float GetRightHandDamage() { return RightHandDamage; }
+	void SetRightHandDamage(float NewDamage) { RightHandDamage = NewDamage; }
+
 protected:
 	virtual void BeginPlay() override;
-
-	/*
-	UFUNCTION()
-	virtual void HitRightHandTracing();
-	*/
 
 	UFUNCTION()
 	virtual void ResetTracingVectors() override;
@@ -47,6 +46,8 @@ private:
 	ACEBaseCharacter* Character;
 	AWeapon* RightHandEquippedWeapon;
 	AWeapon* LeftHandEquippedWeapon;
+
+	TArray<AActor*> ActorsToIgnore;
 
 	//Tracing Sockets for weapon
 	FVector HalfSize{ 5.f, 5.f, 5.f };
@@ -60,7 +61,8 @@ private:
 	FVector PrevEndSocketLocation;
 	FVector CurrentEndSocketLocation;
 
-	//GetSocket
+	// Damage
+	float RightHandDamage = 1.f;
 
 public:
 	UFUNCTION()

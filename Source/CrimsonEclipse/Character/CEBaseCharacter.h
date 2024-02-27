@@ -8,6 +8,8 @@
 
 class UCombatComponent;
 class UHealthComponent;
+class UWidgetComponent;
+//class AController;
 
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter
@@ -25,10 +27,12 @@ protected:
 	UCombatComponent* CombatComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class UWidgetComponent* OverheadWidgetComponent;
+	UWidgetComponent* OverheadWidgetComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UHealthComponent* HealthComponent;
+
+	virtual void SetOverheadWidgetInfo(float NewHealth, float MaxHealth);
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -36,5 +40,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	void SetOverheadWidgetInfo(float NewHealth);
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+		AController* InstigatorController, AActor* DamageCauser);
 };

@@ -17,6 +17,7 @@
 #include "InventoryComponent.h"
 #include "Item.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "CrimsonEclipse/HUD/PlayerHUD.h"
 
 
 
@@ -210,6 +211,7 @@ void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Typ
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
 			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			CombatComponent->SetRightHandDamage(InItem->GetWeaponDamage());
 			UE_LOG(LogTemp, Warning, TEXT("Primary Weapon"));
 		}
 		break;
@@ -260,4 +262,11 @@ void ACrimsonEclipseCharacter::OnItemUnequip(UItem* InItem, EEquipmentSlotType T
 		break;
 	}
 	}
+}
+
+void ACrimsonEclipseCharacter::SetOverheadWidgetInfo(float NewHealth, float MaxHealth)
+{
+	Super::SetOverheadWidgetInfo(NewHealth, MaxHealth);
+	auto HUD = Cast<APlayerController>(GetController())->GetHUD();
+	Cast<APlayerHUD>(HUD)->SetPlayerStats(NewHealth, MaxHealth);
 }
