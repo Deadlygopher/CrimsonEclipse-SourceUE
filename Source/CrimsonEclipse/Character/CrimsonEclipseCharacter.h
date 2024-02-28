@@ -40,15 +40,6 @@ private:
 
 	bool bIsCameraRotate = false;
 
-	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
-	class AWeapon* OverlappingWeapon;
-
-	//UPROPERTY(VisibleAnywhere)
-	//class UCombatComponent* CombatComponent;
-
-	UFUNCTION()
-	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
-
 	UFUNCTION(Server, Reliable)
 	void ServerEquipWeapon(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 
@@ -57,8 +48,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 
 	class UInventoryComponent* InventoryComponent;
-
-	void SetOverlappingWeapon(AWeapon* Weapon);
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -79,4 +68,3 @@ public:
 	UFUNCTION()
 	void OnItemUnequip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 };
-

@@ -18,7 +18,10 @@ class CRIMSONECLIPSE_API UHitDetectAnimNotify : public UAnimNotifyState
 private:
 
 	UFUNCTION(BlueprintCallable)
-	void DetectHitOnTick(USkeletalMeshComponent* MeshComp);
+	//void DetectHitOnTick(USkeletalMeshComponent* MeshComp);
+
+	virtual void NotifyTick(USkeletalMeshComponent* MeshComp,
+		UAnimSequenceBase* Animation, float FrameDeltaTime) override;
 
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
 };

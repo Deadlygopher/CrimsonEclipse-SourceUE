@@ -27,8 +27,11 @@ public:
 	void UnequipRightWeapon();
 	void UnequipLeftWeapon();
 
+
+	//Weapon getters
 	virtual AWeapon* GetRightHandWeapon();
 	virtual AWeapon* GetLeftHandWeapon();
+
 	void SetCharacter(ACEBaseCharacter* Char);
 
 	//Damage

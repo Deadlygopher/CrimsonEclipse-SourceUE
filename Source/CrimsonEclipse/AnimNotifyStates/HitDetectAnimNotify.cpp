@@ -2,8 +2,22 @@
 
 
 #include "HitDetectAnimNotify.h"
-
+/*
 void UHitDetectAnimNotify::DetectHitOnTick(USkeletalMeshComponent* MeshComp)
+{
+	auto Interfaces = MeshComp->GetOwner()->GetComponents();
+	for (auto Interface : Interfaces)
+	{
+		if (auto HitInterface = Cast<IHitDetectInterface>(Interface))
+		{
+			HitInterface->OnHitDetect();
+			break;
+		}
+	}
+}
+*/
+
+void UHitDetectAnimNotify::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
 	auto Interfaces = MeshComp->GetOwner()->GetComponents();
 	for (auto Interface : Interfaces)

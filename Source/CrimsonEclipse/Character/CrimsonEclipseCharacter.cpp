@@ -83,7 +83,7 @@ void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ACrimsonEclipseCharacter, OverlappingWeapon, COND_OwnerOnly);
+	//DOREPLIFETIME_CONDITION(ACrimsonEclipseCharacter, OverlappingWeapon, COND_OwnerOnly);
 }
 
 void ACrimsonEclipseCharacter::Tick(float DeltaSeconds)
@@ -104,41 +104,16 @@ void ACrimsonEclipseCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-void ACrimsonEclipseCharacter::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
-{
-	if (OverlappingWeapon)
-	{
-		OverlappingWeapon->ShowPickupWidget(true);
-	}
-	if (LastWeapon)
-	{
-		LastWeapon->ShowPickupWidget(false);
-	}
-}
-
-void ACrimsonEclipseCharacter::SetOverlappingWeapon(AWeapon* Weapon)
-{
-	if (OverlappingWeapon)
-	{
-		OverlappingWeapon->ShowPickupWidget(false);
-	}
-
-	OverlappingWeapon = Weapon;
-	if (IsLocallyControlled())
-	{
-		if (OverlappingWeapon)
-		{
-			OverlappingWeapon->ShowPickupWidget(true);
-		}
-	}
-}
-
 void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("CameraRotation", IE_Pressed, this, &ACrimsonEclipseCharacter::CameraRotateON);
 	PlayerInputComponent->BindAction("CameraRotation", IE_Released, this, &ACrimsonEclipseCharacter::CameraRotateOFF);
+	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ACEBaseCharacter::StartRoll);
+	//PlayerInputComponent->BindAction("Roll", IE_Released, this, &ACEBaseCharacter::StopRoll);
+
+	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::LightAttack);
 
 	PlayerInputComponent->BindAxis("CameraRotationAxis", this, &ACrimsonEclipseCharacter::ChangeCameraAngle);
 	PlayerInputComponent->BindAxis("CameraZoom", this, &ACrimsonEclipseCharacter::CameraZoom);

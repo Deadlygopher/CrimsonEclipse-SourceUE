@@ -2,7 +2,7 @@
 
 
 #include "CrimsonEclipseAnimInstance.h"
-#include "CrimsonEclipse/Character/CrimsonEclipseCharacter.h"
+#include "CrimsonEclipse/Character/CEBaseCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UCrimsonEclipseAnimInstance::NativeInitializeAnimation()
@@ -26,6 +26,7 @@ void UCrimsonEclipseAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	Velocity.Z = 0.f;
 	Speed = Velocity.Size();
 
+	bIsRollig = CrimsonEclipseCharacter->GetIsRollPressed();
 	bIsInAir = CrimsonEclipseCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = CrimsonEclipseCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 }

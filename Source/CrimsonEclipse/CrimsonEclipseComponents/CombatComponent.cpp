@@ -49,7 +49,7 @@ void UCombatComponent::EquipRightWeapon(AWeapon* WeaponToEquip)
 	RightHandEquippedWeapon = WeaponToEquip;
 
 	if (RightHandEquippedWeapon) {
-		RightHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		//RightHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 
 		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 		if (HandSocket)
@@ -70,7 +70,7 @@ void UCombatComponent::EquipLeftWeapon(AWeapon* WeaponToEquip)
 
 	if (LeftHandEquippedWeapon)
 	{
-		LeftHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		//LeftHandEquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
 
 		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("LeftHandSocket"));
 		if (HandSocket)
@@ -90,6 +90,7 @@ void UCombatComponent::ResetTracingVectors()
 	PrevMiddleSocketLocation = CurrentMiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
 	PrevEndSocketLocation = CurrentEndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
 	ActorsToIgnore.Empty();
+	ActorsToIgnore.Add(GetOwner());
 }
 
 void UCombatComponent::OnHitDetect()
@@ -99,14 +100,10 @@ void UCombatComponent::OnHitDetect()
 		FVector StartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
 		FVector MiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
 		FVector EndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
-		//FRotator StartSocketOrientation = StartSocketLocation.ToOrientationRotator();
 		UWorld* World = GetWorld();
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
 		QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-		//TArray<AActor*> ActorsToIgnore;
-		//ActorsToIgnore.Add(GetOwner());
 
 		FHitResult HitResult;
 		TArray<FHitResult> MultiHitResult;
