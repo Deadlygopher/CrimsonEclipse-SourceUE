@@ -28,13 +28,18 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//Roll variables
+	/// Roll variables
 	bool bPressedRoll = false;
 	float RollSpeed = 1000;
 	bool GetIsRollPressed() { return bPressedRoll; }
+
+	UFUNCTION(BlueprintCallable)
 	void StartRoll();
+
 	virtual void RollInProcess() override;
 	virtual void StopRoll() override;
+	/// Roll variables
+
 
 protected:
 	virtual void BeginPlay() override;

@@ -80,7 +80,10 @@ void ACEBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void ACEBaseCharacter::StartRoll()
 {
-	RotateToCursorDirecion();
+	if (IsPlayerControlled())
+	{
+		RotateToCursorDirecion();
+	}
 	bReadyForAttack = false;
 	GetCharacterMovement()->MaxWalkSpeed = RollSpeed;
 	GetCharacterMovement()->Velocity = GetActorForwardVector() * RollSpeed;

@@ -62,9 +62,9 @@ protected:
 	virtual void SetOverheadWidgetInfo(float NewHealth, float MaxHealth) override;
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnItemEquip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OnItemUnequip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 };

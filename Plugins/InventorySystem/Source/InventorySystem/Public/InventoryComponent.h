@@ -462,6 +462,9 @@ public:
 	virtual void RemoveItemFromOverlapping(APickup* PickupToRemove) override;
 	virtual void SwitchItemWidgetVisibility(bool bShowWidget) override;
 
+	UFUNCTION(BlueprintCallable)
+	virtual void EquipItem(UItem* Item);
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

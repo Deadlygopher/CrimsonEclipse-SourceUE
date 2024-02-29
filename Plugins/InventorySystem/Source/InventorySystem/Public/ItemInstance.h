@@ -23,6 +23,8 @@ public:
 
 	UItemInstance();
 
+
+
 	void NativeOnConstruct();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "ItemInstance")
