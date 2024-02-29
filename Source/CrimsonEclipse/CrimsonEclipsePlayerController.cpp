@@ -7,6 +7,9 @@
 #include "Engine/World.h"
 #include "Pickup.h"
 #include "InventoryInterface.h"
+#include "CrimsonEclipse/HUD/PlayerHUD.h"
+
+#include "CrimsonEclipse/CrimsonEclipseComponents/HealthComponent.h"
 
 ACrimsonEclipsePlayerController::ACrimsonEclipsePlayerController()
 {
@@ -24,6 +27,7 @@ void ACrimsonEclipsePlayerController::PlayerTick(float DeltaTime)
 		MoveToMouseCursor();
 	}
 }
+
 
 void ACrimsonEclipsePlayerController::SetupInputComponent()
 {
@@ -184,4 +188,3 @@ void ACrimsonEclipsePlayerController::OnSetDestinationReleased()
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
-

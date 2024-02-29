@@ -6,10 +6,10 @@
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/HealthComponent.h"
 #include "Components/WidgetComponent.h"
+#include "InventoryComponent.h"
+#include "Item.h"
 #include "CrimsonEclipse/HUD/OverheadWidget.h"
 #include "CrimsonEclipse/Items/Weapon.h"
-#include "Kismet/KismetMathLibrary.h"
-//#include "GameFramework/Controller.h"
 
 
 ACEBaseCharacter::ACEBaseCharacter()
@@ -26,16 +26,19 @@ ACEBaseCharacter::ACEBaseCharacter()
 	OverheadWidgetComponent->SetupAttachment(RootComponent);
 
 	GetCharacterMovement()->MaxWalkSpeed = MaxMoveSpeed;
-	//GetMovementComponent()->
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
+	InventoryComponent->OnItemEquipped.AddDynamic(this, &ACEBaseCharacter::OnItemEquip);
+	InventoryComponent->OnItemUnequipped.AddDynamic(this, &ACEBaseCharacter::OnItemUnequip);
 }
 
 void ACEBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetOverheadWidgetInfo(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
+	SetHealthWidgetInfo(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
 
-	HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetOverheadWidgetInfo);
+	HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
 	if (IsPlayerControlled())
 	{
 		OverheadWidgetComponent->SetVisibility(false);
@@ -56,7 +59,7 @@ void ACEBaseCharacter::LightAttack()
 {
 	if (CombatComponent->GetRightHandWeapon() && bReadyForAttack)
 	{
-		RotateToCursorDirecion();
+		//RotateToCursorDirecion();
 		GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ACEBaseCharacter::ResetReadyForAttack);
 		auto AnimMontage = CombatComponent->GetRightHandWeapon()->GetLightAttackAnimMontage();
 		if (AnimMontage)
@@ -78,12 +81,23 @@ void ACEBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+UHealthComponent* ACEBaseCharacter::GetHealthComponent()
+{
+	return HealthComponent;
+}
+
+float ACEBaseCharacter::GetHealth()
+{
+	return HealthComponent->GetHealth();
+}
+
+float ACEBaseCharacter::GetMaxHealth()
+{
+	return HealthComponent->GetMaxHealth();
+}
+
 void ACEBaseCharacter::StartRoll()
 {
-	if (IsPlayerControlled())
-	{
-		RotateToCursorDirecion();
-	}
 	bReadyForAttack = false;
 	GetCharacterMovement()->MaxWalkSpeed = RollSpeed;
 	GetCharacterMovement()->Velocity = GetActorForwardVector() * RollSpeed;
@@ -115,22 +129,74 @@ void ACEBaseCharacter::ResetReadyForAttack(UAnimMontage* Montage, bool bInterrup
 	GetCharacterMovement()->MaxWalkSpeed = MaxMoveSpeed;
 }
 
-void ACEBaseCharacter::RotateToCursorDirecion()
-{
-	FHitResult HitResult;
-	Cast<APlayerController>(GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
-	FVector LastLocation = GetCharacterMovement()->GetLastUpdateLocation();
-	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(LastLocation, HitResult.Location);
-	GetCharacterMovement()->MoveUpdatedComponent(FVector{ 0 }, FRotator{ 0.f,NewRotation.Yaw, NewRotation.Roll }, true);
-}
-
-void ACEBaseCharacter::SetOverheadWidgetInfo(float NewHealth, float MaxHealth)
+void ACEBaseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
 {
 	if (OverheadWidgetComponent)
 	{
 		auto Widget = Cast<UOverheadWidget>(OverheadWidgetComponent->GetWidget());
-		//float MaxHealth = HealthComponent->GetMaxHealth();
 		Widget->UpdateHealthBar(NewHealth, MaxHealth);
 	}
 }
 
+void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+{
+	switch (Type)
+	{
+	case EEquipmentSlotType::PrimaryWeapon:
+	{
+		if (InItem->GetWeaponType() && CombatComponent)
+		{
+			FActorSpawnParameters WeaponSpawnParameters;
+			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			CombatComponent->SetRightHandDamage(InItem->GetWeaponDamage());
+			UE_LOG(LogTemp, Warning, TEXT("Primary Weapon"));
+		}
+		break;
+	}
+	case EEquipmentSlotType::SecondaryWeapon:
+	{
+		if (InItem->GetWeaponType() && CombatComponent)
+		{
+			FActorSpawnParameters WeaponSpawnParameters;
+			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			UE_LOG(LogTemp, Warning, TEXT("Secondary Weapon"));
+		}
+		break;
+	}
+	default:
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Default EQUIP case"));
+		break;
+	}
+	}
+}
+
+void ACEBaseCharacter::OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+{
+	switch (Type)
+	{
+	case EEquipmentSlotType::PrimaryWeapon:
+	{
+		if (CombatComponent->GetRightHandWeapon())
+		{
+			CombatComponent->UnequipRightWeapon();
+			UE_LOG(LogTemp, Warning, TEXT("Unequip Primary Weapon"));
+		}
+		break;
+	}
+	case EEquipmentSlotType::SecondaryWeapon:
+	{
+		if (CombatComponent->GetLeftHandWeapon())
+		{
+			CombatComponent->UnequipLeftWeapon();
+			UE_LOG(LogTemp, Warning, TEXT("Unequip Secondary Weapon"));
+		}
+		break;
+	}
+	default:
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Default UNEQUIP case"));
+		break;
+	}
+	}
+}

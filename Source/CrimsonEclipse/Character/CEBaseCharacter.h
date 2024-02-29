@@ -11,7 +11,7 @@
 class UCombatComponent;
 class UHealthComponent;
 class UWidgetComponent;
-//class AController;
+class UInventoryComponent;
 
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter, public IEvadeAnimInterface
@@ -28,18 +28,37 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UHealthComponent* GetHealthComponent();
+	float GetHealth();
+	float GetMaxHealth();
+
 	/// Roll variables
+private:
+	UPROPERTY(EditDefaultsOnly)
 	bool bPressedRoll = false;
+
+	UPROPERTY(EditDefaultsOnly)
 	float RollSpeed = 1000;
+public:
 	bool GetIsRollPressed() { return bPressedRoll; }
 
 	UFUNCTION(BlueprintCallable)
-	void StartRoll();
+	virtual void StartRoll();
 
 	virtual void RollInProcess() override;
 	virtual void StopRoll() override;
 	/// Roll variables
 
+	/// Inventory
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UInventoryComponent* InventoryComponent;
+
+	UFUNCTION(BlueprintCallable)
+	void OnItemEquip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+
+	UFUNCTION(BlueprintCallable)
+	void OnItemUnequip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+	/// Inventory
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,7 +78,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float InAttackMoveSpeed = 200;
 
-	virtual void SetOverheadWidgetInfo(float NewHealth, float MaxHealth);
+	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth);
 
 private:
 	UFUNCTION()
@@ -70,8 +89,4 @@ private:
 
 	UFUNCTION()
 	void ResetReadyForAttack(UAnimMontage* Montage, bool bInterrupted);
-
-	void RotateToCursorDirecion();
-
-
 };

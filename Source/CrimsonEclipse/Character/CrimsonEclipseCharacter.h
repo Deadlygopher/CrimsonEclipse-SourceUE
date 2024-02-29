@@ -40,15 +40,6 @@ private:
 
 	bool bIsCameraRotate = false;
 
-	UFUNCTION(Server, Reliable)
-	void ServerEquipWeapon(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
-
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-
-	class UInventoryComponent* InventoryComponent;
-
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	void CameraRotateON();
@@ -56,15 +47,10 @@ protected:
 	void ChangeCameraAngle(float Value);
 	void CameraZoom(float Value);
 
-	UFUNCTION()
-	void EquipWeapon(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
-
-	virtual void SetOverheadWidgetInfo(float NewHealth, float MaxHealth) override;
+	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void OnItemEquip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
-
-	UFUNCTION(BlueprintCallable)
-	void OnItemUnequip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+	virtual void StartRoll() override;
+	virtual void LightAttack() override;
+	void RotateToCursorDirecion();
 };

@@ -12,11 +12,9 @@
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
-#include "CrimsonEclipse/Items/Weapon.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
-#include "InventoryComponent.h"
-#include "Item.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "CrimsonEclipse/HUD/PlayerHUD.h"
 
 
@@ -64,14 +62,6 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-
-	//CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	//CombatComponent->SetIsReplicated(true);
-
-	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent1");
-	//InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemEquip);
-	InventoryComponent->OnItemEquipped.AddDynamic(this, &ACrimsonEclipseCharacter::EquipWeapon);
-	InventoryComponent->OnItemUnequipped.AddDynamic(this, &ACrimsonEclipseCharacter::OnItemUnequip);
 }
 
 void ACrimsonEclipseCharacter::BeginPlay()
@@ -111,7 +101,6 @@ void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	PlayerInputComponent->BindAction("CameraRotation", IE_Pressed, this, &ACrimsonEclipseCharacter::CameraRotateON);
 	PlayerInputComponent->BindAction("CameraRotation", IE_Released, this, &ACrimsonEclipseCharacter::CameraRotateOFF);
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ACEBaseCharacter::StartRoll);
-	//PlayerInputComponent->BindAction("Roll", IE_Released, this, &ACEBaseCharacter::StopRoll);
 
 	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::LightAttack);
 
@@ -149,99 +138,39 @@ void ACrimsonEclipseCharacter::CameraZoom(float Value)
 	}
 }
 
-void ACrimsonEclipseCharacter::EquipWeapon(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+void ACrimsonEclipseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
 {
-	//if (CombatComponent)
-	//{
-		if (HasAuthority())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("HasAuthority"));
-			OnItemEquip(InItem, Type, InQuantity);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("NOTHasAuthority"));
-			ServerEquipWeapon(InItem, Type, InQuantity);
-		}
-	//}
-}
-
-void ACrimsonEclipseCharacter::ServerEquipWeapon_Implementation(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
-{
-	//if (CombatComponent)
-	//{
-		OnItemEquip(InItem, Type, InQuantity);
-		UE_LOG(LogTemp, Warning, TEXT("ServerEquip"));
-		//CombatComponent->EquipRightWeapon(OverlappingWeapon);
-	//}
-}
-
-void ACrimsonEclipseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
-{
-	switch (Type)
+	Super::SetHealthWidgetInfo(NewHealth, MaxHealth);
+	if (GetController())
 	{
-	case EEquipmentSlotType::PrimaryWeapon:
-	{
-		if (InItem->GetWeaponType() && CombatComponent)
+		if (Cast<APlayerController>(GetController())->GetHUD())
 		{
-			FActorSpawnParameters WeaponSpawnParameters;
-			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
-			CombatComponent->SetRightHandDamage(InItem->GetWeaponDamage());
-			UE_LOG(LogTemp, Warning, TEXT("Primary Weapon"));
+			auto HUD = Cast<APlayerController>(GetController())->GetHUD();
+			if (HUD)
+			{
+				Cast<APlayerHUD>(HUD)->UpdateHUDHealth(NewHealth, MaxHealth);
+			}
 		}
-		break;
-	}
-	case EEquipmentSlotType::SecondaryWeapon:
-	{
-		if (InItem->GetWeaponType() && CombatComponent)
-		{
-			FActorSpawnParameters WeaponSpawnParameters;
-			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
-			UE_LOG(LogTemp, Warning, TEXT("Secondary Weapon"));
-		}
-		break;
-	}
-	default:
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Default EQUIP case"));
-		break;
-	}
 	}
 }
 
-void ACrimsonEclipseCharacter::OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+void ACrimsonEclipseCharacter::StartRoll()
 {
-	switch (Type)
-	{
-	case EEquipmentSlotType::PrimaryWeapon:
-	{
-		if (CombatComponent->GetRightHandWeapon())
-		{
-			CombatComponent->UnequipRightWeapon();
-			UE_LOG(LogTemp, Warning, TEXT("Unequip Primary Weapon"));
-		}
-		break;
-	}
-	case EEquipmentSlotType::SecondaryWeapon:
-	{
-		if (CombatComponent->GetLeftHandWeapon())
-		{
-			CombatComponent->UnequipLeftWeapon();
-			UE_LOG(LogTemp, Warning, TEXT("Unequip Secondary Weapon"));
-		}
-		break;
-	}
-	default:
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Default UNEQUIP case"));
-		break;
-	}
-	}
+	RotateToCursorDirecion();
+	Super::StartRoll();
 }
 
-void ACrimsonEclipseCharacter::SetOverheadWidgetInfo(float NewHealth, float MaxHealth)
+void ACrimsonEclipseCharacter::LightAttack()
 {
-	Super::SetOverheadWidgetInfo(NewHealth, MaxHealth);
-	auto HUD = Cast<APlayerController>(GetController())->GetHUD();
-	Cast<APlayerHUD>(HUD)->SetPlayerStats(NewHealth, MaxHealth);
+	RotateToCursorDirecion();
+	Super::LightAttack();
+}
+
+void ACrimsonEclipseCharacter::RotateToCursorDirecion()
+{
+	FHitResult HitResult;
+	Cast<APlayerController>(GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
+	FVector LastLocation = GetCharacterMovement()->GetLastUpdateLocation();
+	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(LastLocation, HitResult.Location);
+	GetCharacterMovement()->MoveUpdatedComponent(FVector{ 0 }, FRotator{ 0.f,NewRotation.Yaw, NewRotation.Roll }, true);
 }

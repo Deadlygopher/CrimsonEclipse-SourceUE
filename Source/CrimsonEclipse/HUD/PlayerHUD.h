@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+
 #include "PlayerHUD.generated.h"
 
 class UPlayerStatsWidget;
@@ -16,7 +17,7 @@ class CRIMSONECLIPSE_API APlayerHUD : public AHUD
 public:
 	virtual void BeginPlay() override;
 
-	void SetPlayerStats(float Health, float MaxHealth);
+	virtual void UpdateHUDHealth(float Health, float MaxHealth);
 
 private:
 	UPROPERTY(EditDefaultsOnly)

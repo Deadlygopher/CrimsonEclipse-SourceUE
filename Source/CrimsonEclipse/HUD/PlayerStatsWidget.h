@@ -15,9 +15,6 @@ class CRIMSONECLIPSE_API UPlayerStatsWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void UpdatePlayerWidget(float Health, float MaxHealth);
-
-protected:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* PlayerHealthBar;
 

@@ -4,6 +4,8 @@
 #include "PlayerHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "PlayerStatsWidget.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 
 void APlayerHUD::BeginPlay()
@@ -13,7 +15,11 @@ void APlayerHUD::BeginPlay()
 	PlayerStats->SetVisibility(ESlateVisibility::HitTestInvisible);
 }
 
-void APlayerHUD::SetPlayerStats(float Health, float MaxHealth)
+void APlayerHUD::UpdateHUDHealth(float Health, float MaxHealth)
 {
-	PlayerStats->UpdatePlayerWidget(Health, MaxHealth);
+	if (MaxHealth > 0 && PlayerStats && PlayerStats->PlayerHealthBar && PlayerStats->PlayerHealthText)
+	{
+		PlayerStats->PlayerHealthBar->SetPercent(Health / MaxHealth);
+		PlayerStats->PlayerHealthText->SetText(FText::FromString(FString::FromInt(Health)));
+	}
 }
