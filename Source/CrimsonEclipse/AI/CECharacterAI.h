@@ -6,12 +6,16 @@
 #include "CrimsonEclipse/Character/CEBaseCharacter.h"
 #include "CECharacterAI.generated.h"
 
-/**
- * 
- */
+class UBehaviorTree;
+
 UCLASS()
 class CRIMSONECLIPSE_API ACECharacterAI : public ACEBaseCharacter
 {
 	GENERATED_BODY()
 	
+public:
+	ACECharacterAI();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="AI")
+	UBehaviorTree* BehaviorTreeAsset;
 };

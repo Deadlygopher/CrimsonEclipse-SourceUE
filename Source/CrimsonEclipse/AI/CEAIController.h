@@ -6,12 +6,19 @@
 #include "AIController.h"
 #include "CEAIController.generated.h"
 
-/**
- * 
- */
+class UCEAIPerceptionComponent;
+
 UCLASS()
 class CRIMSONECLIPSE_API ACEAIController : public AAIController
 {
 	GENERATED_BODY()
 	
+public:
+	ACEAIController();
+
+protected:
+	virtual void OnPossess(APawn* InPawn) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	UCEAIPerceptionComponent* CEAIPerceptionComponent;
 };
