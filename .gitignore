@@ -6,4 +6,10 @@ Saved/
 Binaries/
 
 #Content folder
-Content/
+Content/Geometry
+Content/HUD/CursorImages
+Content/Materials
+Content/Meshes
+Content/StarterContent
+Content/TopDownCPP/Maps
+Content/Mannequin

@@ -21,6 +21,14 @@ public class CrimsonEclipse : ModuleRules
 															"HTTP",
 															"Json",
 															"JsonUtilities",
+															"GameplayTasks",
 															/*"UMG"*/});
+
+		PrivateDependencyModuleNames.AddRange(new string[] { });
+
+		PublicIncludePaths.AddRange(new string[] 
+		{
+			"CrimsonEclipse/AI/Tasks",
+		});
     }
 }
