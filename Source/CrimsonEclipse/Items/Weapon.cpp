@@ -11,7 +11,7 @@
 AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	bReplicates = true;
+	//bReplicates = true;
 
 	USceneComponent* SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(SceneComponent);
@@ -32,6 +32,7 @@ void AWeapon::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("WEAPON SPAWNED"));
 }
 
+/*
 void AWeapon::OnRep_WeaponState()
 {
 	switch (WeaponState)
@@ -40,7 +41,7 @@ void AWeapon::OnRep_WeaponState()
 
 		break;
 	}
-}
+}*/
 
 void AWeapon::Tick(float DeltaTime)
 {

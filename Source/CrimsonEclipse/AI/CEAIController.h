@@ -17,6 +17,7 @@ public:
 	ACEAIController();
 
 protected:
+	virtual void Tick(float DeltaTime) override;
 	virtual void OnPossess(APawn* InPawn) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

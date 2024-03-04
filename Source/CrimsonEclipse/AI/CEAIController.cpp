@@ -5,10 +5,18 @@
 #include "CECharacterAI.h"
 #include "Components/CEAIPerceptionComponent.h"
 
+
 ACEAIController::ACEAIController()
 {
 	CEAIPerceptionComponent = CreateDefaultSubobject<UCEAIPerceptionComponent>("CEAIPerceptionComponent");
 	SetPerceptionComponent(*CEAIPerceptionComponent);
+}
+
+void ACEAIController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	const auto AimActor = CEAIPerceptionComponent->GetClosestEnemy();
+	SetFocus(AimActor);
 }
 
 void ACEAIController::OnPossess(APawn* InPawn)

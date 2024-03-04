@@ -41,11 +41,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	USkeletalMeshComponent* WeaponMesh;
 
-	UPROPERTY(ReplicatedUsing = OnRep_WeaponState, VisibleAnywhere, Category = "Weapon Properties")
+	UPROPERTY(/*ReplicatedUsing = OnRep_WeaponState,*/ VisibleAnywhere, Category = "Weapon Properties")
 	EWeaponState WeaponState;
 
-	UFUNCTION()
-	void OnRep_WeaponState();
+	//UFUNCTION()
+	//void OnRep_WeaponState();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
 	UAnimMontage* WeaponLightAttackAnimMontage;

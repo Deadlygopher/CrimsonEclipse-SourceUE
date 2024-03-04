@@ -38,12 +38,16 @@ void ACEBaseCharacter::BeginPlay()
 
 	SetHealthWidgetInfo(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
 
-	HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
 	if (IsPlayerControlled())
 	{
 		OverheadWidgetComponent->SetVisibility(false);
 	}
 	OnTakeAnyDamage.AddDynamic(this, &ACEBaseCharacter::ReceiveDamage);
+	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ACEBaseCharacter::ResetReadyForAttack);
+	if (HealthComponent)
+	{
+		HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
+	}
 }
 
 void ACEBaseCharacter::PostInitializeComponents()
@@ -59,8 +63,6 @@ void ACEBaseCharacter::LightAttack()
 {
 	if (CombatComponent->GetRightHandWeapon() && bReadyForAttack)
 	{
-		//RotateToCursorDirecion();
-		GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ACEBaseCharacter::ResetReadyForAttack);
 		auto AnimMontage = CombatComponent->GetRightHandWeapon()->GetLightAttackAnimMontage();
 		if (AnimMontage)
 		{
@@ -120,7 +122,6 @@ void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const U
 	AController* InstigatorController, AActor* DamageCauser)
 {
 	HealthComponent->DecreaseHealth(Damage);
-	UE_LOG(LogTemp, Warning, TEXT("DELEGATE"));
 }
 
 void ACEBaseCharacter::ResetReadyForAttack(UAnimMontage* Montage, bool bInterrupted)
@@ -134,6 +135,8 @@ void ACEBaseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
 	if (OverheadWidgetComponent)
 	{
 		auto Widget = Cast<UOverheadWidget>(OverheadWidgetComponent->GetWidget());
+
+		if (!Widget) return;
 		Widget->UpdateHealthBar(NewHealth, MaxHealth);
 	}
 }
