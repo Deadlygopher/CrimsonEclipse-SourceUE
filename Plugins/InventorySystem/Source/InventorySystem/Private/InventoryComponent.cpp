@@ -1130,22 +1130,7 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			NotifyInventoryUpdated();
 			NotifyInventoryWeightChanged();
 		}
-		/*
-		else if (SecondarySlot.IsValid() && SecondarySlot.Data.IsEmpty())
-		{
-			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
-			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
-			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
-
-			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-			Slots.Remove(Slot);
-
-			NotifyInventoryUpdated();
-			NotifyInventoryWeightChanged();
-		}
-		*/
 		else if (PrimarySlot.Data.IsOccupied())
 		{
 			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
@@ -1284,22 +1269,6 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			NotifyInventoryUpdated();
 			NotifyInventoryWeightChanged();
 		}
-		/*
-		else if (SecondarySlot.IsValid() && SecondarySlot.Data.IsEmpty())
-		{
-			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(SecondarySlot.Type);
-
-			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
-			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
-
-			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.Quantity);
-			Slots.Remove(Slot);
-
-			NotifyInventoryUpdated();
-			NotifyInventoryWeightChanged();
-		}
-		*/
 		else if (PrimarySlot.Data.IsOccupied())
 		{
 			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
