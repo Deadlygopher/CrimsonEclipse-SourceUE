@@ -4,7 +4,6 @@
 #include "Weapon.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
-//#include "CrimsonEclipse/Character/CrimsonEclipseCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 

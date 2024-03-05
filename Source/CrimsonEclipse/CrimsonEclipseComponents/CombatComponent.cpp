@@ -3,11 +3,15 @@
 
 #include "CombatComponent.h"
 #include "CrimsonEclipse/Items/Weapon.h"
-#include "CrimsonEclipse/Character/CrimsonEclipseCharacter.h"
+#include "CrimsonEclipse/Character/CEBaseCharacter.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "DrawDebugHelpers.h"
+
+DEFINE_LOG_CATEGORY(LogCombatComponent);
 
 UCombatComponent::UCombatComponent()
 {
@@ -40,6 +44,8 @@ AWeapon* UCombatComponent::GetLeftHandWeapon()
 void UCombatComponent::SetCharacter(ACEBaseCharacter* Char)
 {
 	Character = Char;
+	DefaultInAttackMoveSpeed = Character->GetMaxWalkSpeed();
+	InAttackMoveSpeed = DefaultInAttackMoveSpeed;
 }
 
 void UCombatComponent::EquipRightWeapon(AWeapon* WeaponToEquip)
@@ -59,6 +65,10 @@ void UCombatComponent::EquipRightWeapon(AWeapon* WeaponToEquip)
 		RightHandEquippedWeapon->SetOwner(Character);
 		RightHandEquippedWeapon->SetActorLocationAndRotation(RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("HandleSocket"),
 			RightHandEquippedWeapon->GetWeaponMesh()->GetSocketRotation("HandleSocket"));
+		if (InAttackMoveSpeed > RightHandEquippedWeapon->GetWeaponAttackMoveSpeed())
+		{
+			InAttackMoveSpeed = RightHandEquippedWeapon->GetWeaponAttackMoveSpeed();
+		}
 	}
 }
 
@@ -80,6 +90,10 @@ void UCombatComponent::EquipLeftWeapon(AWeapon* WeaponToEquip)
 		LeftHandEquippedWeapon->SetOwner(Character);
 		LeftHandEquippedWeapon->SetActorLocationAndRotation(LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("HandleSocket"),
 			LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketRotation("HandleSocket"));
+		if (InAttackMoveSpeed > LeftHandEquippedWeapon->GetWeaponAttackMoveSpeed())
+		{
+			InAttackMoveSpeed = LeftHandEquippedWeapon->GetWeaponAttackMoveSpeed();
+		}
 	}
 }
 
@@ -90,55 +104,72 @@ void UCombatComponent::ResetTracingVectors()
 	PrevMiddleSocketLocation = CurrentMiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
 	PrevEndSocketLocation = CurrentEndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
 	ActorsToIgnore.Empty();
-	ActorsToIgnore.Add(GetOwner());
+	ActorsToIgnore.Add(Character);
 }
 
 void UCombatComponent::OnHitDetect()
 {
 	if (RightHandEquippedWeapon)
 	{
-		FVector StartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
-		FVector MiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
-		FVector EndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
-		UWorld* World = GetWorld();
+		const FVector StartSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("StartTrackingSocket");
+		const FVector MiddleSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("MiddleTrackingSocket");
+		const FVector EndSocketLocation = RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("EndTrackingSocket");
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
 		QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 
 		FHitResult HitResult;
 		TArray<FHitResult> MultiHitResult;
-		
-		if (World)
-		{
-			CurrentStartSocketLocation = StartSocketLocation;
-			CurrentMiddleSocketLocation = MiddleSocketLocation;
-			CurrentEndSocketLocation = EndSocketLocation;
 
-			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevStartSocketLocation, CurrentStartSocketLocation,
-				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+		if (!GetWorld()) return;
 
-			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevMiddleSocketLocation, CurrentMiddleSocketLocation,
-				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+		CurrentStartSocketLocation = StartSocketLocation;
+		CurrentMiddleSocketLocation = MiddleSocketLocation;
+		CurrentEndSocketLocation = EndSocketLocation;
 
-			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevEndSocketLocation, CurrentEndSocketLocation,
-				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevStartSocketLocation, CurrentStartSocketLocation,
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 
-			UKismetSystemLibrary::LineTraceSingleForObjects(World, PrevEndSocketLocation, CurrentStartSocketLocation,
-				QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-				HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevMiddleSocketLocation, CurrentMiddleSocketLocation,
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 
-			PrevStartSocketLocation = CurrentStartSocketLocation;
-			PrevMiddleSocketLocation = CurrentMiddleSocketLocation;
-			PrevEndSocketLocation = CurrentEndSocketLocation;
-		}
+		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevEndSocketLocation, CurrentEndSocketLocation,
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+
+		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevEndSocketLocation, CurrentStartSocketLocation,
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
+			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+
+		PrevStartSocketLocation = CurrentStartSocketLocation;
+		PrevMiddleSocketLocation = CurrentMiddleSocketLocation;
+		PrevEndSocketLocation = CurrentEndSocketLocation;
+
 		if (HitResult.bBlockingHit)
 		{
 			UGameplayStatics::ApplyDamage(HitResult.GetActor(), RightHandDamage,
 				Cast<APawn>(GetOwner())->GetController(), GetOwner(), UDamageType::StaticClass());
 			ActorsToIgnore.Add(HitResult.GetActor());
+		}
+	}
+}
+
+void UCombatComponent::OnAiming()
+{
+	if (LeftHandEquippedWeapon)
+	{
+		if (Character->IsPlayerControlled())
+		{
+			Character->RotateToCursorDirecion();
+			const FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
+			const FVector TraceStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, Character->GetActorLocation().Z+40);
+			//const FVector TraceStart = SocketTransform.GetLocation();
+			const FVector ArrowDirection = Character->GetActorForwardVector();
+			//const FVector ArrowDirection = SocketTransform.GetRotation().GetForwardVector();
+			const FVector TraceEnd = TraceStart + ArrowDirection * 1000; // Magic number
+			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 3.f, 0, 3.f);
 		}
 	}
 }
@@ -154,9 +185,17 @@ void UCombatComponent::UnequipRightWeapon()
 {
 	if (RightHandEquippedWeapon)
 	{
-		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+		//const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 		RightHandEquippedWeapon->Destroy();
 		RightHandEquippedWeapon = nullptr;
+		if (LeftHandEquippedWeapon)
+		{
+			InAttackMoveSpeed = LeftHandEquippedWeapon->GetWeaponAttackMoveSpeed();
+		}
+	}
+	if (RightHandEquippedWeapon == nullptr && LeftHandEquippedWeapon == nullptr)
+	{
+		InAttackMoveSpeed = DefaultInAttackMoveSpeed;
 	}
 }
 
@@ -164,8 +203,16 @@ void UCombatComponent::UnequipLeftWeapon()
 {
 	if (LeftHandEquippedWeapon)
 	{
-		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+		//const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 		LeftHandEquippedWeapon->Destroy();
 		LeftHandEquippedWeapon = nullptr;
+		if (RightHandEquippedWeapon)
+		{
+			InAttackMoveSpeed = RightHandEquippedWeapon->GetWeaponAttackMoveSpeed();
+		}
+	}
+	if (LeftHandEquippedWeapon == nullptr && RightHandEquippedWeapon == nullptr)
+	{
+		InAttackMoveSpeed = DefaultInAttackMoveSpeed;
 	}
 }

@@ -168,6 +168,7 @@ void ACrimsonEclipseCharacter::LightAttack()
 
 void ACrimsonEclipseCharacter::RotateToCursorDirecion()
 {
+	Super::RotateToCursorDirecion();
 	FHitResult HitResult;
 	Cast<APlayerController>(GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
 	FVector LastLocation = GetCharacterMovement()->GetLastUpdateLocation();

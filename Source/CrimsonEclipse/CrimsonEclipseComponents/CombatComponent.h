@@ -8,6 +8,8 @@
 
 #include "CombatComponent.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogCombatComponent, Log, All);
+
 class AWeapon;
 class ACEBaseCharacter;
 
@@ -27,6 +29,7 @@ public:
 	void UnequipRightWeapon();
 	void UnequipLeftWeapon();
 
+	//float
 
 	//Weapon getters
 	virtual AWeapon* GetRightHandWeapon();
@@ -46,8 +49,13 @@ protected:
 
 private:
 	
+	UPROPERTY()
 	ACEBaseCharacter* Character;
+
+	UPROPERTY()
 	AWeapon* RightHandEquippedWeapon;
+
+	UPROPERTY()
 	AWeapon* LeftHandEquippedWeapon;
 
 	TArray<AActor*> ActorsToIgnore;
@@ -66,10 +74,15 @@ private:
 
 	// Damage
 	float RightHandDamage = 1.f;
+	float DefaultInAttackMoveSpeed = 0.f;
+	float InAttackMoveSpeed = 0.f;
 
 public:
 	UFUNCTION()
 	virtual void OnHitDetect() override;
+
+	UFUNCTION()
+	virtual void OnAiming() override;
 
 	UFUNCTION()
 	void SimpleRightHandAttack();

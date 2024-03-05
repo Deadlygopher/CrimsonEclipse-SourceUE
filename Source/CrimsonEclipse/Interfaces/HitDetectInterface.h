@@ -20,10 +20,14 @@ class CRIMSONECLIPSE_API IHitDetectInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
+	// Melee Weapon
 	virtual void OnHitDetect();
-
 	virtual void ResetTracingVectors();
+	// Melee Weapon
+
+	// Range Weapon
+	virtual void OnAiming();
+	// Range Weapon
 };

@@ -11,6 +11,7 @@
 #include "CrimsonEclipse/HUD/OverheadWidget.h"
 #include "CrimsonEclipse/Items/Weapon.h"
 
+DEFINE_LOG_CATEGORY(LogCEBaseCharacter);
 
 ACEBaseCharacter::ACEBaseCharacter()
 {
@@ -67,7 +68,17 @@ void ACEBaseCharacter::LightAttack()
 		if (AnimMontage)
 		{
 			bReadyForAttack = false;
-			GetCharacterMovement()->MaxWalkSpeed = InAttackMoveSpeed;
+			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetRightHandWeapon()->GetWeaponAttackMoveSpeed();
+			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		}
+	}
+	if (CombatComponent->GetLeftHandWeapon() && bReadyForAttack)
+	{
+		auto AnimMontage = CombatComponent->GetLeftHandWeapon()->GetLightAttackAnimMontage();
+		if (AnimMontage)
+		{
+			bReadyForAttack = false;
+			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetLeftHandWeapon()->GetWeaponAttackMoveSpeed();
 			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 		}
 	}
@@ -81,6 +92,11 @@ void ACEBaseCharacter::Tick(float DeltaTime)
 void ACEBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+float ACEBaseCharacter::GetMaxWalkSpeed()
+{
+	return GetCharacterMovement()->MaxWalkSpeed;
 }
 
 UHealthComponent* ACEBaseCharacter::GetHealthComponent()
@@ -98,12 +114,20 @@ float ACEBaseCharacter::GetMaxHealth()
 	return HealthComponent->GetMaxHealth();
 }
 
+void ACEBaseCharacter::RotateToCursorDirecion()
+{
+
+}
+
 void ACEBaseCharacter::StartRoll()
 {
-	bReadyForAttack = false;
-	GetCharacterMovement()->MaxWalkSpeed = RollSpeed;
-	GetCharacterMovement()->Velocity = GetActorForwardVector() * RollSpeed;
-	bPressedRoll = true;
+	if (bReadyForAttack != false)
+	{
+		bReadyForAttack = false;
+		GetCharacterMovement()->MaxWalkSpeed = RollSpeed;
+		GetCharacterMovement()->Velocity = GetActorForwardVector() * RollSpeed;
+		bPressedRoll = true;
+	}
 }
 
 void ACEBaseCharacter::RollInProcess()
@@ -150,9 +174,9 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 		if (InItem->GetWeaponType() && CombatComponent)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
+			//checkf(InItem->GetWeaponType() != TSubclassOf<AWeapon>(), TEXT("Wrong Weapon class in ItemAsset")) return;
 			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
 			CombatComponent->SetRightHandDamage(InItem->GetWeaponDamage());
-			UE_LOG(LogTemp, Warning, TEXT("Primary Weapon"));
 		}
 		break;
 	}
@@ -161,14 +185,14 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 		if (InItem->GetWeaponType() && CombatComponent)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
+			//checkf(InItem->GetWeaponType() != TSubclassOf<AWeapon>(), TEXT("Wrong Weapon class in ItemAsset")) return;
 			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
-			UE_LOG(LogTemp, Warning, TEXT("Secondary Weapon"));
 		}
 		break;
 	}
 	default:
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Default EQUIP case"));
+		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Default EQUIP case"));
 		break;
 	}
 	}
@@ -183,7 +207,6 @@ void ACEBaseCharacter::OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int
 		if (CombatComponent->GetRightHandWeapon())
 		{
 			CombatComponent->UnequipRightWeapon();
-			UE_LOG(LogTemp, Warning, TEXT("Unequip Primary Weapon"));
 		}
 		break;
 	}
@@ -192,13 +215,12 @@ void ACEBaseCharacter::OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int
 		if (CombatComponent->GetLeftHandWeapon())
 		{
 			CombatComponent->UnequipLeftWeapon();
-			UE_LOG(LogTemp, Warning, TEXT("Unequip Secondary Weapon"));
 		}
 		break;
 	}
 	default:
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Default UNEQUIP case"));
+		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Default UNEQUIP case"));
 		break;
 	}
 	}

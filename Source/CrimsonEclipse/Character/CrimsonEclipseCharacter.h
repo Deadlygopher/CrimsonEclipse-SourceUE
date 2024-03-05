@@ -52,5 +52,5 @@ protected:
 public:
 	virtual void StartRoll() override;
 	virtual void LightAttack() override;
-	void RotateToCursorDirecion();
+	virtual void RotateToCursorDirecion() override;
 };

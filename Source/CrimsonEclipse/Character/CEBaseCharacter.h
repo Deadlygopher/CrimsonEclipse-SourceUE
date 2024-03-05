@@ -8,6 +8,8 @@
 
 #include "CEBaseCharacter.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogCEBaseCharacter, Log, All);
+
 class UCombatComponent;
 class UHealthComponent;
 class UWidgetComponent;
@@ -28,9 +30,13 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	float GetMaxWalkSpeed();
+
 	UHealthComponent* GetHealthComponent();
 	float GetHealth();
 	float GetMaxHealth();
+
+	virtual void RotateToCursorDirecion();
 
 	/// Roll variables
 private:
@@ -39,6 +45,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float RollSpeed = 1000;
+
 public:
 	bool GetIsRollPressed() { return bPressedRoll; }
 
@@ -74,9 +81,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float MaxMoveSpeed = 600;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	float InAttackMoveSpeed = 200;
 
 	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth);
 

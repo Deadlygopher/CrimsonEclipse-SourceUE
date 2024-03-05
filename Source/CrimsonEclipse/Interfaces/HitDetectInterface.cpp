@@ -7,9 +7,12 @@
 
 void IHitDetectInterface::OnHitDetect()
 {
-
 }
 
 void IHitDetectInterface::ResetTracingVectors()
+{
+}
+
+void IHitDetectInterface::OnAiming()
 {
 }
