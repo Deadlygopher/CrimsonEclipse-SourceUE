@@ -16,3 +16,16 @@ void UAimingAnimNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimS
 		}
 	}
 }
+
+void UAimingAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	auto Interfaces = MeshComp->GetOwner()->GetComponents();
+	for (auto Interface : Interfaces)
+	{
+		if (auto HitInterface = Cast<IHitDetectInterface>(Interface))
+		{
+			HitInterface->OnProjectileSpawn();
+			break;
+		}
+	}
+}

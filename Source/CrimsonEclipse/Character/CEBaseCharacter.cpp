@@ -104,12 +104,12 @@ UHealthComponent* ACEBaseCharacter::GetHealthComponent()
 	return HealthComponent;
 }
 
-float ACEBaseCharacter::GetHealth()
+float ACEBaseCharacter::GetHealth() const
 {
 	return HealthComponent->GetHealth();
 }
 
-float ACEBaseCharacter::GetMaxHealth()
+float ACEBaseCharacter::GetMaxHealth() const
 {
 	return HealthComponent->GetMaxHealth();
 }
@@ -174,7 +174,7 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 		if (InItem->GetWeaponType() && CombatComponent)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
-			//checkf(InItem->GetWeaponType() != TSubclassOf<AWeapon>(), TEXT("Wrong Weapon class in ItemAsset")) return;
+			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
 			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
 			CombatComponent->SetRightHandDamage(InItem->GetWeaponDamage());
 		}
@@ -185,7 +185,7 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 		if (InItem->GetWeaponType() && CombatComponent)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
-			//checkf(InItem->GetWeaponType() != TSubclassOf<AWeapon>(), TEXT("Wrong Weapon class in ItemAsset")) return;
+			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
 			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
 		}
 		break;

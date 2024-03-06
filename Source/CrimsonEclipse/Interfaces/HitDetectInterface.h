@@ -29,5 +29,6 @@ public:
 
 	// Range Weapon
 	virtual void OnAiming();
+	virtual void OnProjectileSpawn();
 	// Range Weapon
 };

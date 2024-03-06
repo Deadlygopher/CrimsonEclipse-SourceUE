@@ -85,5 +85,8 @@ public:
 	virtual void OnAiming() override;
 
 	UFUNCTION()
+	virtual void OnProjectileSpawn() override;
+
+	UFUNCTION()
 	void SimpleRightHandAttack();
 };

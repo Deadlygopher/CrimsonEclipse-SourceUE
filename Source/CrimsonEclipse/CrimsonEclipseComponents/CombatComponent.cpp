@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+//#include "CrimsonEclipse/Projectile/CEProjectileActor.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -164,13 +165,23 @@ void UCombatComponent::OnAiming()
 		{
 			Character->RotateToCursorDirecion();
 			const FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
-			const FVector TraceStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, Character->GetActorLocation().Z+40);
-			//const FVector TraceStart = SocketTransform.GetLocation();
+			const FVector TraceStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, Character->GetActorLocation().Z+40);// Magic number
+
 			const FVector ArrowDirection = Character->GetActorForwardVector();
-			//const FVector ArrowDirection = SocketTransform.GetRotation().GetForwardVector();
 			const FVector TraceEnd = TraceStart + ArrowDirection * 1000; // Magic number
+
 			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 3.f, 0, 3.f);
+			//LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection);
 		}
+	}
+}
+
+void UCombatComponent::OnProjectileSpawn()
+{
+	if (LeftHandEquippedWeapon)
+	{
+		const FVector ArrowDirection = Character->GetActorForwardVector();
+		LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection);
 	}
 }
 

@@ -16,3 +16,7 @@ void IHitDetectInterface::ResetTracingVectors()
 void IHitDetectInterface::OnAiming()
 {
 }
+
+void IHitDetectInterface::OnProjectileSpawn()
+{
+}

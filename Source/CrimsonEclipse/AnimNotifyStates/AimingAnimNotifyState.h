@@ -14,4 +14,7 @@ class CRIMSONECLIPSE_API UAimingAnimNotifyState : public UAnimNotifyState
 	
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComp,
 		UAnimSequenceBase* Animation, float FrameDeltaTime) override;
+
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp,
+		UAnimSequenceBase* Animation) override;
 };

@@ -33,8 +33,8 @@ public:
 	float GetMaxWalkSpeed();
 
 	UHealthComponent* GetHealthComponent();
-	float GetHealth();
-	float GetMaxHealth();
+	float GetHealth() const;
+	float GetMaxHealth() const;
 
 	virtual void RotateToCursorDirecion();
 

@@ -7,6 +7,7 @@
 #include "Weapon.generated.h"
 
 class USphereComponent;
+class ACEProjectileActor;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -44,6 +45,8 @@ public:
 	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
 	EWeaponType GetWeaponType() { return WeaponType; }
 
+	void SpawnProjectile(APawn* SpawnInstigator, FVector AimVector);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -67,4 +70,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
 	float WeaponAttackMoveSpeed = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
+	TSubclassOf<ACEProjectileActor> ProjectileClass;
 };
