@@ -24,6 +24,7 @@ ACEProjectileActor::ACEProjectileActor()
 	CapsuleComponent->SetupAttachment(ProjectileMesh);
 	CapsuleComponent->SetCapsuleHalfHeight(100);
 	CapsuleComponent->SetCapsuleRadius(10);
+
 }
 
 void ACEProjectileActor::BeginPlay()
@@ -31,6 +32,7 @@ void ACEProjectileActor::BeginPlay()
 	Super::BeginPlay();
 	checkf(ProjectileComponent, TEXT("Projectile component Assertion"));
 	
+	CapsuleComponent->MoveIgnoreActors.Add(this);
 	CapsuleComponent->MoveIgnoreActors.Add(GetOwner());
 	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &ACEProjectileActor::OnProjectileHit);
 }
@@ -44,22 +46,25 @@ void ACEProjectileActor::Tick(float DeltaTime)
 void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//if (SweepResult.bBlockingHit)
-	//{
-		//ProjectileComponent->Deactivate();
-		//ProjectileMesh->SetSimulatePhysics(true);
-	//}
-	if (OtherActor)
+	if(GetOwner() != OtherActor)
 	{
-		ProjectileComponent->Deactivate();
-		UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *OtherActor->GetName());
-		//FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld , true};
-		//AttachToActor(OtherActor, AttachmentTransform, "LeftHandSocket");
-	}
-	else
-	{
-		ProjectileComponent->Deactivate();
-		ProjectileMesh->SetSimulatePhysics(true);
-		UE_LOG(LogProjectileActor, Warning, TEXT("Not Actor %s"), *OtherActor->GetName());
+		if (OtherActor->IsA(APawn::StaticClass()))
+		{
+			ProjectileComponent->Deactivate();
+			CapsuleComponent->OnComponentBeginOverlap.RemoveAll(this);
+			CapsuleComponent->Deactivate();
+			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			//UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *OtherActor->GetName());
+			FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld , true };
+			AttachToActor(OtherActor, AttachmentTransform, "LeftHandSocket");
+		}
+		else
+		{
+			ProjectileComponent->Deactivate();
+			CapsuleComponent->OnComponentBeginOverlap.RemoveAll(this);
+			CapsuleComponent->Deactivate();
+			ProjectileMesh->SetSimulatePhysics(true);
+			//UE_LOG(LogProjectileActor, Warning, TEXT("Not Actor %s"), *OtherActor->GetName());
+		}
 	}
 }

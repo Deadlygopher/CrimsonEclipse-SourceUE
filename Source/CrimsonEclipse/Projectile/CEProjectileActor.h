@@ -30,7 +30,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UProjectileMovementComponent* ProjectileComponent;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMeshComponent* ProjectileMesh;
 
 	UPROPERTY(EditDefaultsOnly)

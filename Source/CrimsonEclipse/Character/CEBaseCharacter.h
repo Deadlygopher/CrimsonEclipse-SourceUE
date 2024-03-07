@@ -24,6 +24,7 @@ public:
 	ACEBaseCharacter();
 	virtual void PostInitializeComponents() override;
 
+	UFUNCTION(BlueprintCallable)
 	virtual void LightAttack();
 
 	virtual void Tick(float DeltaTime) override;
