@@ -180,8 +180,24 @@ void UCombatComponent::OnProjectileSpawn()
 {
 	if (LeftHandEquippedWeapon)
 	{
-		const FVector ArrowDirection = Character->GetActorForwardVector();
-		LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection);
+		if (Character->IsPlayerControlled())
+		{
+			FHitResult HitResult;
+			Cast<APlayerController>(Character->GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_MAX, false, HitResult);
+
+			const FVector ArrowDirection = Character->GetActorForwardVector();
+			const FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
+
+			FVector ProjectileVector{ HitResult.Location.X - SocketTransform.GetLocation().X,
+				HitResult.Location.Y - SocketTransform.GetLocation().Y, ArrowDirection.Z };
+
+			LeftHandEquippedWeapon->SpawnProjectile(Character, ProjectileVector); //ArrowDirection);
+		}
+		else
+		{
+			const FVector ArrowDirection = Character->GetActorForwardVector();
+			LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection);
+		}
 	}
 }
 

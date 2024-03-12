@@ -38,6 +38,7 @@ public:
 	float GetMaxHealth() const;
 
 	virtual void RotateToCursorDirecion();
+	virtual bool GetIsReceiveHitImpact() { return bIsReceiveHitImpact; }
 
 	/// Roll variables
 private:
@@ -74,7 +75,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCombatComponent* CombatComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* OverheadWidgetComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -86,7 +87,7 @@ protected:
 	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth);
 
 private:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 		AController* InstigatorController, AActor* DamageCauser);
 
@@ -94,4 +95,11 @@ private:
 
 	UFUNCTION()
 	void ResetReadyForAttack(UAnimMontage* Montage, bool bInterrupted);
+
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* ImpactAnimMontage;
+
+	bool bIsReceiveHitImpact;
+
+	void IsReceiveHitImpactReset();
 };

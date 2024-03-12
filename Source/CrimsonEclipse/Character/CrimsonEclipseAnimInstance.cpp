@@ -12,6 +12,7 @@ void UCrimsonEclipseAnimInstance::NativeInitializeAnimation()
 	CrimsonEclipseCharacter = Cast<ACEBaseCharacter>(TryGetPawnOwner());
 }
 
+
 void UCrimsonEclipseAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
@@ -29,4 +30,6 @@ void UCrimsonEclipseAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsRollig = CrimsonEclipseCharacter->GetIsRollPressed();
 	bIsInAir = CrimsonEclipseCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = CrimsonEclipseCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
+	bIsHitImpact = CrimsonEclipseCharacter->GetIsReceiveHitImpact();
 }
+

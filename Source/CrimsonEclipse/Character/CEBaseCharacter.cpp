@@ -146,12 +146,22 @@ void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const U
 	AController* InstigatorController, AActor* DamageCauser)
 {
 	HealthComponent->DecreaseHealth(Damage);
+	bIsReceiveHitImpact = true;
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ACEBaseCharacter::IsReceiveHitImpactReset, 0.2f, false);
 }
 
 void ACEBaseCharacter::ResetReadyForAttack(UAnimMontage* Montage, bool bInterrupted)
 {
 	bReadyForAttack = true;
 	GetCharacterMovement()->MaxWalkSpeed = MaxMoveSpeed;
+}
+
+void ACEBaseCharacter::IsReceiveHitImpactReset()
+{
+	bIsReceiveHitImpact = false;
+	GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
 void ACEBaseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)

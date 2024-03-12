@@ -4,6 +4,7 @@
 #include "CEProjectileActor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogProjectileActor);
 
@@ -40,7 +41,6 @@ void ACEProjectileActor::BeginPlay()
 void ACEProjectileActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -54,9 +54,15 @@ void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponen
 			CapsuleComponent->OnComponentBeginOverlap.RemoveAll(this);
 			CapsuleComponent->Deactivate();
 			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			//UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *OtherActor->GetName());
-			FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld , true };
-			AttachToActor(OtherActor, AttachmentTransform, "LeftHandSocket");
+			FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld, true };
+
+			auto SkeletalMesh = Cast<USkeletalMeshComponent>(SweepResult.Component);
+			auto ClosestBone = SkeletalMesh->FindClosestBone(ProjectileMesh->GetComponentLocation());
+			AttachToComponent(SkeletalMesh, AttachmentTransform, ClosestBone);
+			UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *GetInstigator()->GetName());
+
+			UGameplayStatics::ApplyDamage(OtherActor, 10.f, GetInstigator()->GetController(),
+				GetInstigator(), UDamageType::StaticClass());
 		}
 		else
 		{
