@@ -69,6 +69,9 @@ private:
 	UAnimMontage* WeaponLightAttackAnimMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
+	UAnimMontage* WeaponHeavyAttackAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
 	float WeaponAttackMoveSpeed = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")

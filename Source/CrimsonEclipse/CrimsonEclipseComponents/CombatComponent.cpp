@@ -164,6 +164,7 @@ void UCombatComponent::OnAiming()
 		if (Character->IsPlayerControlled())
 		{
 			Character->RotateToCursorDirecion();
+			/*
 			const FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
 			const FVector TraceStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, Character->GetActorLocation().Z+40);// Magic number
 
@@ -171,7 +172,7 @@ void UCombatComponent::OnAiming()
 			const FVector TraceEnd = TraceStart + ArrowDirection * 1000; // Magic number
 
 			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 3.f, 0, 3.f);
-			//LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection);
+			*/
 		}
 	}
 }
