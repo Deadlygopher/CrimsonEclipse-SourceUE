@@ -7,6 +7,7 @@
 #include "Pickup.generated.h"
 
 class UItemInstance;
+class UItem;
 
 UENUM(BlueprintType)
 enum class EPickupState : uint8
@@ -38,19 +39,21 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnPickupDataReceived"), Category = "Pickup")
 	void K2_OnPickupDataReceived();
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	UItem* InitItem;
+
+	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Category = Pickup)
 	UItemInstance* ItemInstance;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Category = Pickup)
 	int32 Quantity;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true), Category = "Pickup")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, /*Meta = (AllowPrivateAccess = true),*/ Category = "Pickup")
 	UStaticMeshComponent* PickupMesh;
 
 	//Initialize in open world items
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
-	TSubclassOf<UItemInstance> InitItemInstance;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	//TSubclassOf<UItemInstance> InitItemInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	int32 InitQuantity;

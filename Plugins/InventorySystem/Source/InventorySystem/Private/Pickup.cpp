@@ -15,8 +15,10 @@ APickup::APickup()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>("RootComponent");
+
 	PickupMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickupMesh"));
-	RootComponent = PickupMesh;
+	PickupMesh->SetupAttachment(RootComponent);
 
 	PickupMesh->SetSimulatePhysics(true);
 	//PickupMesh->SetMassOverrideInKg(EName::NAME_None, 100.0f, true);
@@ -35,10 +37,11 @@ APickup::APickup()
 	SphereComponent->SetSphereRadius(200);
 	SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SphereComponent->SetupAttachment(PickupMesh);
 
 	PickupWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("Pickup Text"));
 	PickupWidgetComponent->SetWidgetClass(WidgetClass);
-	PickupWidgetComponent->SetupAttachment(RootComponent);
+	PickupWidgetComponent->SetupAttachment(PickupMesh);
 	PickupWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 	PickupWidgetComponent->SetDrawSize(FVector2D(50.f, 100.f));
 	PickupWidgetComponent->SetPivot(FVector2D(0.5f, 1.0f));
@@ -57,15 +60,23 @@ void APickup::BeginPlay()
 		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &APickup::OnOverlapComponentEnd);
 	}
 
+	if (!ItemInstance && InitItem->GetItemInstanceClass())
+	{
+		ItemInstance = NewObject<UItemInstance>(this, InitItem->GetItemInstanceClass());
+		Quantity = InitQuantity;
+	}
+
+	/*
 	if (!ItemInstance && InitItemInstance)
 	{
 		ItemInstance = NewObject<UItemInstance>(this, InitItemInstance);
-	}
+		Quantity = InitQuantity;
+	}*/
 
 	if (PickupWidgetComponent)
 	{
 		PickupWidget = Cast<UPickupWidget>(PickupWidgetComponent->GetWidget());
-		if (PickupWidget)
+		if (PickupWidget && ItemInstance)
 		{
 			PickupWidget->SetPickupText(ItemInstance->Item->GetItemName());
 		}

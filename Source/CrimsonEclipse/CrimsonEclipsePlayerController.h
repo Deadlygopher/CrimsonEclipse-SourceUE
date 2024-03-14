@@ -68,6 +68,8 @@ protected:
 
 private:
 	bool bShowWidget = false;
+
+	void ClickAttack();
 };
 
 

@@ -35,6 +35,7 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACrimsonEclipsePlayerController::OnSetDestinationPressed);
+	InputComponent->BindAction("ClickAttack", IE_Pressed, this, &ACrimsonEclipsePlayerController::ClickAttack);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACrimsonEclipsePlayerController::OnSetDestinationReleased);
 
 	// set key for pickup items from inventory component
@@ -82,7 +83,7 @@ void ACrimsonEclipsePlayerController::PickupItem()
 	QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Visibility));
 	FHitResult Hit;
 
-	GetHitResultUnderCursorForObjects(QueryArray, true, Hit);
+	GetHitResultUnderCursorForObjects(QueryArray, false, Hit);
 	APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
 	if (ActorToPickup)
 	{
@@ -139,6 +140,22 @@ void ACrimsonEclipsePlayerController::PickupButtonPressed()
 	else
 	{
 		ServerPickupButtonPressed();
+	}
+}
+
+void ACrimsonEclipsePlayerController::ClickAttack()
+{
+	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
+	QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	FHitResult Hit;
+
+	GetHitResultUnderCursorForObjects(QueryArray, false, Hit);
+	if (APawn* TargetActor = Cast<APawn>(Hit.GetActor()))
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToActor(this, TargetActor);
+
+		Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(TargetActor);
+		Cast<ACrimsonEclipseCharacter>(GetCharacter())->OnClickAttack();
 	}
 }
 

@@ -10,6 +10,7 @@
 #include "Item.h"
 #include "CrimsonEclipse/HUD/OverheadWidget.h"
 #include "CrimsonEclipse/Items/Weapon.h"
+#include "Components/SphereComponent.h"
 
 DEFINE_LOG_CATEGORY(LogCEBaseCharacter);
 
@@ -31,6 +32,10 @@ ACEBaseCharacter::ACEBaseCharacter()
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("InventoryComponent");
 	InventoryComponent->OnItemEquipped.AddDynamic(this, &ACEBaseCharacter::OnItemEquip);
 	InventoryComponent->OnItemUnequipped.AddDynamic(this, &ACEBaseCharacter::OnItemUnequip);
+
+	AttackReachRadius = CreateDefaultSubobject<USphereComponent>("AttackReachRadius");
+	AttackReachRadius->SetupAttachment(RootComponent);
+	AttackReachRadius->SetSphereRadius(100.f, true);
 }
 
 void ACEBaseCharacter::BeginPlay()
@@ -49,6 +54,10 @@ void ACEBaseCharacter::BeginPlay()
 	{
 		HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
 	}
+	AttackReachRadius->SetGenerateOverlapEvents(false);
+	AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
+	AttackReachRadius->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	AttackReachRadius->OnComponentBeginOverlap.AddDynamic(this, &ACEBaseCharacter::OnReachAttackRadius);
 }
 
 void ACEBaseCharacter::PostInitializeComponents()
@@ -180,6 +189,28 @@ void ACEBaseCharacter::ResetReadyForAttack(UAnimMontage* Montage, bool bInterrup
 {
 	bReadyForAttack = true;
 	GetCharacterMovement()->MaxWalkSpeed = MaxMoveSpeed;
+}
+
+void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+	if (OtherActor == TargetActor)//(OtherActor != this)
+	{
+		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Activate Overlap %s"), *OtherActor->GetName());
+		LightAttack();
+		//AttackReachRadius->Deactivate();
+		AttackReachRadius->SetGenerateOverlapEvents(false);
+		//AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
+		//AttackReachRadius->OnComponentBeginOverlap.Clear();
+	}
+}
+
+void ACEBaseCharacter::OnClickAttack()
+{
+	//AttackReachRadius->Activate();
+	AttackReachRadius->SetGenerateOverlapEvents(true);
+	UE_LOG(LogCEBaseCharacter, Warning, TEXT("Activate Click"))
 }
 
 void ACEBaseCharacter::IsReceiveHitImpactReset()

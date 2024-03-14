@@ -14,6 +14,7 @@ class UCombatComponent;
 class UHealthComponent;
 class UWidgetComponent;
 class UInventoryComponent;
+class USphereComponent;
 
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter, public IEvadeAnimInterface
@@ -72,6 +73,9 @@ public:
 	void OnItemUnequip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 	/// Inventory
 
+	void OnClickAttack();
+	void SetTargetActor(APawn* TActor) { TargetActor = TActor; };
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -101,6 +105,16 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	UAnimMontage* ImpactAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly)
+	USphereComponent* AttackReachRadius;
+
+	UFUNCTION()
+	void OnReachAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY()
+	APawn* TargetActor = nullptr;
 
 	bool bIsReceiveHitImpact;
 
