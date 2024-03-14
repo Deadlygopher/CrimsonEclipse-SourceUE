@@ -1052,7 +1052,7 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 
 	switch (Slot.ItemInstance->Item->GetItemType())
 	{
-	case EItemType::Weapon:
+	case EItemType::OneHandWeapon:
 	{
 		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
 		const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
@@ -1087,25 +1087,406 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 		}
 		else if (PrimarySlot.Data.IsOccupied())
 		{
-			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			if (PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponR)
+			{
+				const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+				const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
+
+				if (bIsAdded)
+				{
+					//auto ItemInst = NewObject<UItemInstance>(this, Slot.ItemInstance->Item->GetItemInstanceClass());
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = nullptr;
+					EquipmentSlots[EquipmentSlotIndexL].Data.Quantity = 0;
+					//EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+			else if (PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponL)
+			{
+				const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+				const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(SecondarySlot.Data.ItemInstance, SecondarySlot.Data.Quantity, AddedQuantity);
+
+				if (bIsAdded)
+				{
+					auto ItemInst = NewObject<UItemInstance>(this, Slot.ItemInstance->Item->GetItemInstanceClass());
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = nullptr;
+					EquipmentSlots[EquipmentSlotIndexL].Data.Quantity = 0;
+					//EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+			else
+			{
+				const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
+
+				if (bIsAdded)
+				{
+					EquipmentSlots[EquipmentSlotIndex].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndex].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+		}
+		break;
+	}
+
+	// For Two hands which attach to right hand
+	case EItemType::TwoHandsWeaponR:
+	{
+		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
+		const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
+
+		//Both hands empty (Eqip TwoHandsWeapon Right Socket)
+		if (PrimarySlot.Data.IsEmpty() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+			EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+			Slots.Remove(Slot);
+
+			NotifyInventoryUpdated();
+			NotifyInventoryWeightChanged();
+		}
+
+		//Right hand is occupied, but left is empty (Eqip TwoHandsWeapon Right Socket)
+		else if (PrimarySlot.Data.IsOccupied() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
 			int32 AddedQuantity = 0;
 			const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
 
 			if (bIsAdded)
 			{
-				EquipmentSlots[EquipmentSlotIndex].Data = Slot;
-				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
-				EquipmentSlots[EquipmentSlotIndex].Type;
+				EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+				EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 
-				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 
-				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
-				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 				Slots.Remove(Slot);
 
 				NotifyInventoryUpdated();
 				NotifyInventoryWeightChanged();
+			}
+		}
+
+		//Right hand is empty, but Left is occupied (Eqip TwoHandsWeapon Right Socket)
+		else if (PrimarySlot.Data.IsEmpty() && SecondarySlot.Data.IsOccupied())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(SecondarySlot.Data.ItemInstance, SecondarySlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded)
+			{
+				EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+				EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+				//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				Slots.Remove(Slot);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
+		}
+
+		// Both hands id occupied (Eqip TwoHandsWeapon Right Socket)
+		else if (PrimarySlot.Data.IsOccupied() && SecondarySlot.Data.IsOccupied())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			if (PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponR)
+			{
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
+
+				if (bIsAdded)
+				{
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+			else if (PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponL)
+			{
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(SecondarySlot.Data.ItemInstance, SecondarySlot.Data.Quantity, AddedQuantity);
+
+				if (bIsAdded)
+				{
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+			else
+			{
+				int32 AddedQuantityR = 0;
+				const bool bIsAddedR = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantityR);
+				int32 AddedQuantityL = 0;
+				const bool bIsAddedL = AddExistingItem_Internal(SecondarySlot.Data.ItemInstance, SecondarySlot.Data.Quantity, AddedQuantityL);
+
+				if (bIsAddedR && bIsAddedL)
+				{
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+		}
+		break;
+	}
+
+	// For Two hands which attach to right hand
+	case EItemType::TwoHandsWeaponL:
+	{
+		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
+		const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Slot.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
+
+		//Both hands empty (Eqip TwoHandsWeapon Right Socket)
+		if (PrimarySlot.Data.IsEmpty() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+			EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+			Slots.Remove(Slot);
+
+			NotifyInventoryUpdated();
+			NotifyInventoryWeightChanged();
+		}
+
+		//Right hand is occupied, but left is empty (Eqip TwoHandsWeapon Right Socket)
+		else if (PrimarySlot.Data.IsOccupied() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded)
+			{
+				EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+				EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				Slots.Remove(Slot);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
+		}
+
+		//Right hand is empty, but Left is occupied (Eqip TwoHandsWeapon Right Socket)
+		else if (PrimarySlot.Data.IsEmpty() && SecondarySlot.Data.IsOccupied())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(SecondarySlot.Data.ItemInstance, SecondarySlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded)
+			{
+				EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+				EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+				//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				Slots.Remove(Slot);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
+		}
+
+		// Both hands id occupied (Eqip TwoHandsWeapon Right Socket)
+		else if (PrimarySlot.Data.IsOccupied() && SecondarySlot.Data.IsOccupied())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			if (PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponR)
+			{
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
+
+				if (bIsAdded)
+				{
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+			else if (PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponL)
+			{
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(SecondarySlot.Data.ItemInstance, SecondarySlot.Data.Quantity, AddedQuantity);
+
+				if (bIsAdded)
+				{
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
+			}
+			else
+			{
+				int32 AddedQuantityR = 0;
+				const bool bIsAddedR = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantityR);
+				int32 AddedQuantityL = 0;
+				const bool bIsAddedL = AddExistingItem_Internal(SecondarySlot.Data.ItemInstance, SecondarySlot.Data.Quantity, AddedQuantityL);
+
+				if (bIsAddedR && bIsAddedL)
+				{
+					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+					//EquipmentSlots[EquipmentSlotIndexR].Type;
+
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
 			}
 		}
 		break;
@@ -1187,7 +1568,7 @@ void UInventoryComponent::EquipItem(UItem* Item)
 
 	switch (Item->GetItemType())
 	{
-	case EItemType::Weapon:
+	case EItemType::OneHandWeapon:
 	{
 		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Item->GetItemPrimaryEquipmentSlotType());
 		const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Item->GetItemSecondaryEquipmentSlotType());
@@ -1224,26 +1605,29 @@ void UInventoryComponent::EquipItem(UItem* Item)
 		}
 		else if (PrimarySlot.Data.IsOccupied())
 		{
-			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
-
-			int32 AddedQuantity = 0;
-			const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
-
-			if (bIsAdded)
+			if (PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponR || PrimarySlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponL)
 			{
-				auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
-				EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
-				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
-				EquipmentSlots[EquipmentSlotIndex].Type;
+				const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
 
-				NotifyInventoryItemUnequipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+				int32 AddedQuantity = 0;
+				const bool bIsAdded = AddExistingItem_Internal(PrimarySlot.Data.ItemInstance, PrimarySlot.Data.Quantity, AddedQuantity);
 
-				NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
-				K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
-				//Slots.Remove(Slot);
+				if (bIsAdded)
+				{
+					auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+					EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
+					EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
+					EquipmentSlots[EquipmentSlotIndex].Type;
 
-				NotifyInventoryUpdated();
-				NotifyInventoryWeightChanged();
+					NotifyInventoryItemUnequipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+
+					NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+					K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+					//Slots.Remove(Slot);
+
+					NotifyInventoryUpdated();
+					NotifyInventoryWeightChanged();
+				}
 			}
 		}
 		break;
@@ -1307,22 +1691,79 @@ void UInventoryComponent::UnequipItem(const EEquipmentSlotType EquipmentSlot)
 
 	if (TargetSlot.Data.IsOccupied())
 	{
-		const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(EquipmentSlot);
-		
-		int32 AddedQuantity = 0;
-		const bool bIsAdded = AddExistingItem_Internal(TargetSlot.Data.ItemInstance, TargetSlot.Data.Quantity, AddedQuantity);
-
-		if (bIsAdded && AddedQuantity == TargetSlot.Data.Quantity)
+		if (TargetSlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponR)
 		{
-			//EquipmentSlots[EquipmentSlotIndex].Data.OwnerInventory = nullptr;
-			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance = nullptr;
-			EquipmentSlots[EquipmentSlotIndex].Data.Quantity = 0;
+			const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(TargetSlot.Data.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
+			const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(TargetSlot.Data.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
 
-			NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
-			K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
+			const int32 EquipmentSlotIndexR= GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
-			NotifyInventoryUpdated();
-			NotifyInventoryWeightChanged();
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(TargetSlot.Data.ItemInstance, TargetSlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded && AddedQuantity == TargetSlot.Data.Quantity)
+			{
+				//EquipmentSlots[EquipmentSlotIndex].Data.OwnerInventory = nullptr;
+				EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance = nullptr;
+				EquipmentSlots[EquipmentSlotIndexR].Data.Quantity = 0;
+				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = nullptr;
+				EquipmentSlots[EquipmentSlotIndexL].Data.Quantity = 0;
+
+				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, TargetSlot.Data.Quantity);
+				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, TargetSlot.Data.Quantity);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
+		}
+		else if (TargetSlot.Data.ItemInstance->Item->GetItemType() == EItemType::TwoHandsWeaponL)
+		{
+			const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(TargetSlot.Data.ItemInstance->Item->GetItemPrimaryEquipmentSlotType());
+			const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(TargetSlot.Data.ItemInstance->Item->GetItemSecondaryEquipmentSlotType());
+
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(TargetSlot.Data.ItemInstance, TargetSlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded && AddedQuantity == TargetSlot.Data.Quantity)
+			{
+				//EquipmentSlots[EquipmentSlotIndex].Data.OwnerInventory = nullptr;
+				EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance = nullptr;
+				EquipmentSlots[EquipmentSlotIndexR].Data.Quantity = 0;
+				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = nullptr;
+				EquipmentSlots[EquipmentSlotIndexL].Data.Quantity = 0;
+
+				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, TargetSlot.Data.Quantity);
+				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, TargetSlot.Data.Quantity);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
+		}
+		else
+		{
+			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(EquipmentSlot);
+
+			int32 AddedQuantity = 0;
+			const bool bIsAdded = AddExistingItem_Internal(TargetSlot.Data.ItemInstance, TargetSlot.Data.Quantity, AddedQuantity);
+
+			if (bIsAdded && AddedQuantity == TargetSlot.Data.Quantity)
+			{
+				//EquipmentSlots[EquipmentSlotIndex].Data.OwnerInventory = nullptr;
+				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance = nullptr;
+				EquipmentSlots[EquipmentSlotIndex].Data.Quantity = 0;
+
+				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
+				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
+
+				NotifyInventoryUpdated();
+				NotifyInventoryWeightChanged();
+			}
 		}
 	}
 }

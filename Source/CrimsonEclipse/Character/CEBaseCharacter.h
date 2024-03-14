@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void LightAttack();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void HeavyAttack();
+
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -42,6 +42,7 @@ public:
 	float GetWeaponAttackMoveSpeed() { return WeaponAttackMoveSpeed; }
 
 	UAnimMontage* GetLightAttackAnimMontage() { return WeaponLightAttackAnimMontage; }
+	UAnimMontage* GetHeavyAttackAnimMontage() { return WeaponHeavyAttackAnimMontage; }
 	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
 	EWeaponType GetWeaponType() { return WeaponType; }
 

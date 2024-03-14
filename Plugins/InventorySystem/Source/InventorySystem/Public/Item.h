@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InventoryComponent.h"
+//#include "InventoryComponent.h"
 #include "Engine/DataAsset.h"
 
 #include "Item.generated.h"
@@ -62,10 +62,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	EItemType Type;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::Weapon"), Category = "Item")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::OneHandWeapon || Type == EItemType::TwoHandsWeaponR || Type == EItemType::TwoHandsWeaponL"), Category = "Item")
 	TSubclassOf<AActor> WeaponType;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::Weapon"), Category = "Item")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::OneHandWeapon || Type == EItemType::TwoHandsWeaponR || Type == EItemType::TwoHandsWeaponL"), Category = "Item")
 	float Damage = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")

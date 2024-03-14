@@ -68,7 +68,7 @@ void ACEBaseCharacter::LightAttack()
 		if (AnimMontage)
 		{
 			bReadyForAttack = false;
-			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetRightHandWeapon()->GetWeaponAttackMoveSpeed();
+			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
 			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 		}
 	}
@@ -78,7 +78,31 @@ void ACEBaseCharacter::LightAttack()
 		if (AnimMontage)
 		{
 			bReadyForAttack = false;
-			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetLeftHandWeapon()->GetWeaponAttackMoveSpeed();
+			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
+			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		}
+	}
+}
+
+void ACEBaseCharacter::HeavyAttack()
+{
+	if (CombatComponent->GetRightHandWeapon() && bReadyForAttack)
+	{
+		auto AnimMontage = CombatComponent->GetRightHandWeapon()->GetHeavyAttackAnimMontage();
+		if (AnimMontage)
+		{
+			bReadyForAttack = false;
+			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
+			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		}
+	}
+	if (CombatComponent->GetLeftHandWeapon() && bReadyForAttack)
+	{
+		auto AnimMontage = CombatComponent->GetLeftHandWeapon()->GetHeavyAttackAnimMontage();
+		if (AnimMontage)
+		{
+			bReadyForAttack = false;
+			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
 			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 		}
 	}

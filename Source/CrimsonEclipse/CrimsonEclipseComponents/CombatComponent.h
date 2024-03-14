@@ -29,7 +29,7 @@ public:
 	void UnequipRightWeapon();
 	void UnequipLeftWeapon();
 
-	//float
+	float GetInAttackMoveSpeed() { return InAttackMoveSpeed;}
 
 	//Weapon getters
 	virtual AWeapon* GetRightHandWeapon();
