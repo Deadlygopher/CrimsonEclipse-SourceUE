@@ -12,6 +12,8 @@
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "Components/SphereComponent.h"
 
+#include "Blueprint/AIBlueprintHelperLibrary.h" //TODO Delete
+
 DEFINE_LOG_CATEGORY(LogCEBaseCharacter);
 
 ACEBaseCharacter::ACEBaseCharacter()
@@ -35,7 +37,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 
 	AttackReachRadius = CreateDefaultSubobject<USphereComponent>("AttackReachRadius");
 	AttackReachRadius->SetupAttachment(RootComponent);
-	AttackReachRadius->SetSphereRadius(100.f, true);
+	AttackReachRadius->InitSphereRadius(150.f);
 }
 
 void ACEBaseCharacter::BeginPlay()
@@ -54,10 +56,11 @@ void ACEBaseCharacter::BeginPlay()
 	{
 		HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
 	}
-	AttackReachRadius->SetGenerateOverlapEvents(false);
+	AttackReachRadius->SetGenerateOverlapEvents(true);
 	AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
 	AttackReachRadius->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	AttackReachRadius->OnComponentBeginOverlap.AddDynamic(this, &ACEBaseCharacter::OnReachAttackRadius);
+	AttackReachRadius->OnComponentEndOverlap.AddDynamic(this, &ACEBaseCharacter::OnLeftAttackRadius);
 }
 
 void ACEBaseCharacter::PostInitializeComponents()
@@ -194,23 +197,36 @@ void ACEBaseCharacter::ResetReadyForAttack(UAnimMontage* Montage, bool bInterrup
 void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
-	if (OtherActor == TargetActor)//(OtherActor != this)
+	if (OtherActor == TargetActor &&  bAttackClicked)
 	{
-		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Activate Overlap %s"), *OtherActor->GetName());
+		//OverlappedInfo.OverlapInfo.Actor = OtherActor;
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
+		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Begin Overlap %i"), AttackReachRadius->GetScaledSphereRadius());
 		LightAttack();
-		//AttackReachRadius->Deactivate();
-		AttackReachRadius->SetGenerateOverlapEvents(false);
-		//AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
-		//AttackReachRadius->OnComponentBeginOverlap.Clear();
+		//bWeaponRadiusReached = true;
+		bAttackClicked = false;
+	}
+}
+
+void ACEBaseCharacter::OnLeftAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (bWeaponRadiusReached)
+	{
+		UE_LOG(LogCEBaseCharacter, Warning, TEXT("End Overlap %s"), *OtherActor->GetName());
+		//bWeaponRadiusReached = false;
+		//bAttackClicked = false;
 	}
 }
 
 void ACEBaseCharacter::OnClickAttack()
 {
-	//AttackReachRadius->Activate();
-	AttackReachRadius->SetGenerateOverlapEvents(true);
-	UE_LOG(LogCEBaseCharacter, Warning, TEXT("Activate Click"))
+	bAttackClicked = true;
+	if (GetDistanceTo(TargetActor) <= 300)
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
+		LightAttack();
+	}
 }
 
 void ACEBaseCharacter::IsReceiveHitImpactReset()

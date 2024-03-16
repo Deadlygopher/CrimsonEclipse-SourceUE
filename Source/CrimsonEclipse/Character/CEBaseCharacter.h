@@ -113,8 +113,15 @@ private:
 	void OnReachAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
+	void OnLeftAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	UPROPERTY()
 	APawn* TargetActor = nullptr;
+	FOverlapInfo OverlappedInfo;
+	bool bWeaponRadiusReached = false;
+	bool bAttackClicked = false;
 
 	bool bIsReceiveHitImpact;
 

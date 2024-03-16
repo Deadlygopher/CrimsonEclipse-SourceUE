@@ -35,7 +35,7 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACrimsonEclipsePlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("ClickAttack", IE_Pressed, this, &ACrimsonEclipsePlayerController::ClickAttack);
+	//InputComponent->BindAction("ClickAttack", IE_Pressed, this, &ACrimsonEclipsePlayerController::ClickAttack);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACrimsonEclipsePlayerController::OnSetDestinationReleased);
 
 	// set key for pickup items from inventory component
@@ -52,14 +52,14 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 void ACrimsonEclipsePlayerController::MoveToMouseCursor()
 {
 	// Trace to see what is under the mouse cursor
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-	if (Hit.bBlockingHit)
+	if (bMoveToMouseCursor)
 	{
-		// We hit something, move there
-		RequestSetNewMoveDestination(Hit.ImpactPoint);
-		//SetNewMoveDestination(Hit.ImpactPoint);
+		FHitResult Hit;
+		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		if (Hit.bBlockingHit)
+		{
+			RequestSetNewMoveDestination(Hit.ImpactPoint);
+		}
 	}
 }
 
@@ -143,6 +143,7 @@ void ACrimsonEclipsePlayerController::PickupButtonPressed()
 	}
 }
 
+/*
 void ACrimsonEclipsePlayerController::ClickAttack()
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
@@ -150,14 +151,15 @@ void ACrimsonEclipsePlayerController::ClickAttack()
 	FHitResult Hit;
 
 	GetHitResultUnderCursorForObjects(QueryArray, false, Hit);
-	if (APawn* TargetActor = Cast<APawn>(Hit.GetActor()))
+	APawn* TargetActor = Cast<APawn>(Hit.GetActor());
+	if (TargetActor && TargetActor!= GetCharacter())
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToActor(this, TargetActor);
 
 		Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(TargetActor);
 		Cast<ACrimsonEclipseCharacter>(GetCharacter())->OnClickAttack();
 	}
-}
+}*/
 
 // Requests a destination set for the client and server.
 void ACrimsonEclipsePlayerController::RequestSetNewMoveDestination(const FVector DestLocation)
@@ -197,7 +199,23 @@ void ACrimsonEclipsePlayerController::SetNewMoveDestination(const FVector DestLo
 void ACrimsonEclipsePlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
-	bMoveToMouseCursor = true;
+	UE_LOG(LogTemp, Warning, TEXT("OnSetDestination"));
+
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Pawn, false, Hit);
+
+	APawn* TargetActor = Cast<APawn>(Hit.GetActor());
+	if (TargetActor && TargetActor != GetCharacter())
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToActor(this, TargetActor);
+		Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(TargetActor);
+		Cast<ACrimsonEclipseCharacter>(GetCharacter())->OnClickAttack();
+	}
+	else
+	{
+		bMoveToMouseCursor = true;
+		Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(nullptr);
+	}
 }
 
 void ACrimsonEclipsePlayerController::OnSetDestinationReleased()
