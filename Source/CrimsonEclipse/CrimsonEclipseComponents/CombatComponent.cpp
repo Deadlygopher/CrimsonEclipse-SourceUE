@@ -66,6 +66,7 @@ void UCombatComponent::EquipRightWeapon(AWeapon* WeaponToEquip)
 		RightHandEquippedWeapon->SetOwner(Character);
 		RightHandEquippedWeapon->SetActorLocationAndRotation(RightHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("HandleSocket"),
 			RightHandEquippedWeapon->GetWeaponMesh()->GetSocketRotation("HandleSocket"));
+		Character->SetAttackRadius(RightHandEquippedWeapon->GetReachRadius());
 		if (InAttackMoveSpeed > RightHandEquippedWeapon->GetWeaponAttackMoveSpeed())
 		{
 			InAttackMoveSpeed = RightHandEquippedWeapon->GetWeaponAttackMoveSpeed();
@@ -91,6 +92,7 @@ void UCombatComponent::EquipLeftWeapon(AWeapon* WeaponToEquip)
 		LeftHandEquippedWeapon->SetOwner(Character);
 		LeftHandEquippedWeapon->SetActorLocationAndRotation(LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketLocation("HandleSocket"),
 			LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketRotation("HandleSocket"));
+		Character->SetAttackRadius(LeftHandEquippedWeapon->GetReachRadius());
 		if (InAttackMoveSpeed > LeftHandEquippedWeapon->GetWeaponAttackMoveSpeed())
 		{
 			InAttackMoveSpeed = LeftHandEquippedWeapon->GetWeaponAttackMoveSpeed();

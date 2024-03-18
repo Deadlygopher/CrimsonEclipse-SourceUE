@@ -37,7 +37,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 
 	AttackReachRadius = CreateDefaultSubobject<USphereComponent>("AttackReachRadius");
 	AttackReachRadius->SetupAttachment(RootComponent);
-	AttackReachRadius->InitSphereRadius(150.f);
+	AttackReachRadius->InitSphereRadius(AttackRadius- AttackRadius*0.15); //TODO Magic Number
 }
 
 void ACEBaseCharacter::BeginPlay()
@@ -155,6 +155,12 @@ void ACEBaseCharacter::RotateToCursorDirecion()
 
 }
 
+void ACEBaseCharacter::SetAttackRadius(float RadiusForSet)
+{
+	AttackRadius = RadiusForSet;
+	AttackReachRadius->SetSphereRadius(RadiusForSet - RadiusForSet*0.15);  //TODO Magic Number
+}
+
 void ACEBaseCharacter::StartRoll()
 {
 	if (bReadyForAttack != false)
@@ -199,11 +205,9 @@ void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedCompon
 {
 	if (OtherActor == TargetActor &&  bAttackClicked)
 	{
-		//OverlappedInfo.OverlapInfo.Actor = OtherActor;
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
-		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Begin Overlap %i"), AttackReachRadius->GetScaledSphereRadius());
+		//UE_LOG(LogCEBaseCharacter, Warning, TEXT("Begin Overlap %i"), AttackReachRadius->GetScaledSphereRadius());
 		LightAttack();
-		//bWeaponRadiusReached = true;
 		bAttackClicked = false;
 	}
 }
@@ -211,18 +215,14 @@ void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedCompon
 void ACEBaseCharacter::OnLeftAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (bWeaponRadiusReached)
-	{
-		UE_LOG(LogCEBaseCharacter, Warning, TEXT("End Overlap %s"), *OtherActor->GetName());
-		//bWeaponRadiusReached = false;
-		//bAttackClicked = false;
-	}
+	UE_LOG(LogCEBaseCharacter, Warning, TEXT("End Overlap %s"), *OtherActor->GetName());
 }
 
 void ACEBaseCharacter::OnClickAttack()
 {
 	bAttackClicked = true;
-	if (GetDistanceTo(TargetActor) <= 300)
+	UE_LOG(LogCEBaseCharacter, Warning, TEXT("%s"), *FString::SanitizeFloat(GetDistanceTo(TargetActor)));
+	if (GetDistanceTo(TargetActor) <= AttackRadius)
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
 		LightAttack();

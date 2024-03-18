@@ -39,7 +39,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	float GetWeaponAttackMoveSpeed() { return WeaponAttackMoveSpeed; }
+	float GetWeaponAttackMoveSpeed() const { return WeaponAttackMoveSpeed; }
+	float GetReachRadius() const { return ReachRadius; }
 
 	UAnimMontage* GetLightAttackAnimMontage() { return WeaponLightAttackAnimMontage; }
 	UAnimMontage* GetHeavyAttackAnimMontage() { return WeaponHeavyAttackAnimMontage; }
@@ -74,6 +75,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
 	float WeaponAttackMoveSpeed = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
+	float ReachRadius = 100.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
 	TSubclassOf<ACEProjectileActor> ProjectileClass;

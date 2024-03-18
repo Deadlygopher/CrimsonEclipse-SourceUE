@@ -42,7 +42,8 @@ public:
 	float GetMaxHealth() const;
 
 	virtual void RotateToCursorDirecion();
-	virtual bool GetIsReceiveHitImpact() { return bIsReceiveHitImpact; }
+	virtual bool GetIsReceiveHitImpact() const { return bIsReceiveHitImpact; }
+	void SetAttackRadius(float RadiusForSet);
 
 	/// Roll variables
 private:
@@ -119,7 +120,10 @@ private:
 
 	UPROPERTY()
 	APawn* TargetActor = nullptr;
-	FOverlapInfo OverlappedInfo;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AttackRadius = 150.f;
+
 	bool bWeaponRadiusReached = false;
 	bool bAttackClicked = false;
 

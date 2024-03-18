@@ -1633,6 +1633,60 @@ void UInventoryComponent::EquipItem(UItem* Item)
 		break;
 	}
 
+	case EItemType::TwoHandsWeaponR:
+	{
+		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Item->GetItemPrimaryEquipmentSlotType());
+		const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Item->GetItemSecondaryEquipmentSlotType());
+
+		//Both hands empty (Eqip TwoHandsWeapon Right Socket)
+		if (PrimarySlot.Data.IsEmpty() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+
+			EquipmentSlots[EquipmentSlotIndexR].Data = FSlot(ItemInst, 1, this);
+			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+			EquipmentSlots[EquipmentSlotIndexL].Data = FSlot(ItemInst, 1, this);
+			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+
+			NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+			K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+
+			NotifyInventoryUpdated();
+			NotifyInventoryWeightChanged();
+		}
+		break;
+	}
+
+	case EItemType::TwoHandsWeaponL:
+	{
+		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Item->GetItemPrimaryEquipmentSlotType());
+		const FEquipmentSlot SecondarySlot = GetEquipmentSlotByType(Item->GetItemSecondaryEquipmentSlotType());
+
+		//Both hands empty (Eqip TwoHandsWeapon Right Socket)
+		if (PrimarySlot.Data.IsEmpty() && SecondarySlot.Data.IsEmpty())
+		{
+			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
+			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
+
+			auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+
+			EquipmentSlots[EquipmentSlotIndexR].Data = FSlot(ItemInst, 1, this);
+			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
+			EquipmentSlots[EquipmentSlotIndexL].Data = FSlot(ItemInst, 1, this);
+			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+
+			NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+			K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+
+			NotifyInventoryUpdated();
+			NotifyInventoryWeightChanged();
+		}
+		break;
+	}
+
 	case EItemType::Armor:
 	{
 		const FEquipmentSlot PrimarySlot = GetEquipmentSlotByType(Item->GetItemPrimaryEquipmentSlotType());

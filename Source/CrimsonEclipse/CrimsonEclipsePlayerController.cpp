@@ -79,11 +79,12 @@ void ACrimsonEclipsePlayerController::MoveToTouchLocation(const ETouchIndex::Typ
 
 void ACrimsonEclipsePlayerController::PickupItem()
 {
-	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
-	QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Visibility));
+	//TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
+	//QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Visibility));
 	FHitResult Hit;
 
-	GetHitResultUnderCursorForObjects(QueryArray, false, Hit);
+	//GetHitResultUnderCursorForObjects(QueryArray, false, Hit);
+	GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, false, Hit);
 	APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
 	if (ActorToPickup)
 	{
