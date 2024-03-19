@@ -60,7 +60,6 @@ void ACEBaseCharacter::BeginPlay()
 	AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
 	AttackReachRadius->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	AttackReachRadius->OnComponentBeginOverlap.AddDynamic(this, &ACEBaseCharacter::OnReachAttackRadius);
-	AttackReachRadius->OnComponentEndOverlap.AddDynamic(this, &ACEBaseCharacter::OnLeftAttackRadius);
 }
 
 void ACEBaseCharacter::PostInitializeComponents()
@@ -71,6 +70,7 @@ void ACEBaseCharacter::PostInitializeComponents()
 		CombatComponent->SetCharacter(this);
 	}
 }
+
 
 void ACEBaseCharacter::LightAttack()
 {
@@ -96,6 +96,7 @@ void ACEBaseCharacter::LightAttack()
 	}
 }
 
+
 void ACEBaseCharacter::HeavyAttack()
 {
 	if (CombatComponent->GetRightHandWeapon() && bReadyForAttack)
@@ -118,6 +119,15 @@ void ACEBaseCharacter::HeavyAttack()
 			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 		}
 	}
+}
+
+
+float ACEBaseCharacter::GetMovementDirection() const
+{
+	const auto VelocityNormal = GetVelocity().GetSafeNormal();
+	const auto AngleBetween = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
+	const auto CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
+	return FMath::RadiansToDegrees(AngleBetween) * FMath::Sign(CrossProduct.Z);
 }
 
 void ACEBaseCharacter::Tick(float DeltaTime)
@@ -191,7 +201,7 @@ void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const U
 	bIsReceiveHitImpact = true;
 
 	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &ACEBaseCharacter::IsReceiveHitImpactReset, 0.2f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ACEBaseCharacter::IsReceiveHitImpactReset, 0.2f, false); //TODO Magic Number
 }
 
 void ACEBaseCharacter::ResetReadyForAttack(UAnimMontage* Montage, bool bInterrupted)
@@ -212,11 +222,6 @@ void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedCompon
 	}
 }
 
-void ACEBaseCharacter::OnLeftAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	UE_LOG(LogCEBaseCharacter, Warning, TEXT("End Overlap %s"), *OtherActor->GetName());
-}
 
 void ACEBaseCharacter::OnClickAttack()
 {

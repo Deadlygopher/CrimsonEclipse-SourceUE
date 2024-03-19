@@ -26,6 +26,7 @@ void UCrimsonEclipseAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	FVector Velocity = CrimsonEclipseCharacter->GetVelocity();
 	Velocity.Z = 0.f;
 	Speed = Velocity.Size();
+	Direction = CrimsonEclipseCharacter->GetMovementDirection();
 
 	bIsRollig = CrimsonEclipseCharacter->GetIsRollPressed();
 	bIsInAir = CrimsonEclipseCharacter->GetCharacterMovement()->IsFalling();

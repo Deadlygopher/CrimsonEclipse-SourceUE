@@ -13,6 +13,7 @@ UCLASS()
 class CRIMSONECLIPSE_API UCEAIPerceptionComponent : public UAIPerceptionComponent
 {
 	GENERATED_BODY()
+
 public:
 	AActor* GetClosestEnemy() const;
 

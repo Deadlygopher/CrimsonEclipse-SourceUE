@@ -5,6 +5,8 @@
 #include "CECharacterAI.h"
 #include "Components/CEAIPerceptionComponent.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
+
 
 ACEAIController::ACEAIController()
 {
@@ -15,7 +17,7 @@ ACEAIController::ACEAIController()
 void ACEAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	const auto AimActor = CEAIPerceptionComponent->GetClosestEnemy();
+	const auto AimActor = GetFocusOnActor();
 	SetFocus(AimActor);
 }
 
@@ -28,4 +30,10 @@ void ACEAIController::OnPossess(APawn* InPawn)
 	{
 		RunBehaviorTree(AICharacter->BehaviorTreeAsset);
 	}
+}
+
+AActor* ACEAIController::GetFocusOnActor() const
+{
+	if(!GetBlackboardComponent()) return nullptr;
+	return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
 }

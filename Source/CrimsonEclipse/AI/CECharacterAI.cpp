@@ -15,6 +15,6 @@ ACECharacterAI::ACECharacterAI()
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->bUseControllerDesiredRotation = true;
-		GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
+		GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);  // TODO Magic Number
 	}
 }

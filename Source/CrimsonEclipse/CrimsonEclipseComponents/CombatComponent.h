@@ -58,6 +58,7 @@ private:
 	UPROPERTY()
 	AWeapon* LeftHandEquippedWeapon;
 
+	UPROPERTY()
 	TArray<AActor*> ActorsToIgnore;
 
 	//Tracing Sockets for weapon

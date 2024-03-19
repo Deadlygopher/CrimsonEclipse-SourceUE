@@ -22,4 +22,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCEAIPerceptionComponent* CEAIPerceptionComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	FName FocusOnKeyName = "EnemyActor";
+
+private:
+	AActor* GetFocusOnActor() const;
 };

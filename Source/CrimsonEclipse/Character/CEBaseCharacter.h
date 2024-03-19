@@ -31,10 +31,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void HeavyAttack();
 
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	float GetMovementDirection() const;
+
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 	float GetMaxWalkSpeed();
 
 	UHealthComponent* GetHealthComponent();
@@ -114,20 +117,15 @@ private:
 	void OnReachAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-	void OnLeftAttackRadius(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 	UPROPERTY()
 	APawn* TargetActor = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	float AttackRadius = 150.f;
 
-	bool bWeaponRadiusReached = false;
+	//bool bWeaponRadiusReached = false;
 	bool bAttackClicked = false;
 
 	bool bIsReceiveHitImpact;
-
 	void IsReceiveHitImpactReset();
 };

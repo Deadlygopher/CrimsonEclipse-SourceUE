@@ -35,7 +35,6 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACrimsonEclipsePlayerController::OnSetDestinationPressed);
-	//InputComponent->BindAction("ClickAttack", IE_Pressed, this, &ACrimsonEclipsePlayerController::ClickAttack);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACrimsonEclipsePlayerController::OnSetDestinationReleased);
 
 	// set key for pickup items from inventory component
