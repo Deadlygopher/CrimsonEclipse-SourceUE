@@ -54,15 +54,15 @@ void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponen
 			CapsuleComponent->OnComponentBeginOverlap.RemoveAll(this);
 			CapsuleComponent->Deactivate();
 			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld, true };
-
-			auto SkeletalMesh = Cast<USkeletalMeshComponent>(SweepResult.Component);
-			auto ClosestBone = SkeletalMesh->FindClosestBone(ProjectileMesh->GetComponentLocation());
-			AttachToComponent(SkeletalMesh, AttachmentTransform, ClosestBone);
-			UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *GetInstigator()->GetName());
-
 			UGameplayStatics::ApplyDamage(OtherActor, 10.f, GetInstigator()->GetController(),
 				GetInstigator(), UDamageType::StaticClass());
+
+			auto SkeletalMesh = Cast<USkeletalMeshComponent>(SweepResult.Component);
+			if (!SkeletalMesh) return;
+			auto ClosestBone = SkeletalMesh->FindClosestBone(ProjectileMesh->GetComponentLocation());
+			FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld, true };
+			AttachToComponent(SkeletalMesh, AttachmentTransform, ClosestBone);
+			//UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *GetInstigator()->GetName());
 		}
 		else
 		{

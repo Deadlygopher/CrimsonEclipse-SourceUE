@@ -52,6 +52,7 @@ void ACEBaseCharacter::BeginPlay()
 	}
 	OnTakeAnyDamage.AddDynamic(this, &ACEBaseCharacter::ReceiveDamage);
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ACEBaseCharacter::ResetReadyForAttack);
+	//GetMesh()->GetAnimInstance()->OnMontageStarted.
 	if (HealthComponent)
 	{
 		HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
@@ -72,53 +73,17 @@ void ACEBaseCharacter::PostInitializeComponents()
 }
 
 
-void ACEBaseCharacter::LightAttack()
+void ACEBaseCharacter::RequestLightAttack()
 {
-	if (CombatComponent->GetRightHandWeapon() && bReadyForAttack)
-	{
-		auto AnimMontage = CombatComponent->GetRightHandWeapon()->GetLightAttackAnimMontage();
-		if (AnimMontage)
-		{
-			bReadyForAttack = false;
-			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
-			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
-		}
-	}
-	if (CombatComponent->GetLeftHandWeapon() && bReadyForAttack)
-	{
-		auto AnimMontage = CombatComponent->GetLeftHandWeapon()->GetLightAttackAnimMontage();
-		if (AnimMontage)
-		{
-			bReadyForAttack = false;
-			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
-			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
-		}
-	}
+	if (!CombatComponent) return;
+	CombatComponent->LightAttack();
 }
 
 
-void ACEBaseCharacter::HeavyAttack()
+void ACEBaseCharacter::RequestHeavyAttack()
 {
-	if (CombatComponent->GetRightHandWeapon() && bReadyForAttack)
-	{
-		auto AnimMontage = CombatComponent->GetRightHandWeapon()->GetHeavyAttackAnimMontage();
-		if (AnimMontage)
-		{
-			bReadyForAttack = false;
-			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
-			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
-		}
-	}
-	if (CombatComponent->GetLeftHandWeapon() && bReadyForAttack)
-	{
-		auto AnimMontage = CombatComponent->GetLeftHandWeapon()->GetHeavyAttackAnimMontage();
-		if (AnimMontage)
-		{
-			bReadyForAttack = false;
-			GetCharacterMovement()->MaxWalkSpeed = CombatComponent->GetInAttackMoveSpeed();
-			GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
-		}
-	}
+	if (!CombatComponent) return;
+	CombatComponent->HeavyAttack();
 }
 
 
@@ -140,9 +105,14 @@ void ACEBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-float ACEBaseCharacter::GetMaxWalkSpeed()
+float ACEBaseCharacter::GetMaxWalkSpeed() const
 {
 	return GetCharacterMovement()->MaxWalkSpeed;
+}
+
+void ACEBaseCharacter::SetMaxWalkSpeed(float NewSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
 UHealthComponent* ACEBaseCharacter::GetHealthComponent()
@@ -217,7 +187,7 @@ void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedCompon
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
 		//UE_LOG(LogCEBaseCharacter, Warning, TEXT("Begin Overlap %i"), AttackReachRadius->GetScaledSphereRadius());
-		LightAttack();
+		RequestLightAttack();
 		bAttackClicked = false;
 	}
 }
@@ -230,7 +200,7 @@ void ACEBaseCharacter::OnClickAttack()
 	if (GetDistanceTo(TargetActor) <= AttackRadius)
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
-		LightAttack();
+		RequestLightAttack();
 	}
 }
 

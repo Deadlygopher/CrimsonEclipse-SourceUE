@@ -204,10 +204,44 @@ void UCombatComponent::OnProjectileSpawn()
 	}
 }
 
-void UCombatComponent::SimpleRightHandAttack()
+void UCombatComponent::LightAttack()
 {
-	//ResetTracingVectors();
-	//HitRightHandTracing();
+	if (Character->GetReadyForAttack() && RightHandEquippedWeapon)
+	{
+		auto const AnimMontage = RightHandEquippedWeapon->GetLightAttackAnimMontage();
+		if (!AnimMontage) return;
+		Character->SetReadyForAttack(false);
+		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+	}
+	if (Character->GetReadyForAttack() && LeftHandEquippedWeapon)
+	{
+		auto const AnimMontage = LeftHandEquippedWeapon->GetLightAttackAnimMontage();
+		if (!AnimMontage) return;
+		Character->SetReadyForAttack(false);
+		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+	}
+}
+
+void UCombatComponent::HeavyAttack()
+{
+	if (Character->GetReadyForAttack() && RightHandEquippedWeapon)
+	{
+		auto const AnimMontage = RightHandEquippedWeapon->GetHeavyAttackAnimMontage();
+		if (!AnimMontage) return;
+		Character->SetReadyForAttack(false);
+		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+	}
+	if (Character->GetReadyForAttack() && LeftHandEquippedWeapon)
+	{
+		auto const AnimMontage = LeftHandEquippedWeapon->GetHeavyAttackAnimMontage();
+		if (!AnimMontage) return;
+		Character->SetReadyForAttack(false);
+		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
+		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+	}
 }
 
 

@@ -26,10 +26,10 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void LightAttack();
+	virtual void RequestLightAttack();
 
 	UFUNCTION(BlueprintCallable)
-	virtual void HeavyAttack();
+	virtual void RequestHeavyAttack();
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	float GetMovementDirection() const;
@@ -38,7 +38,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	float GetMaxWalkSpeed();
+	float GetMaxWalkSpeed() const;
+	void SetMaxWalkSpeed(float NewSpeed);
 
 	UHealthComponent* GetHealthComponent();
 	float GetHealth() const;
@@ -57,7 +58,7 @@ private:
 	float RollSpeed = 1000;
 
 public:
-	bool GetIsRollPressed() { return bPressedRoll; }
+	bool GetIsRollPressed() const { return bPressedRoll; }
 
 	UFUNCTION(BlueprintCallable)
 	virtual void StartRoll();
@@ -79,6 +80,9 @@ public:
 
 	void OnClickAttack();
 	void SetTargetActor(APawn* TActor) { TargetActor = TActor; };
+
+	bool GetReadyForAttack() const { return bReadyForAttack; }
+	void SetReadyForAttack(bool bIsReady) { bReadyForAttack = bIsReady; }
 
 protected:
 	virtual void BeginPlay() override;

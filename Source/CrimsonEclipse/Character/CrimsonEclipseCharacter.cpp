@@ -102,8 +102,8 @@ void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	PlayerInputComponent->BindAction("CameraRotation", IE_Released, this, &ACrimsonEclipseCharacter::CameraRotateOFF);
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ACEBaseCharacter::StartRoll);
 
-	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::LightAttack);
-	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::HeavyAttack);
+	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::RequestLightAttack);
+	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::RequestHeavyAttack);
 
 	PlayerInputComponent->BindAxis("CameraRotationAxis", this, &ACrimsonEclipseCharacter::ChangeCameraAngle);
 	PlayerInputComponent->BindAxis("CameraZoom", this, &ACrimsonEclipseCharacter::CameraZoom);
@@ -161,10 +161,10 @@ void ACrimsonEclipseCharacter::StartRoll()
 	Super::StartRoll();
 }
 
-void ACrimsonEclipseCharacter::LightAttack()
+void ACrimsonEclipseCharacter::RequestLightAttack()
 {
 	RotateToCursorDirecion();
-	Super::LightAttack();
+	Super::RequestLightAttack();
 }
 
 void ACrimsonEclipseCharacter::RotateToCursorDirecion()
