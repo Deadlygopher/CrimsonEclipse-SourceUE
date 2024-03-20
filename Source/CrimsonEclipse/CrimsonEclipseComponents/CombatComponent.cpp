@@ -212,7 +212,8 @@ void UCombatComponent::LightAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		Character->PlayAnimMontage(AnimMontage);
+		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 	}
 	if (Character->GetReadyForAttack() && LeftHandEquippedWeapon)
 	{
@@ -220,7 +221,8 @@ void UCombatComponent::LightAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		Character->PlayAnimMontage(AnimMontage);
+		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 	}
 }
 
@@ -232,7 +234,8 @@ void UCombatComponent::HeavyAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		Character->PlayAnimMontage(AnimMontage);
+		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 	}
 	if (Character->GetReadyForAttack() && LeftHandEquippedWeapon)
 	{
@@ -240,7 +243,8 @@ void UCombatComponent::HeavyAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		Character->PlayAnimMontage(AnimMontage);
+		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 	}
 }
 

@@ -56,12 +56,32 @@ void ACEBaseCharacter::BeginPlay()
 	if (HealthComponent)
 	{
 		HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
+		HealthComponent->OnDeath.AddUObject(this, &ACEBaseCharacter::OnDeath);
 	}
 	AttackReachRadius->SetGenerateOverlapEvents(true);
 	AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
 	AttackReachRadius->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	AttackReachRadius->OnComponentBeginOverlap.AddDynamic(this, &ACEBaseCharacter::OnReachAttackRadius);
 }
+
+void ACEBaseCharacter::OnDeath()
+{
+	GetController()->UnPossess();
+	//bIsReceiveHitImpact = false;
+	//GetMesh()->ResetAnimInstanceDynamics();
+	GetCharacterMovement()->StopActiveMovement();
+	PlayAnimMontage(DeathAnimation);
+
+	FTimerHandle DeathAnimationTimer;
+	GetWorldTimerManager().SetTimer(DeathAnimationTimer, this, &ACEBaseCharacter::AfterDeathAnimation, 0.5f, false); //TODO MAgic Number
+}
+
+void ACEBaseCharacter::AfterDeathAnimation()
+{
+	//UE_LOG(LogCEBaseCharacter, Warning, TEXT("DEAD!!!"))
+	GetMesh()->SetSimulatePhysics(true);
+}
+
 
 void ACEBaseCharacter::PostInitializeComponents()
 {
@@ -141,6 +161,7 @@ void ACEBaseCharacter::SetAttackRadius(float RadiusForSet)
 	AttackReachRadius->SetSphereRadius(RadiusForSet - RadiusForSet*0.15);  //TODO Magic Number
 }
 
+
 void ACEBaseCharacter::StartRoll()
 {
 	if (bReadyForAttack != false)
@@ -174,6 +195,7 @@ void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const U
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ACEBaseCharacter::IsReceiveHitImpactReset, 0.2f, false); //TODO Magic Number
 }
 
+
 void ACEBaseCharacter::ResetReadyForAttack(UAnimMontage* Montage, bool bInterrupted)
 {
 	bReadyForAttack = true;
@@ -206,8 +228,9 @@ void ACEBaseCharacter::OnClickAttack()
 
 void ACEBaseCharacter::IsReceiveHitImpactReset()
 {
+	UE_LOG(LogCEBaseCharacter, Warning, TEXT("RESET IMPACT"))
 	bIsReceiveHitImpact = false;
-	GetWorldTimerManager().ClearAllTimersForObject(this);
+	//GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
 void ACEBaseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
@@ -233,6 +256,14 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
 			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
 			CombatComponent->SetRightHandDamage(InItem->GetWeaponDamage());
+			if (CombatComponent->GetRightHandWeapon())
+			{
+				if (CombatComponent->GetRightHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range || 
+					CombatComponent->GetRightHandWeapon()->GetWeaponType() == EWeaponType::EWT_Magic)
+				{
+					SetIsRangeWeapon(true);
+				}
+			}
 		}
 		break;
 	}
@@ -243,6 +274,14 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 			FActorSpawnParameters WeaponSpawnParameters;
 			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
 			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			if (CombatComponent->GetLeftHandWeapon())
+			{
+				if (CombatComponent->GetLeftHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range ||
+					CombatComponent->GetLeftHandWeapon()->GetWeaponType() == EWeaponType::EWT_Magic)
+				{
+					SetIsRangeWeapon(true);
+				}
+			}
 		}
 		break;
 	}

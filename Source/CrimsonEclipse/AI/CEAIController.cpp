@@ -4,6 +4,7 @@
 #include "CEAIController.h"
 #include "CECharacterAI.h"
 #include "Components/CEAIPerceptionComponent.h"
+#include "BrainComponent.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -12,6 +13,12 @@ ACEAIController::ACEAIController()
 {
 	CEAIPerceptionComponent = CreateDefaultSubobject<UCEAIPerceptionComponent>("CEAIPerceptionComponent");
 	SetPerceptionComponent(*CEAIPerceptionComponent);
+}
+
+void ACEAIController::SetWeaponTypeKey(bool bIsRangeWeapon)
+{
+	if (!GetBlackboardComponent()) return;
+	GetBlackboardComponent()->SetValueAsBool(WeaponTypeKeyName, bIsRangeWeapon);
 }
 
 void ACEAIController::Tick(float DeltaTime)
@@ -30,6 +37,13 @@ void ACEAIController::OnPossess(APawn* InPawn)
 	{
 		RunBehaviorTree(AICharacter->BehaviorTreeAsset);
 	}
+}
+
+void ACEAIController::OnUnPossess()
+{
+	Super::OnUnPossess();
+
+	BrainComponent->Cleanup();
 }
 
 AActor* ACEAIController::GetFocusOnActor() const

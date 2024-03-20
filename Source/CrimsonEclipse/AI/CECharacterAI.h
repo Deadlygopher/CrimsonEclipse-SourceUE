@@ -18,4 +18,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="AI")
 	UBehaviorTree* BehaviorTreeAsset;
+
+	//UFUNCTION(BlueprintCallable)
+	void OnItemEquip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity) override;
 };

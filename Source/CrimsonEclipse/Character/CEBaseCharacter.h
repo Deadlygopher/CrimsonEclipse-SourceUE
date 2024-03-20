@@ -15,6 +15,7 @@ class UHealthComponent;
 class UWidgetComponent;
 class UInventoryComponent;
 class USphereComponent;
+class UItem;
 
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter, public IEvadeAnimInterface
@@ -49,6 +50,10 @@ public:
 	virtual bool GetIsReceiveHitImpact() const { return bIsReceiveHitImpact; }
 	void SetAttackRadius(float RadiusForSet);
 
+	void SetIsRangeWeapon(bool bIsRange) { bIsRangeWeapon = bIsRange; }
+	bool GetIsRangeWeapon() {return bIsRangeWeapon;	};
+	bool bIsRangeWeapon = false;
+
 	/// Roll variables
 private:
 	UPROPERTY(EditDefaultsOnly)
@@ -56,6 +61,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	float RollSpeed = 1000;
+
+	UPROPERTY(EditDefaultsOnly)
+	UAnimMontage* DeathAnimation;
 
 public:
 	bool GetIsRollPressed() const { return bPressedRoll; }
@@ -72,10 +80,10 @@ public:
 	UInventoryComponent* InventoryComponent;
 
 	UFUNCTION(BlueprintCallable)
-	void OnItemEquip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+	virtual void OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 
 	UFUNCTION(BlueprintCallable)
-	void OnItemUnequip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+	void OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
 	/// Inventory
 
 	void OnClickAttack();
@@ -86,6 +94,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void OnDeath();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCombatComponent* CombatComponent;
@@ -108,11 +118,11 @@ private:
 
 	bool bReadyForAttack = true;
 
+	//UFUNCTION()
+	void AfterDeathAnimation();
+
 	UFUNCTION()
 	void ResetReadyForAttack(UAnimMontage* Montage, bool bInterrupted);
-
-	UPROPERTY(EditDefaultsOnly)
-	UAnimMontage* ImpactAnimMontage;
 
 	UPROPERTY(EditDefaultsOnly)
 	USphereComponent* AttackReachRadius;
@@ -131,5 +141,6 @@ private:
 	bool bAttackClicked = false;
 
 	bool bIsReceiveHitImpact;
+	//UFUNCTION()
 	void IsReceiveHitImpactReset();
 };

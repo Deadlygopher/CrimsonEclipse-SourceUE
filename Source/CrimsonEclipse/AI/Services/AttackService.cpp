@@ -8,7 +8,7 @@
 
 UAttackService::UAttackService()
 {
-	NodeName = "Fire";
+	NodeName = "Attack Service";
 }
 
 void UAttackService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

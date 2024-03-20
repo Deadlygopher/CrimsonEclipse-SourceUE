@@ -18,3 +18,9 @@ ACECharacterAI::ACECharacterAI()
 		GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);  // TODO Magic Number
 	}
 }
+
+void ACECharacterAI::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+{
+	Super::OnItemEquip(InItem, Type, InQuantity);
+	Cast<ACEAIController>(GetController())->SetWeaponTypeKey(GetIsRangeWeapon());
+}

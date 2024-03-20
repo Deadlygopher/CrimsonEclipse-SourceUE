@@ -53,6 +53,7 @@ void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponen
 			ProjectileComponent->Deactivate();
 			CapsuleComponent->OnComponentBeginOverlap.RemoveAll(this);
 			CapsuleComponent->Deactivate();
+			ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			UGameplayStatics::ApplyDamage(OtherActor, 10.f, GetInstigator()->GetController(),
 				GetInstigator(), UDamageType::StaticClass());

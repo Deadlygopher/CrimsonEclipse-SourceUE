@@ -16,15 +16,21 @@ class CRIMSONECLIPSE_API ACEAIController : public AAIController
 public:
 	ACEAIController();
 
+	void SetWeaponTypeKey(bool bIsRangeWeapon);
+
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	UCEAIPerceptionComponent* CEAIPerceptionComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	FName FocusOnKeyName = "EnemyActor";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	FName WeaponTypeKeyName = "IsRangeWeapon";
 
 private:
 	AActor* GetFocusOnActor() const;
