@@ -215,7 +215,7 @@ struct INVENTORYSYSTEM_API FEquipmentSlot
  */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemEvent, UItem*, Item, int32, Quantity);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FInventoryEquipmentEvent, UItem*, Item, EEquipmentSlotType, Type, int32, Quantity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FInventoryEquipmentEvent, UItem*, Item, UItemInstance*, ItemInstance, EEquipmentSlotType, Type, int32, Quantity);
 
 /**
  * UInventoryComponent
@@ -360,10 +360,10 @@ public:
 	void K2_OnInventoryItemRemoved(UItem* Item, int32 Quantity);
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Inventory Item Equipped"), Category = "Inventory")
-	void K2_OnInventoryItemEquipped(UItem* Item, EEquipmentSlotType Type, int32 Quantity);
+	void K2_OnInventoryItemEquipped(UItem* Item, UItemInstance* InItemInstance, EEquipmentSlotType Type, int32 Quantity);
 	
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Inventory Item Unequipped"), Category = "Inventory")
-	void K2_OnInventoryItemUnequipped(UItem* Item, EEquipmentSlotType Type, int32 Quantity);
+	void K2_OnInventoryItemUnequipped(UItem* Item, UItemInstance* InItemInstance, EEquipmentSlotType Type, int32 Quantity);
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Inventory Item Used"), Category = "Inventory")
 	void K2_OnInventoryItemUsed(UItem* Item, int32 Quantity);
@@ -448,8 +448,10 @@ public:
 	void NotifyInventoryWeightChanged();
 	void NotifyInventoryItemAdded(UItem* InItem, int32 InQuantity);
 	void NotifyInventoryItemRemoved(UItem* InItem, int32 InQuantity);
-	void NotifyInventoryItemEquipped(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
-	void NotifyInventoryItemUnequipped(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+	void NotifyInventoryItemEquipped(UItem* InItem, UItemInstance* InItemInstance,
+		EEquipmentSlotType Type, int32 InQuantity);
+	void NotifyInventoryItemUnequipped(UItem* InItem, UItemInstance* InItemInstance,
+		EEquipmentSlotType Type, int32 InQuantity);
 	void NotifyInventoryItemUsed(UItem* InItem, int32 InQuantity);
 	//void NotifyMoneyChanged();
 

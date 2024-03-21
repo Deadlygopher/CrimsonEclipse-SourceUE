@@ -38,8 +38,11 @@ public:
 	void SetCharacter(ACEBaseCharacter* Char);
 
 	//Damage
-	float GetRightHandDamage() { return RightHandDamage; }
+	float GetRightHandDamage() const { return RightHandDamage; }
 	void SetRightHandDamage(float NewDamage) { RightHandDamage = NewDamage; }
+
+	float GetLeftHandDamage() const { return LeftHandDamage; }
+	void SetLeftHandDamage(float NewDamage) { LeftHandDamage = NewDamage; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -75,6 +78,7 @@ private:
 
 	// Damage
 	float RightHandDamage = 1.f;
+	float LeftHandDamage = 1.f;
 	float DefaultInAttackMoveSpeed = 0.f;
 	float InAttackMoveSpeed = 0.f;
 

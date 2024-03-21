@@ -16,6 +16,7 @@ class UWidgetComponent;
 class UInventoryComponent;
 class USphereComponent;
 class UItem;
+class UItemInstance;
 
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter, public IEvadeAnimInterface
@@ -80,10 +81,10 @@ public:
 	UInventoryComponent* InventoryComponent;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+	virtual void OnItemEquip(UItem* InItem, UItemInstance* InIntemInstance, EEquipmentSlotType Type, int32 InQuantity);
 
 	UFUNCTION(BlueprintCallable)
-	void OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity);
+	void OnItemUnequip(UItem* InItem, UItemInstance* InIntemInstance, EEquipmentSlotType Type, int32 InQuantity);
 	/// Inventory
 
 	void OnClickAttack();

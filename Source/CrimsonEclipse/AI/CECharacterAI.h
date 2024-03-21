@@ -20,5 +20,5 @@ public:
 	UBehaviorTree* BehaviorTreeAsset;
 
 	//UFUNCTION(BlueprintCallable)
-	void OnItemEquip(class UItem* InItem, EEquipmentSlotType Type, int32 InQuantity) override;
+	void OnItemEquip(class UItem* InItem, class UItemInstance* InItemInstance, EEquipmentSlotType Type, int32 InQuantity) override;
 };

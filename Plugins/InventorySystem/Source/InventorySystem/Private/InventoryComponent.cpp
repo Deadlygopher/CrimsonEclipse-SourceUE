@@ -1066,8 +1066,8 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
-			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
 			Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1080,8 +1080,8 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
-			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
 			Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1107,10 +1107,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					//EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1135,10 +1135,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					//EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1158,10 +1158,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 					EquipmentSlots[EquipmentSlotIndex].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1185,14 +1185,11 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
 			EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
-			//EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance = Slot.ItemInstance; ////
 			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
 			EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
-			//EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = Slot.ItemInstance; ////
 			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
-			UE_LOG(LogTemp, Warning, TEXT("%f"), EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ItemInstanceDamage); ////
-			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 			Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1215,10 +1212,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 				EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
 				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 
-				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 
-				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 				Slots.Remove(Slot);
 
 				NotifyInventoryUpdated();
@@ -1243,10 +1240,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 				//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
-				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 				Slots.Remove(Slot);
 
 				NotifyInventoryUpdated();
@@ -1273,10 +1270,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1296,10 +1293,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1321,11 +1318,11 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1352,8 +1349,8 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
 			EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
 			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
-			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
-			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 			Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1376,10 +1373,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 				EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
 				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 
-				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 
-				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
-				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 				Slots.Remove(Slot);
 
 				NotifyInventoryUpdated();
@@ -1404,10 +1401,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 				//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
-				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
-				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 				Slots.Remove(Slot);
 
 				NotifyInventoryUpdated();
@@ -1434,10 +1431,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1457,10 +1454,10 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1482,11 +1479,11 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 					//EquipmentSlots[EquipmentSlotIndexR].Type;
 
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemUnequipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
-					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+					K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 					Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1509,8 +1506,8 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			EquipmentSlots[EquipmentSlotIndex].Data = Slot;
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
-			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
 			Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1529,8 +1526,8 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 				EquipmentSlots[EquipmentSlotIndex].Data = Slot;
 				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
-				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+				NotifyInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
+				K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, Slot.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, Slot.Quantity);
 				Slots.Remove(Slot);
 
 				NotifyInventoryUpdated();
@@ -1586,8 +1583,8 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
-			K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+			NotifyInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+			K2_OnInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
 			//Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1601,8 +1598,8 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
-			K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+			NotifyInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+			K2_OnInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
 			//Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1624,10 +1621,10 @@ void UInventoryComponent::EquipItem(UItem* Item)
 					EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 					EquipmentSlots[EquipmentSlotIndex].Type;
 
-					NotifyInventoryItemUnequipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+					NotifyInventoryItemUnequipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
 
-					NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
-					K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+					NotifyInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+					K2_OnInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
 					//Slots.Remove(Slot);
 
 					NotifyInventoryUpdated();
@@ -1656,8 +1653,8 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			EquipmentSlots[EquipmentSlotIndexL].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
-			K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+			NotifyInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
+			K2_OnInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 
 			NotifyInventoryUpdated();
 			NotifyInventoryWeightChanged();
@@ -1683,8 +1680,8 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			EquipmentSlots[EquipmentSlotIndexL].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
-			K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+			NotifyInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
+			K2_OnInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndexL].Type, 1);
 
 			NotifyInventoryUpdated();
 			NotifyInventoryWeightChanged();
@@ -1705,8 +1702,8 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-			NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
-			K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+			NotifyInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+			K2_OnInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
 			//Slots.Remove(Slot);
 
 			NotifyInventoryUpdated();
@@ -1725,8 +1722,8 @@ void UInventoryComponent::EquipItem(UItem* Item)
 				EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
-				NotifyInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
-				K2_OnInventoryItemEquipped(Item, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+				NotifyInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
+				K2_OnInventoryItemEquipped(Item, ItemInst, EquipmentSlots[EquipmentSlotIndex].Type, 1);
 				//Slots.Remove(Slot);
 
 				NotifyInventoryUpdated();
@@ -1770,8 +1767,8 @@ void UInventoryComponent::UnequipItem(const EEquipmentSlotType EquipmentSlot)
 				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = nullptr;
 				EquipmentSlots[EquipmentSlotIndexL].Data.Quantity = 0;
 
-				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, TargetSlot.Data.Quantity);
-				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, TargetSlot.Data.Quantity);
+				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, TargetSlot.Data.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, TargetSlot.Data.Quantity);
+				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, TargetSlot.Data.ItemInstance, EquipmentSlots[EquipmentSlotIndexR].Type, TargetSlot.Data.Quantity);
 
 				NotifyInventoryUpdated();
 				NotifyInventoryWeightChanged();
@@ -1797,8 +1794,8 @@ void UInventoryComponent::UnequipItem(const EEquipmentSlotType EquipmentSlot)
 				EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = nullptr;
 				EquipmentSlots[EquipmentSlotIndexL].Data.Quantity = 0;
 
-				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, TargetSlot.Data.Quantity);
-				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexL].Type, TargetSlot.Data.Quantity);
+				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, TargetSlot.Data.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, TargetSlot.Data.Quantity);
+				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, TargetSlot.Data.ItemInstance, EquipmentSlots[EquipmentSlotIndexL].Type, TargetSlot.Data.Quantity);
 
 				NotifyInventoryUpdated();
 				NotifyInventoryWeightChanged();
@@ -1817,8 +1814,8 @@ void UInventoryComponent::UnequipItem(const EEquipmentSlotType EquipmentSlot)
 				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance = nullptr;
 				EquipmentSlots[EquipmentSlotIndex].Data.Quantity = 0;
 
-				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
-				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
+				NotifyInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, TargetSlot.Data.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
+				K2_OnInventoryItemUnequipped(TargetSlot.Data.ItemInstance->Item, TargetSlot.Data.ItemInstance, EquipmentSlots[EquipmentSlotIndex].Type, TargetSlot.Data.Quantity);
 
 				NotifyInventoryUpdated();
 				NotifyInventoryWeightChanged();
@@ -1865,23 +1862,19 @@ bool UInventoryComponent::DropItemOnSlot(const FSlot& Slot)
 		APickup* SpawnedPickup = GetWorld()->SpawnActorDeferred<APickup>(DataCopy.ItemInstance->Item->GetItemPickupClass(), SpawnTransform);
 		if (SpawnedPickup)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%f"), DataCopy.ItemInstance->ItemInstanceDamage)
 			SpawnedPickup->SetActorScale3D(DataCopy.ItemInstance->Item->GetItemPickupStaticMeshScale());
 			SpawnedPickup->SetPickupData(DataCopy.ItemInstance, DataCopy.Quantity);
 			UGameplayStatics::FinishSpawningActor(SpawnedPickup, SpawnTransform);
 			return true;
-		}//
-
-
+		}
     	return false;
     }
-
 	return false;
 }
 
 bool UInventoryComponent::LootItem(APickup* Pickup, int32& LootedQuantity)
 {
-	//LootedQuantity = 0;
+	//LootedQuantity = 0; //////?
 	
 	if (Pickup == nullptr)
 	{
@@ -1890,7 +1883,6 @@ bool UInventoryComponent::LootItem(APickup* Pickup, int32& LootedQuantity)
 
 	int32 AddedQuantity = 0;
 	const bool bIsLooted = AddExistingItem(Pickup->ItemInstance, Pickup->Quantity, AddedQuantity);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), Pickup->ItemInstance->ItemInstanceDamage)
 
 	LootedQuantity = AddedQuantity;
 	
@@ -2337,16 +2329,16 @@ void UInventoryComponent::NotifyMoneyChanged()
 }
 */
 
-void UInventoryComponent::NotifyInventoryItemEquipped(UItem* InItem, EEquipmentSlotType Type, const int32 InQuantity)
+void UInventoryComponent::NotifyInventoryItemEquipped(UItem* InItem, UItemInstance* InItemInstance, EEquipmentSlotType Type, const int32 InQuantity)
 {
-	OnItemEquipped.Broadcast(InItem, Type, InQuantity);
-	K2_OnInventoryItemEquipped(InItem,Type, InQuantity);
+	OnItemEquipped.Broadcast(InItem, InItemInstance, Type, InQuantity);
+	K2_OnInventoryItemEquipped(InItem, InItemInstance, Type, InQuantity);
 }
 
-void UInventoryComponent::NotifyInventoryItemUnequipped(UItem* InItem, EEquipmentSlotType Type, const int32 InQuantity)
+void UInventoryComponent::NotifyInventoryItemUnequipped(UItem* InItem, UItemInstance* InItemInstance, EEquipmentSlotType Type, const int32 InQuantity)
 {
-	OnItemUnequipped.Broadcast(InItem, Type, InQuantity);
-	K2_OnInventoryItemUnequipped(InItem, Type, InQuantity);
+	OnItemUnequipped.Broadcast(InItem, InItemInstance, Type, InQuantity);
+	K2_OnInventoryItemUnequipped(InItem, InItemInstance, Type, InQuantity);
 }
 
 void UInventoryComponent::NotifyInventoryItemUsed(UItem* InItem, const int32 InQuantity)

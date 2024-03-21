@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "InventoryComponent.h"
 #include "Item.h"
+#include "ItemInstance.h"
 #include "CrimsonEclipse/HUD/OverheadWidget.h"
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "Components/SphereComponent.h"
@@ -244,7 +245,7 @@ void ACEBaseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
 	}
 }
 
-void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+void ACEBaseCharacter::OnItemEquip(UItem* InItem, UItemInstance* InIntemInstance, EEquipmentSlotType Type, int32 InQuantity)
 {
 	switch (Type)
 	{
@@ -255,7 +256,7 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 			FActorSpawnParameters WeaponSpawnParameters;
 			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
 			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
-			CombatComponent->SetRightHandDamage(InItem->GetWeaponDamage());
+			CombatComponent->SetRightHandDamage(InIntemInstance->ItemInstanceDamage);
 			if (CombatComponent->GetRightHandWeapon())
 			{
 				if (CombatComponent->GetRightHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range || 
@@ -274,6 +275,7 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 			FActorSpawnParameters WeaponSpawnParameters;
 			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
 			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			CombatComponent->SetLeftHandDamage(InIntemInstance->ItemInstanceDamage);
 			if (CombatComponent->GetLeftHandWeapon())
 			{
 				if (CombatComponent->GetLeftHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range ||
@@ -293,7 +295,7 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, EEquipmentSlotType Type, int32
 	}
 }
 
-void ACEBaseCharacter::OnItemUnequip(UItem* InItem, EEquipmentSlotType Type, int32 InQuantity)
+void ACEBaseCharacter::OnItemUnequip(UItem* InItem, UItemInstance* InIntemInstance, EEquipmentSlotType Type, int32 InQuantity)
 {
 	switch (Type)
 	{
