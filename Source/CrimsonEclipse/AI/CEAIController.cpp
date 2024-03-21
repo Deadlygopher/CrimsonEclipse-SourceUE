@@ -33,7 +33,7 @@ void ACEAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	const auto AICharacter = Cast<ACECharacterAI>(InPawn);
-	if (AICharacter)
+	if (AICharacter && AICharacter->BehaviorTreeAsset)
 	{
 		RunBehaviorTree(AICharacter->BehaviorTreeAsset);
 	}
@@ -43,7 +43,7 @@ void ACEAIController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
-	BrainComponent->Cleanup();
+	if(BrainComponent) BrainComponent->Cleanup();
 }
 
 AActor* ACEAIController::GetFocusOnActor() const

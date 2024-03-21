@@ -49,7 +49,7 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	FPrimaryAssetType AssetType;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	FText Name;
 
@@ -65,7 +65,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::OneHandWeapon || Type == EItemType::TwoHandsWeaponR || Type == EItemType::TwoHandsWeaponL"), Category = "Item")
 	TSubclassOf<AActor> WeaponType;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::OneHandWeapon || Type == EItemType::TwoHandsWeaponR || Type == EItemType::TwoHandsWeaponL"), Category = "Item")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "Type == EItemType::OneHandWeapon || Type == EItemType::TwoHandsWeaponR || Type == EItemType::TwoHandsWeaponL"), Category = "Item")
 	float Damage = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
@@ -73,7 +73,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	bool bCanBeDropped = true;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "bCanBeDropped"), Category = "Item")
 	TSubclassOf<APickup> PickupClass;
 
@@ -82,7 +82,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	FString UnitSuffix;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	bool bCanBeStacked = false;
 
@@ -94,7 +94,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	bool bUseScaledWeight = true;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, ClampMin = 0.0f, UIMin = 0.0f, EditCondition = "!bUseScaledWeight"), Category = "Item")
 	float Weight;
 
@@ -103,7 +103,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "!bCanBeConsumed"), Category = "Item")
 	bool bCanBeEquipped = false;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true, EditCondition = "bCanBeEquipped && !bCanBeConsumed"), Category = "Item")
 	EEquipmentSlotType PrimaryEquipmentSlot;
 
@@ -121,7 +121,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	FVector PickupStaticMeshScale;
-	
+
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -194,5 +194,5 @@ public:
 	TSubclassOf<AActor> GetWeaponType() const { return WeaponType; };
 
 	UFUNCTION(BlueprintCallable)
-	float GetWeaponDamage() { return Damage; }
+	float GetWeaponDamage() const { return Damage; }
 };
