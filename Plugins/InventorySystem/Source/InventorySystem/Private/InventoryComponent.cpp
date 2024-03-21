@@ -6,6 +6,7 @@
 #include "Item.h"
 #include "Pickup.h"
 #include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 
 bool FSlot::IsOnMaxStackSize() const
 {
@@ -754,7 +755,8 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 	
 	while (RemainingQuantity > 0)
 	{
-		UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+		//UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+		UItemInstance* NewItemInstance = ItemInstance;  // for save modified stats
 		check(NewItemInstance != nullptr);
 	
 		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -1183,9 +1185,12 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
 			EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
+			//EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance = Slot.ItemInstance; ////
 			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
 			EquipmentSlots[EquipmentSlotIndexL].Data = Slot;
+			//EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = Slot.ItemInstance; ////
 			EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance->ResetRotation();
+			UE_LOG(LogTemp, Warning, TEXT("%f"), EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ItemInstanceDamage); ////
 			NotifyInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 			K2_OnInventoryItemEquipped(Slot.ItemInstance->Item, EquipmentSlots[EquipmentSlotIndexR].Type, 1);
 			Slots.Remove(Slot);
@@ -1845,13 +1850,28 @@ bool UInventoryComponent::DropItemOnSlot(const FSlot& Slot)
     	FActorSpawnParameters SpawnParams;
     	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    	APickup* SpawnedPickup = GetWorld()->SpawnActor<APickup>(DataCopy.ItemInstance->Item->GetItemPickupClass(), SpawnLocation, FRotator(), SpawnParams);
+
+    	/*APickup* SpawnedPickup = GetWorld()->SpawnActor<APickup>(DataCopy.ItemInstance->Item->GetItemPickupClass(), SpawnLocation, FRotator(), SpawnParams);
     	if (SpawnedPickup)
     	{
     		SpawnedPickup->SetActorScale3D(DataCopy.ItemInstance->Item->GetItemPickupStaticMeshScale());
     		SpawnedPickup->SetPickupData(DataCopy.ItemInstance, DataCopy.Quantity);
     		return true;
-    	}
+    	}*/
+
+
+		//GetWorld()->SpawnActor<APickup>()
+		FTransform SpawnTransform(SpawnLocation);
+		APickup* SpawnedPickup = GetWorld()->SpawnActorDeferred<APickup>(DataCopy.ItemInstance->Item->GetItemPickupClass(), SpawnTransform);
+		if (SpawnedPickup)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%f"), DataCopy.ItemInstance->ItemInstanceDamage)
+			SpawnedPickup->SetActorScale3D(DataCopy.ItemInstance->Item->GetItemPickupStaticMeshScale());
+			SpawnedPickup->SetPickupData(DataCopy.ItemInstance, DataCopy.Quantity);
+			UGameplayStatics::FinishSpawningActor(SpawnedPickup, SpawnTransform);
+			return true;
+		}//
+
 
     	return false;
     }
@@ -1870,6 +1890,7 @@ bool UInventoryComponent::LootItem(APickup* Pickup, int32& LootedQuantity)
 
 	int32 AddedQuantity = 0;
 	const bool bIsLooted = AddExistingItem(Pickup->ItemInstance, Pickup->Quantity, AddedQuantity);
+	UE_LOG(LogTemp, Warning, TEXT("%f"), Pickup->ItemInstance->ItemInstanceDamage)
 
 	LootedQuantity = AddedQuantity;
 	
@@ -2061,7 +2082,7 @@ int32 UInventoryComponent::GetEquipmentSlotIndexByType(const EEquipmentSlotType 
 	return INDEX_NONE;
 }
 
-bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInstance, const int32 Quantity, int32& AddedQuantity)
+bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, const int32 Quantity, int32& AddedQuantity)
 {
 	AddedQuantity = 0;
 	const UItem* Item = ItemInstance->Item;
@@ -2168,7 +2189,8 @@ bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInst
 		
 		if (RemainingQuantity > 0)
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			//UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			UItemInstance* NewItemInstance = ItemInstance;  // for save modified stats
 			check(NewItemInstance != nullptr);
 	
 			const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -2221,7 +2243,8 @@ bool UInventoryComponent::AddExistingItem_Internal(const UItemInstance* ItemInst
 	
 	while (RemainingQuantity > 0)
 	{
-		UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+		//UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+		UItemInstance* NewItemInstance = ItemInstance; // for save modified stats
 		check(NewItemInstance != nullptr);
 	
 		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);

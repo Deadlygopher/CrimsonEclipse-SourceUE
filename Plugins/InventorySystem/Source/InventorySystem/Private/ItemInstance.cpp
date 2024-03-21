@@ -10,9 +10,11 @@ UItemInstance::UItemInstance()
 
 void UItemInstance::NativeOnConstruct()
 {
+	UE_LOG(LogTemp, Warning, TEXT("ItemInstance OnConstruct"))
 	Size = Item->GetItemSize();
 	bIsRotated = false;
 	SizeInCells = Item->GetSizeInCells();
+	ItemInstanceDamage = Item->GetWeaponDamage();
 }
 
 void UItemInstance::Rotate()

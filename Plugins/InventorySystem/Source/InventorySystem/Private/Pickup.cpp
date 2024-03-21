@@ -60,18 +60,19 @@ void APickup::BeginPlay()
 		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &APickup::OnOverlapComponentEnd);
 	}
 
+	/*
 	if (!ItemInstance && InitItem->GetItemInstanceClass())
 	{
 		ItemInstance = NewObject<UItemInstance>(this, InitItem->GetItemInstanceClass());
 		Quantity = InitQuantity;
-	}
+	}*/
 
-	/*
 	if (!ItemInstance && InitItemInstance)
 	{
 		ItemInstance = NewObject<UItemInstance>(this, InitItemInstance);
+		ItemInstance->NativeOnConstruct();
 		Quantity = InitQuantity;
-	}*/
+	}
 
 	if (PickupWidgetComponent)
 	{

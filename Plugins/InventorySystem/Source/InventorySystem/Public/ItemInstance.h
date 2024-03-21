@@ -69,5 +69,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FItemEvent OnItemRotated;
+
+	UPROPERTY(BlueprintReadWrite)
+	float ItemInstanceDamage = 0;
 	
 };

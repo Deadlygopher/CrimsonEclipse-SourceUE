@@ -42,11 +42,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	UItem* InitItem;
 
-	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Category = Pickup)
-	UItemInstance* ItemInstance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
+	TSubclassOf<UItemInstance> InitItemInstance;
 
 	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Category = Pickup)
-	int32 Quantity;
+	UItemInstance* ItemInstance = nullptr;
+
+	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Category = Pickup)
+	int32 Quantity = 1;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, /*Meta = (AllowPrivateAccess = true),*/ Category = "Pickup")
 	UStaticMeshComponent* PickupMesh;

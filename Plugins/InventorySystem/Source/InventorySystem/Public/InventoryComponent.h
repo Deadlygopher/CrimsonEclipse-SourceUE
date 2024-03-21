@@ -331,7 +331,7 @@ public:
 
 
 	/** Internal functions used in native code (c++ only) */
-	bool AddExistingItem_Internal(const UItemInstance* ItemInstance, int32 Quantity, int32& AddedQuantity);
+	bool AddExistingItem_Internal(UItemInstance* ItemInstance, int32 Quantity, int32& AddedQuantity);
 	// void RemoveItemOnSlot_Internal();
 	// void RemoveItem_Internal();
 	
