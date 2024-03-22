@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "InventoryInterface.h"
+#include "InventoryTypes.h"
 #include "InventoryComponent.generated.h"
+
 
 class UItem;
 class APickup;
@@ -14,19 +16,19 @@ class UInventoryComponent;
 
 /**
  * Point2D 
- */
+
 USTRUCT(BlueprintType)
-struct INVENTORYSYSTEM_API FPoint2D
+struct INVENTORYSYSTEM_API FInvPoint2D
 {
 	GENERATED_BODY()
 
-	FPoint2D()
+	FInvPoint2D()
 	{
 		X = 0;
 		Y = 0;
 	}
 
-	FPoint2D(const int32 InX, const int32 InY)
+	FInvPoint2D(const int32 InX, const int32 InY)
 	{
 		X = InX;
 		Y = InY;
@@ -38,36 +40,36 @@ struct INVENTORYSYSTEM_API FPoint2D
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0, UIMin = 0))
 	int32 Y;
 
-	bool operator == (const FPoint2D& Other) const
+	bool operator == (const FInvPoint2D& Other) const
 	{
 		return Other.X == X && Other.Y == Y;
 	}
 
-	FPoint2D operator + (const FPoint2D& Other) const
+	FInvPoint2D operator + (const FInvPoint2D& Other) const
 	{
-		return FPoint2D(Other.X + X, Other.Y + Y);
+		return FInvPoint2D(Other.X + X, Other.Y + Y);
 	}
 
-	bool operator > (const FPoint2D& Other) const
+	bool operator > (const FInvPoint2D& Other) const
 	{
 		return Other.X > X && Other.Y > Y;
 	}
 
-	bool operator >= (const FPoint2D& Other) const
+	bool operator >= (const FInvPoint2D& Other) const
 	{
 		return Other.X >= X && Other.Y >= Y;
 	}
 
-	bool operator < (const FPoint2D& Other) const
+	bool operator < (const FInvPoint2D& Other) const
 	{
 		return (Other.X < X && Other.Y < Y);
 	}
 
-	bool operator <= (const FPoint2D& Other) const
+	bool operator <= (const FInvPoint2D& Other) const
 	{
 		return (Other.X <= X && Other.Y <= Y);
 	}
-};
+}; */
 
 /**
  * Slot
@@ -75,7 +77,7 @@ struct INVENTORYSYSTEM_API FPoint2D
 USTRUCT(BlueprintType)
 struct INVENTORYSYSTEM_API FSlot
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 	FSlot()
 	{
@@ -129,7 +131,7 @@ struct INVENTORYSYSTEM_API FSlot
 USTRUCT(BlueprintType)
 struct INVENTORYSYSTEM_API FStartupItem
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 	FStartupItem()
 	{
@@ -190,7 +192,7 @@ enum class EEquipmentSlotType : uint8
 USTRUCT(BlueprintType)
 struct INVENTORYSYSTEM_API FEquipmentSlot
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 	FEquipmentSlot()
 	{
@@ -235,19 +237,19 @@ public:
 	UItemInstance* CreateItemInstance(TSubclassOf<UItemInstance> ItemInstanceClass) const;
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
-	bool IsWithinBoundaries(const FPoint2D& Coordinates) const;
+	bool IsWithinBoundaries(const FInvPoint2D& Coordinates) const;
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
-	bool IsFreeCell(const FPoint2D& Coordinates);
+	bool IsFreeCell(const FInvPoint2D& Coordinates);
 	
 	UFUNCTION(BlueprintPure, Category = "Inventory")
-	bool DoesItemFit(const TArray<FPoint2D>& SizeInCells, const FPoint2D& Coordinates);
+	bool DoesItemFit(const TArray<FInvPoint2D>& SizeInCells, const FInvPoint2D& Coordinates);
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
-	FPoint2D GetFreeCell();
+	FInvPoint2D GetFreeCell();
 	
 	UFUNCTION(BlueprintPure, Category = "Inventory")
-	FPoint2D GetFreeCellWhereItemCanFit(const TArray<FPoint2D>& SizeInCells);
+	FInvPoint2D GetFreeCellWhereItemCanFit(const TArray<FInvPoint2D>& SizeInCells);
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
 	bool IsFull() const;
@@ -259,10 +261,10 @@ public:
 	int32 CountItemQuantity(const UItem* Item);
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
-	FSlot GetSlotByCoordinates(const FPoint2D& Coordinates);
+	FSlot GetSlotByCoordinates(const FInvPoint2D& Coordinates);
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
-	int32 GetSlotIndexByCoordinates(const FPoint2D& Coordinates);
+	int32 GetSlotIndexByCoordinates(const FInvPoint2D& Coordinates);
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
 	bool CanCarryItem(const UItem* Item, const int32 Quantity) const;
@@ -286,10 +288,10 @@ public:
 	bool RemoveItemOnSlot(const FSlot& Slot, int32 Quantity, int32& RemovedQuantity);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool MoveItemOnSlot(const FSlot& Slot, const FPoint2D& Destination);
+	bool MoveItemOnSlot(const FSlot& Slot, const FInvPoint2D& Destination);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void StackItemStackOnSlot(const FSlot& Slot, const FPoint2D& Destination, int32 Quantity);
+	void StackItemStackOnSlot(const FSlot& Slot, const FInvPoint2D& Destination, int32 Quantity);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void EquipItemOnSlot(const FSlot& Slot);
@@ -370,13 +372,13 @@ public:
 
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
-	FPoint2D GridSize;
+	FInvPoint2D GridSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 1.0f, UIMin = 1.0f), Category = "Inventory")
 	float CellSize;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
-	TArray<FPoint2D> Cells;
+	TArray<FInvPoint2D> Cells;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	TArray<FSlot> Slots;

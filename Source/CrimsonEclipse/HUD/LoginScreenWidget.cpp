@@ -111,8 +111,8 @@ void ULoginScreenWidget::BeginDestroy()
 	}
 }
 
-void ULoginScreenWidget::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+void ULoginScreenWidget::NativeDestruct()
 {
 	RemoveFromParent();
-	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
+	Super::NativeDestruct();
 }

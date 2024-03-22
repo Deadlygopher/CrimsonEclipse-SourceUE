@@ -9,12 +9,13 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/GridSlot.h"
 
+
 UCellWidget::UCellWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	
 }
 
-void UCellWidget::SetCellData(const FPoint2D& InCoordinates, const float InSize, UGridWidget* InParentWidget)
+void UCellWidget::SetCellData(const FInvPoint2D& InCoordinates, const float InSize, UGridWidget* InParentWidget)
 {
 	ParentWidget = InParentWidget;
 	Coordinates = InCoordinates;
@@ -59,9 +60,9 @@ void UCellWidget::OnItemRotated()
 
 	if (ParentWidget->Inventory->DoesItemFit(DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells, Coordinates))
 	{
-		for (const FPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
+		for (const FInvPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
 		{
-			FPoint2D TargetCell = Cell + Coordinates;
+			FInvPoint2D TargetCell = Cell + Coordinates;
 			const int32 CellIndex = ParentWidget->GetCellIndex(TargetCell);
 
 			if (CellIndex > INDEX_NONE)
@@ -72,9 +73,9 @@ void UCellWidget::OnItemRotated()
 	}
 	else
 	{
-		for (const FPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
+		for (const FInvPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
 		{
-			FPoint2D TargetCell = Cell + Coordinates;
+			FInvPoint2D TargetCell = Cell + Coordinates;
 			const int32 CellIndex = ParentWidget->GetCellIndex(TargetCell);
 
 			if (CellIndex > INDEX_NONE)
@@ -151,9 +152,9 @@ void UCellWidget::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDrop
 
 	if (ParentWidget->Inventory->DoesItemFit(DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells, Coordinates))
 	{
-		for (const FPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
+		for (const FInvPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
 		{
-			FPoint2D TargetCell = Cell + Coordinates;
+			FInvPoint2D TargetCell = Cell + Coordinates;
 			const int32 CellIndex = ParentWidget->GetCellIndex(TargetCell);
 
 			if (CellIndex > INDEX_NONE)
@@ -164,9 +165,9 @@ void UCellWidget::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDrop
 	}
 	else
 	{
-		for (const FPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
+		for (const FInvPoint2D& Cell: DraggedSlotWidget->InventorySlot.ItemInstance->SizeInCells)
 		{
-			FPoint2D TargetCell = Cell + Coordinates;
+			FInvPoint2D TargetCell = Cell + Coordinates;
 			const int32 CellIndex = ParentWidget->GetCellIndex(TargetCell);
 
 			if (CellIndex > INDEX_NONE)

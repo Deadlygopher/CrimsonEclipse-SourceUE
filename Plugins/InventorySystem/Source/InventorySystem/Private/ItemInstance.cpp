@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
 #include "ItemInstance.h"
 #include "Item.h"
+//#include "InventoryComponent.h"
+//#include "InventoryTypes.h"
 
 UItemInstance::UItemInstance()
 {
@@ -10,7 +13,6 @@ UItemInstance::UItemInstance()
 
 void UItemInstance::NativeOnConstruct()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ItemInstance OnConstruct"))
 	Size = Item->GetItemSize();
 	bIsRotated = false;
 	SizeInCells = Item->GetSizeInCells();
@@ -35,11 +37,11 @@ void UItemInstance::Rotate()
 	}
 
 	SizeInCells.Empty();
-	Size = FPoint2D(Item->GetItemSize().Y, Item->GetItemSize().X);
+	Size = FInvPoint2D(Item->GetItemSize().Y, Item->GetItemSize().X);
 
-	for (const FPoint2D& Point: Item->GetSizeInCells())
+	for (const FInvPoint2D& Point: Item->GetSizeInCells())
 	{
-		SizeInCells.Add(FPoint2D(Point.Y, Point.X));
+		SizeInCells.Add(FInvPoint2D(Point.Y, Point.X));
 	}
 
 	bIsRotated = true;

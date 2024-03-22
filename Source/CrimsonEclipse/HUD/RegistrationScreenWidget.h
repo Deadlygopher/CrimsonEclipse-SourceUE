@@ -24,7 +24,7 @@ protected:
 	UFUNCTION()
 	void LoginScreenButtonClicked();
 
-	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
+	virtual void NativeDestruct() override;
 
 	void OnGetRegistrationResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccesfully);
 

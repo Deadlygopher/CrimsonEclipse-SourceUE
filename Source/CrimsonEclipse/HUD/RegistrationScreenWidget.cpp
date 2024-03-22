@@ -93,10 +93,10 @@ void URegistrationScreenWidget::LoginScreenButtonClicked()
 	}
 }
 
-void URegistrationScreenWidget::OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld)
+void URegistrationScreenWidget::NativeDestruct()
 {
 	RemoveFromParent();
-	Super::OnLevelRemovedFromWorld(InLevel, InWorld);
+	Super::NativeDestruct();
 }
 
 void URegistrationScreenWidget::SetLoginWidget(ULoginScreenWidget* widget)

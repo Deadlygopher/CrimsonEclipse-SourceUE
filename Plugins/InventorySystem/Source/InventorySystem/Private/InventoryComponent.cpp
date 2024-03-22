@@ -8,6 +8,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 
+
 bool FSlot::IsOnMaxStackSize() const
 {
 	if (ItemInstance == nullptr)
@@ -96,7 +97,7 @@ UInventoryComponent::UInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	GridSize = FPoint2D(1, 1);
+	GridSize = FInvPoint2D(1, 1);
 	CellSize = 50.0f;
 	
 	/*
@@ -140,13 +141,13 @@ UItemInstance* UInventoryComponent::CreateItemInstance(const TSubclassOf<UItemIn
 	return ItemInstance;
 }
 
-bool UInventoryComponent::IsWithinBoundaries(const FPoint2D& Coordinates) const
+bool UInventoryComponent::IsWithinBoundaries(const FInvPoint2D& Coordinates) const
 {
 	const bool bIsWithinBoundaries = Coordinates.X >= 0 && Coordinates.Y >= 0 && Coordinates.X < GridSize.X && Coordinates.Y < GridSize.Y;
 	return bIsWithinBoundaries;
 }
 
-bool UInventoryComponent::IsFreeCell(const FPoint2D& Coordinates)
+bool UInventoryComponent::IsFreeCell(const FInvPoint2D& Coordinates)
 {
 	if (!IsWithinBoundaries(Coordinates))
 	{
@@ -155,7 +156,7 @@ bool UInventoryComponent::IsFreeCell(const FPoint2D& Coordinates)
 
 	for (const FSlot& Slot: Slots)
 	{
-		for (const FPoint2D& Cell: Slot.ItemInstance->SizeInCells)
+		for (const FInvPoint2D& Cell: Slot.ItemInstance->SizeInCells)
 		{
 			const bool bIsNotFree = (Cell + Slot.ItemInstance->TopLeftCoordinates == Coordinates);
 			if (bIsNotFree)
@@ -168,11 +169,11 @@ bool UInventoryComponent::IsFreeCell(const FPoint2D& Coordinates)
 	return true;
 }
 
-bool UInventoryComponent::DoesItemFit(const TArray<FPoint2D>& SizeInCells, const FPoint2D& Coordinates)
+bool UInventoryComponent::DoesItemFit(const TArray<FInvPoint2D>& SizeInCells, const FInvPoint2D& Coordinates)
 {
-	for (const FPoint2D& Cell: SizeInCells)
+	for (const FInvPoint2D& Cell: SizeInCells)
 	{
-		if (!IsFreeCell(FPoint2D(Coordinates + Cell)))
+		if (!IsFreeCell(FInvPoint2D(Coordinates + Cell)))
 		{
 			return false;
 		}
@@ -181,9 +182,9 @@ bool UInventoryComponent::DoesItemFit(const TArray<FPoint2D>& SizeInCells, const
 	return true;
 }
 
-FPoint2D UInventoryComponent::GetFreeCell()
+FInvPoint2D UInventoryComponent::GetFreeCell()
 {
-	for (const FPoint2D& Cell: Cells)
+	for (const FInvPoint2D& Cell: Cells)
 	{
 		if (IsFreeCell(Cell))
 		{
@@ -191,12 +192,12 @@ FPoint2D UInventoryComponent::GetFreeCell()
 		}
 	}
 
-	return FPoint2D(INDEX_NONE, INDEX_NONE);
+	return FInvPoint2D(INDEX_NONE, INDEX_NONE);
 }
 
-FPoint2D UInventoryComponent::GetFreeCellWhereItemCanFit(const TArray<FPoint2D>& SizeInCells)
+FInvPoint2D UInventoryComponent::GetFreeCellWhereItemCanFit(const TArray<FInvPoint2D>& SizeInCells)
 {
-	for (const FPoint2D& Cell: Cells)
+	for (const FInvPoint2D& Cell: Cells)
 	{
 		const bool bItemCanFit = IsFreeCell(Cell) && DoesItemFit(SizeInCells, Cell);
 		if (bItemCanFit)
@@ -205,7 +206,7 @@ FPoint2D UInventoryComponent::GetFreeCellWhereItemCanFit(const TArray<FPoint2D>&
 		}
 	}
 
-	return FPoint2D(INDEX_NONE, INDEX_NONE);
+	return FInvPoint2D(INDEX_NONE, INDEX_NONE);
 }
 
 bool UInventoryComponent::IsFull() const
@@ -241,11 +242,11 @@ int32 UInventoryComponent::CountItemQuantity(const UItem* Item)
 	return Quantity;
 }
 
-FSlot UInventoryComponent::GetSlotByCoordinates(const FPoint2D& Coordinates)
+FSlot UInventoryComponent::GetSlotByCoordinates(const FInvPoint2D& Coordinates)
 {
 	for (const FSlot& Slot: Slots)
 	{
-		for (const FPoint2D& Cell: Slot.ItemInstance->SizeInCells)
+		for (const FInvPoint2D& Cell: Slot.ItemInstance->SizeInCells)
 		{
 			const bool bIsWithinThisSlot = (Slot.ItemInstance->TopLeftCoordinates + Cell == Coordinates);
 			if (bIsWithinThisSlot)
@@ -258,7 +259,7 @@ FSlot UInventoryComponent::GetSlotByCoordinates(const FPoint2D& Coordinates)
 	return FSlot();
 }
 
-int32 UInventoryComponent::GetSlotIndexByCoordinates(const FPoint2D& Coordinates)
+int32 UInventoryComponent::GetSlotIndexByCoordinates(const FInvPoint2D& Coordinates)
 {
 	int32 Index = INDEX_NONE;
 	
@@ -266,7 +267,7 @@ int32 UInventoryComponent::GetSlotIndexByCoordinates(const FPoint2D& Coordinates
 	{
 		Index++;
 		
-		for (const FPoint2D& Cell: Slot.ItemInstance->SizeInCells)
+		for (const FInvPoint2D& Cell: Slot.ItemInstance->SizeInCells)
 		{
 			const bool bIsWithinThisSlot = (Slot.ItemInstance->TopLeftCoordinates + Cell == Coordinates);
 			if (bIsWithinThisSlot)
@@ -310,7 +311,7 @@ void UInventoryComponent::Initialize()
 	{
 		for (int32 J = 0; J < GridSize.Y; J++)
 		{
-			Cells.Add(FPoint2D(I, J));
+			Cells.Add(FInvPoint2D(I, J));
 		}
 	}
 
@@ -405,7 +406,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 
-			FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+			FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -422,7 +423,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 				if (Item->CanBeRotated())
 				{
 					NewItemInstance->Rotate();
-					FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+					FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 
 					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 					{
@@ -455,7 +456,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 
-			const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+			const FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, RemainingQuantity))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -477,7 +478,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 				if (Item->CanBeRotated())
 				{
 					NewItemInstance->Rotate();
-					const FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+					const FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 
 					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, RemainingQuantity))
 					{
@@ -522,7 +523,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 		UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 		check(NewItemInstance != nullptr);
 
-		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+		const FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 		if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, 1))
 		{
 			NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -539,7 +540,7 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 			if (Item->CanBeRotated())
 			{
 				NewItemInstance->Rotate();
-				const FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+				const FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 
 				if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, 1))
 				{
@@ -641,7 +642,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 	
-			FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+			FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -658,7 +659,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 				if (Item->CanBeRotated())
 				{
 					NewItemInstance->Rotate();
-					FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+					FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
 					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 					{
@@ -691,7 +692,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 	
-			const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+			const FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, RemainingQuantity))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -713,7 +714,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 				if (Item->CanBeRotated())
 				{
 					NewItemInstance->Rotate();
-					const FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+					const FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
 					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, RemainingQuantity))
 					{
@@ -759,7 +760,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 		UItemInstance* NewItemInstance = ItemInstance;  // for save modified stats
 		check(NewItemInstance != nullptr);
 	
-		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+		const FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 		if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, 1))
 		{
 			NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -776,7 +777,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 			if (Item->CanBeRotated())
 			{
 				NewItemInstance->Rotate();
-				const FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+				const FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
 				if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, 1))
 				{
@@ -928,7 +929,7 @@ bool UInventoryComponent::RemoveItemOnSlot(const FSlot& Slot, const int32 Quanti
 	return true;
 }
 
-bool UInventoryComponent::MoveItemOnSlot(const FSlot& Slot, const FPoint2D& Destination)
+bool UInventoryComponent::MoveItemOnSlot(const FSlot& Slot, const FInvPoint2D& Destination)
 {
 	if (!IsFreeCell(Destination))
 	{
@@ -950,7 +951,7 @@ bool UInventoryComponent::MoveItemOnSlot(const FSlot& Slot, const FPoint2D& Dest
 	return true;
 }
 
-void UInventoryComponent::StackItemStackOnSlot(const FSlot& Slot, const FPoint2D& Destination, const int32 Quantity)
+void UInventoryComponent::StackItemStackOnSlot(const FSlot& Slot, const FInvPoint2D& Destination, const int32 Quantity)
 {
 	if (IsFreeCell(Destination))
 	{
@@ -1127,7 +1128,7 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 
 				if (bIsAdded)
 				{
-					auto ItemInst = NewObject<UItemInstance>(this, Slot.ItemInstance->Item->GetItemInstanceClass());
+					//auto ItemInst = NewObject<UItemInstance>(this, Slot.ItemInstance->Item->GetItemInstanceClass());
 					EquipmentSlots[EquipmentSlotIndexR].Data = Slot;
 					EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
 					EquipmentSlots[EquipmentSlotIndexL].Data.ItemInstance = nullptr;
@@ -1579,7 +1580,9 @@ void UInventoryComponent::EquipItem(UItem* Item)
 		{
 			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
 
-			auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			//auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			auto ItemInst = CreateItemInstance(Item->GetItemInstanceClass());
+
 			EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
@@ -1594,7 +1597,9 @@ void UInventoryComponent::EquipItem(UItem* Item)
 		{
 			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
-			auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			//auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			auto ItemInst = CreateItemInstance(Item->GetItemInstanceClass());
+
 			EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
@@ -1616,7 +1621,9 @@ void UInventoryComponent::EquipItem(UItem* Item)
 
 				if (bIsAdded)
 				{
-					auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+					//auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+					auto ItemInst = CreateItemInstance(Item->GetItemInstanceClass());
+
 					EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 					EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 					EquipmentSlots[EquipmentSlotIndex].Type;
@@ -1646,7 +1653,10 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
 			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
-			auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			//auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			auto ItemInst = CreateItemInstance(Item->GetItemInstanceClass());
+
+			UE_LOG(LogTemp, Warning, TEXT("ItemEquip ItemInstance OnConstruct"));
 
 			EquipmentSlots[EquipmentSlotIndexR].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
@@ -1673,7 +1683,10 @@ void UInventoryComponent::EquipItem(UItem* Item)
 			const int32 EquipmentSlotIndexR = GetEquipmentSlotIndexByType(PrimarySlot.Type);
 			const int32 EquipmentSlotIndexL = GetEquipmentSlotIndexByType(SecondarySlot.Type);
 
-			auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			//auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			auto ItemInst = CreateItemInstance(Item->GetItemInstanceClass());
+
+			UE_LOG(LogTemp, Warning, TEXT("ItemEquip ItemInstance OnConstruct"));
 
 			EquipmentSlots[EquipmentSlotIndexR].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndexR].Data.ItemInstance->ResetRotation();
@@ -1698,7 +1711,9 @@ void UInventoryComponent::EquipItem(UItem* Item)
 		{
 			const int32 EquipmentSlotIndex = GetEquipmentSlotIndexByType(PrimarySlot.Type);
 
-			auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			//auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+			auto ItemInst = CreateItemInstance(Item->GetItemInstanceClass());
+
 			EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 			EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
@@ -1718,7 +1733,9 @@ void UInventoryComponent::EquipItem(UItem* Item)
 
 			if (bIsAdded)
 			{
-				auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+				//auto ItemInst = NewObject<UItemInstance>(this, Item->GetItemInstanceClass());
+				auto ItemInst = CreateItemInstance(Item->GetItemInstanceClass());
+
 				EquipmentSlots[EquipmentSlotIndex].Data = FSlot(ItemInst, 1, this);
 				EquipmentSlots[EquipmentSlotIndex].Data.ItemInstance->ResetRotation();
 
@@ -2136,7 +2153,7 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
 			check(NewItemInstance != nullptr);
 	
-			FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+			FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -2153,7 +2170,7 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 				if (Item->CanBeRotated())
 				{
 					NewItemInstance->Rotate();
-					FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+					FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
 					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, Item->GetItemMaxStackSize()))
 					{
@@ -2185,7 +2202,7 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 			UItemInstance* NewItemInstance = ItemInstance;  // for save modified stats
 			check(NewItemInstance != nullptr);
 	
-			const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+			const FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 			if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, RemainingQuantity))
 			{
 				NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -2203,7 +2220,7 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 				if (Item->CanBeRotated())
 				{
 					NewItemInstance->Rotate();
-					const FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+					const FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
 					if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, RemainingQuantity))
 					{
@@ -2239,7 +2256,7 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 		UItemInstance* NewItemInstance = ItemInstance; // for save modified stats
 		check(NewItemInstance != nullptr);
 	
-		const FPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+		const FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 		if (IsWithinBoundaries(CoordsWhereItemCanFit) && CanCarryItem(Item, 1))
 		{
 			NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
@@ -2256,7 +2273,7 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 			if (Item->CanBeRotated())
 			{
 				NewItemInstance->Rotate();
-				const FPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
+				const FInvPoint2D CoordsWhereItemCanFitRotated = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
 	
 				if (IsWithinBoundaries(CoordsWhereItemCanFitRotated) && CanCarryItem(Item, 1))
 				{

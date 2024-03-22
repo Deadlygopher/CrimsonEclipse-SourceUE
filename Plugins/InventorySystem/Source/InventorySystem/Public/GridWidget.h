@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryComponent.h"
+#include "InventoryTypes.h"
 #include "GridWidget.generated.h"
 
 class UCellWidget;
@@ -26,7 +27,7 @@ public:
 
 	void NativeOnInventoryDataReceived();
 
-	int32 GetCellIndex(const FPoint2D& Coordinates);
+	int32 GetCellIndex(const FInvPoint2D& Coordinates);
 	
 	
 	UFUNCTION(BlueprintCallable, Category = "Grid")

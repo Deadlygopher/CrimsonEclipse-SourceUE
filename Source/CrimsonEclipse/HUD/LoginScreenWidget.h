@@ -25,7 +25,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void RegistrationButtonClicked();
 
-	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
+	virtual void NativeDestruct() override;
 
 	void OnGetLoginResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bConnectedSuccesfully);
 

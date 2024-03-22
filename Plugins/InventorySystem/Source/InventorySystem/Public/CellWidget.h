@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InventoryComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "InventoryTypes.h"
 #include "CellWidget.generated.h"
 
 class UGridWidget;
@@ -22,7 +23,7 @@ public:
 	UCellWidget(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(BlueprintCallable, Category = "Cell")
-	void SetCellData(const FPoint2D& InCoordinates, float InSize, UGridWidget* InParentWidget);
+	void SetCellData(const FInvPoint2D& InCoordinates, float InSize, UGridWidget* InParentWidget);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Grid")
 	void OnCellDataReceived();
@@ -37,7 +38,7 @@ public:
 	void OnItemRotated();
 	
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Cell")
-	FPoint2D Coordinates;
+	FInvPoint2D Coordinates;
 	
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Cell")
 	float CellSize;

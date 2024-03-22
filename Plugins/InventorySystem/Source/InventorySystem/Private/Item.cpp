@@ -3,6 +3,7 @@
 #include "Item.h"
 #include "Pickup.h"
 #include "ItemInstance.h"
+
 #include "AssetManager_Custom.h"
 
 UItem::UItem()
@@ -17,7 +18,7 @@ UItem::UItem()
 	Weight = 0.0f;
 	MaxStackSize = 1;
 
-	Size = FPoint2D(1, 1);
+	Size = FInvPoint2D(1, 1);
 
 	PrimaryEquipmentSlot = EEquipmentSlotType::None;
 	SecondaryEquipmentSlot = EEquipmentSlotType::None;
@@ -42,15 +43,15 @@ FString UItem::GetAssetName() const
 	return GetPrimaryAssetId().PrimaryAssetName.ToString();
 }
 
-TArray<FPoint2D> UItem::GetSizeInCells() const
+TArray<FInvPoint2D> UItem::GetSizeInCells() const
 {
-	TArray<FPoint2D> SizeInCells;
+	TArray<FInvPoint2D> SizeInCells;
 	
 	for (int32 I = 0; I < Size.X; I++)
 	{
 		for (int32 J = 0; J < Size.Y; J++)
 		{
-			SizeInCells.Add(FPoint2D(I, J));
+			SizeInCells.Add(FInvPoint2D(I, J));
 		}
 	}
 

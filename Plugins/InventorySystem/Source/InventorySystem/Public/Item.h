@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "InventoryComponent.h"
+#include "InventoryTypes.h"
 #include "Engine/DataAsset.h"
 
 #include "Item.generated.h"
@@ -38,7 +38,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, Category = "Item")
-	TArray<FPoint2D> GetSizeInCells() const;
+	TArray<FInvPoint2D> GetSizeInCells() const;
 
 	UFUNCTION(BlueprintPure, Category = "Item")
 	virtual bool CanBeRotated() const;
@@ -90,7 +90,7 @@ private:
 	int32 MaxStackSize;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
-	FPoint2D Size;
+	FInvPoint2D Size;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "Item")
 	bool bUseScaledWeight = true;
@@ -158,7 +158,7 @@ public:
 	int32 GetItemMaxStackSize() const { return MaxStackSize; }
 
 	UFUNCTION(BlueprintCallable)
-	FPoint2D GetItemSize() const { return Size; }
+	FInvPoint2D GetItemSize() const { return Size; }
 
 	UFUNCTION(BlueprintCallable)
 	bool GetItemUseScaledWeight() const { return bUseScaledWeight; }

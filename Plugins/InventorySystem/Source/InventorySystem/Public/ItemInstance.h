@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InventoryComponent.h"
 #include "UObject/NoExportTypes.h"
+#include "InventoryTypes.h"
 #include "ItemInstance.generated.h"
 
 class UItem;
@@ -53,13 +54,13 @@ public:
 	UItem* Item;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "ItemInstance")
-	FPoint2D TopLeftCoordinates;
+	FInvPoint2D TopLeftCoordinates;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "ItemInstance")
-	TArray<FPoint2D> SizeInCells;
+	TArray<FInvPoint2D> SizeInCells;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "ItemInstance")
-	FPoint2D Size;
+	FInvPoint2D Size;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "ItemInstance")
 	uint8 bIsRotated : 1;

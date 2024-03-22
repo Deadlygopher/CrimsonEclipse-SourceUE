@@ -38,7 +38,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 
 	AttackReachRadius = CreateDefaultSubobject<USphereComponent>("AttackReachRadius");
 	AttackReachRadius->SetupAttachment(RootComponent);
-	AttackReachRadius->InitSphereRadius(AttackRadius- AttackRadius*0.15); //TODO Magic Number
+	AttackReachRadius->InitSphereRadius(AttackRadius - AttackRadius*0.15); //TODO Magic Number
 }
 
 void ACEBaseCharacter::BeginPlay()
@@ -159,7 +159,7 @@ void ACEBaseCharacter::RotateToCursorDirecion()
 void ACEBaseCharacter::SetAttackRadius(float RadiusForSet)
 {
 	AttackRadius = RadiusForSet;
-	AttackReachRadius->SetSphereRadius(RadiusForSet - RadiusForSet*0.15);  //TODO Magic Number
+	AttackReachRadius->SetSphereRadius(RadiusForSet - RadiusForSet*0.2);  //TODO Magic Number
 }
 
 

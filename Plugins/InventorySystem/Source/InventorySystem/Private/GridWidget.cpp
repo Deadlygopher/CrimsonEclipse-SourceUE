@@ -67,7 +67,7 @@ void UGridWidget::NativeOnInventoryDataReceived()
 	
 	CellsWidgets.Empty();
 	
-	for (const FPoint2D& Cell: Inventory->Cells)
+	for (const FInvPoint2D& Cell: Inventory->Cells)
 	{
 		UCellWidget* CellWidget = CreateWidget<UCellWidget>(GetOwningPlayer(), CellWidgetClass);
 		check(CellWidget != nullptr);
@@ -94,7 +94,7 @@ void UGridWidget::NativeOnInventoryDataReceived()
 	SetWeight(Inventory->CurrentWeight, Inventory->MaxWeight);
 }
 
-int32 UGridWidget::GetCellIndex(const FPoint2D& Coordinates)
+int32 UGridWidget::GetCellIndex(const FInvPoint2D& Coordinates)
 {
 	int32 Index = -1;
 	for (const UCellWidget* Cell: CellsWidgets)
