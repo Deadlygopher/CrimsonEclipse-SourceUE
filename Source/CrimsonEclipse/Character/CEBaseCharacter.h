@@ -17,6 +17,7 @@ class UInventoryComponent;
 class USphereComponent;
 class UItem;
 class UItemInstance;
+class UCharacterLevelComponent;
 
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter, public IEvadeAnimInterface
@@ -106,6 +107,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UHealthComponent* HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UCharacterLevelComponent* CharacterLevelComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float MaxMoveSpeed = 600;

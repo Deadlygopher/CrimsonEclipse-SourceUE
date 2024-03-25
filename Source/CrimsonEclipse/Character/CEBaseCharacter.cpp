@@ -12,6 +12,8 @@
 #include "CrimsonEclipse/HUD/OverheadWidget.h"
 #include "CrimsonEclipse/Items/Weapon.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "CrimsonEclipse/CrimsonEclipseComponents/CharacterLevelComponent.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h" //TODO Delete
 
@@ -24,6 +26,8 @@ ACEBaseCharacter::ACEBaseCharacter()
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
+
+	CharacterLevelComponent = CreateDefaultSubobject<UCharacterLevelComponent>("CharacterLevelComponent");
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
@@ -70,6 +74,8 @@ void ACEBaseCharacter::OnDeath()
 	GetController()->UnPossess();
 	//bIsReceiveHitImpact = false;
 	//GetMesh()->ResetAnimInstanceDynamics();
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	GetCharacterMovement()->StopActiveMovement();
 	PlayAnimMontage(DeathAnimation);
 

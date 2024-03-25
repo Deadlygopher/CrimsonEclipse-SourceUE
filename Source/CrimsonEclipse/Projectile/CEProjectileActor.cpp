@@ -60,10 +60,12 @@ void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponen
 
 			auto SkeletalMesh = Cast<USkeletalMeshComponent>(SweepResult.Component);
 			if (!SkeletalMesh) return;
-			auto ClosestBone = SkeletalMesh->FindClosestBone(ProjectileMesh->GetComponentLocation());
+			//auto ClosestBone = SkeletalMesh->FindClosestBone(ProjectileMesh->GetComponentLocation());
+			auto ClosestBone = SkeletalMesh->FindClosestBone(GetActorLocation());
 			FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld, true };
 			AttachToComponent(SkeletalMesh, AttachmentTransform, ClosestBone);
 			//UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *GetInstigator()->GetName());
+			UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *ClosestBone.ToString());
 		}
 		else
 		{

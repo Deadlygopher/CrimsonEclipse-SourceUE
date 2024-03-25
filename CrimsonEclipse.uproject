@@ -23,6 +23,7 @@
 	],
 	"TargetPlatforms": [
 		"WindowsNoEditor",
-		"AllDesktop"
+		"AllDesktop",
+		"Windows"
 	]
 }
