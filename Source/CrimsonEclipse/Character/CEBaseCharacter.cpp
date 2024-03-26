@@ -16,6 +16,7 @@
 #include "CrimsonEclipse/CrimsonEclipseComponents/CharacterLevelComponent.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h" //TODO Delete
+#include "CrimsonEclipse/CrimsonEclipseComponents/XPComponent.h" //TODO Delete
 
 DEFINE_LOG_CATEGORY(LogCEBaseCharacter);
 
@@ -196,6 +197,12 @@ void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const U
 	AController* InstigatorController, AActor* DamageCauser)
 {
 	HealthComponent->DecreaseHealth(Damage);
+
+	if (GetHealth() <= 0)
+	{
+		DamageCauser->FindComponentByClass<UXPComponent>()->IncreaseCurrentXP(300);
+	}
+
 	bIsReceiveHitImpact = true;
 
 	FTimerHandle TimerHandle;

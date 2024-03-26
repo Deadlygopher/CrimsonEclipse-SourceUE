@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "XPComponent.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogXPComponent, Log, All);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CRIMSONECLIPSE_API UXPComponent : public UActorComponent
@@ -39,5 +40,5 @@ private:
 	float NextLevelExpModifier = 1.f;
 
 	UPROPERTY(EditDefaultsOnly)
-	float RequirGrowCoefficient = 0.05;
+	float RequireGrowCoefficient = 0.05;
 };

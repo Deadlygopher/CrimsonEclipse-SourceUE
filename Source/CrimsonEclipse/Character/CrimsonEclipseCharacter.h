@@ -8,6 +8,7 @@
 
 #include "CrimsonEclipseCharacter.generated.h"
 
+class UXPComponent;
 
 UCLASS(Blueprintable)
 class ACrimsonEclipseCharacter : public ACEBaseCharacter
@@ -27,6 +28,9 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	//virtual void PostInitializeComponents() override;
+
+	UPROPERTY(VisibleAnywhere)
+	UXPComponent* XPComponent;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

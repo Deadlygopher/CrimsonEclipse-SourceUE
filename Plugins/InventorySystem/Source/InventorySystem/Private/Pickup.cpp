@@ -128,7 +128,7 @@ void APickup::SetWidgetVisibility(bool bVisible)
 void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
-{	
+{
 	IInventoryInterface* InventoryInterface = nullptr;
 	auto Components = OtherActor->GetComponents();
 	for (auto Component : Components)
@@ -144,7 +144,6 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 		int32 SizeArray = InventoryInterface->GetOverlappingItems().Num();
 		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
 
-		//InventoryInterface->LootItem(this, Quantity);
 		InventoryInterface->OverlappingItemToArray(this);
 		SizeArray = InventoryInterface->GetOverlappingItems().Num();
 		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);

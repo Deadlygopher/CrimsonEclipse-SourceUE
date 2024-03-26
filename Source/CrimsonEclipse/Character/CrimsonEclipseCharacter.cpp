@@ -13,9 +13,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
+//#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "CrimsonEclipse/HUD/PlayerHUD.h"
+
+#include "CrimsonEclipse/CrimsonEclipseComponents/XPComponent.h"
 
 
 
@@ -23,6 +25,8 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 {
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	XPComponent = CreateDefaultSubobject<UXPComponent>("ExpirienceComponent");
 
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
@@ -107,8 +111,6 @@ void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* Player
 
 	PlayerInputComponent->BindAxis("CameraRotationAxis", this, &ACrimsonEclipseCharacter::ChangeCameraAngle);
 	PlayerInputComponent->BindAxis("CameraZoom", this, &ACrimsonEclipseCharacter::CameraZoom);
-
-	//PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ACrimsonEclipseCharacter::EquipButtonPressed);
 }
 
 void ACrimsonEclipseCharacter::CameraRotateON()

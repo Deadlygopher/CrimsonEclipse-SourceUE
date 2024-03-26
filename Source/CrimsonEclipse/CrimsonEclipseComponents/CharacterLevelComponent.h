@@ -13,16 +13,18 @@ class CRIMSONECLIPSE_API UCharacterLevelComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UCharacterLevelComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+private:
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1"))
+	int32 CurrentLevel = 1;
+
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1"))
+	int32 ExpForKill = 1;
 };
