@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "CrimsonEclipse/Interfaces/HitDetectInterface.h"
 #include "HitDetectAnimNotify.generated.h"
 
 /**

@@ -14,9 +14,9 @@
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CharacterLevelComponent.h"
+#include "CrimsonEclipse/Interfaces/XPComponentInterface.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h" //TODO Delete
-#include "CrimsonEclipse/CrimsonEclipseComponents/XPComponent.h" //TODO Delete
 
 DEFINE_LOG_CATEGORY(LogCEBaseCharacter);
 
@@ -28,12 +28,12 @@ ACEBaseCharacter::ACEBaseCharacter()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
 
-	CharacterLevelComponent = CreateDefaultSubobject<UCharacterLevelComponent>("CharacterLevelComponent");
-
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
 	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidgetComponent->SetupAttachment(RootComponent);
+
+	LevelComponent = CreateDefaultSubobject<UCharacterLevelComponent>(TEXT("Level"));
 
 	GetCharacterMovement()->MaxWalkSpeed = MaxMoveSpeed;
 
@@ -43,7 +43,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 
 	AttackReachRadius = CreateDefaultSubobject<USphereComponent>("AttackReachRadius");
 	AttackReachRadius->SetupAttachment(RootComponent);
-	AttackReachRadius->InitSphereRadius(AttackRadius - AttackRadius*0.15); //TODO Magic Number
+	AttackReachRadius->InitSphereRadius(AttackRadius - AttackRadius*0.2f); //TODO Magic Number
 }
 
 void ACEBaseCharacter::BeginPlay()
@@ -68,17 +68,21 @@ void ACEBaseCharacter::BeginPlay()
 	AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
 	AttackReachRadius->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	AttackReachRadius->OnComponentBeginOverlap.AddDynamic(this, &ACEBaseCharacter::OnReachAttackRadius);
+
 }
 
-void ACEBaseCharacter::OnDeath()
+void ACEBaseCharacter::OnDeath(AActor* DamageCauser)
 {
 	GetController()->UnPossess();
-	//bIsReceiveHitImpact = false;
-	//GetMesh()->ResetAnimInstanceDynamics();
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	GetCharacterMovement()->StopActiveMovement();
 	PlayAnimMontage(DeathAnimation);
+
+	auto FoundInterface = DamageCauser->FindComponentByInterface<UXPComponentInterface>();
+	auto FoundComponent = Cast<IXPComponentInterface>(FoundInterface);
+	if (FoundComponent)FoundComponent->ReceiveExp(LevelComponent->GetCurrentExpForKill());
 
 	FTimerHandle DeathAnimationTimer;
 	GetWorldTimerManager().SetTimer(DeathAnimationTimer, this, &ACEBaseCharacter::AfterDeathAnimation, 0.5f, false); //TODO MAgic Number
@@ -167,6 +171,7 @@ void ACEBaseCharacter::SetAttackRadius(float RadiusForSet)
 {
 	AttackRadius = RadiusForSet;
 	AttackReachRadius->SetSphereRadius(RadiusForSet - RadiusForSet*0.2);  //TODO Magic Number
+	//UE_LOG(LogCEBaseCharacter, Warning, TEXT("%f"), AttackReachRadius->GetScaledSphereRadius());
 }
 
 
@@ -196,12 +201,7 @@ void ACEBaseCharacter::StopRoll()
 void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
-	HealthComponent->DecreaseHealth(Damage);
-
-	if (GetHealth() <= 0)
-	{
-		DamageCauser->FindComponentByClass<UXPComponent>()->IncreaseCurrentXP(300);
-	}
+	HealthComponent->DecreaseHealth(Damage, DamageCauser);
 
 	bIsReceiveHitImpact = true;
 
@@ -222,7 +222,6 @@ void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedCompon
 	if (OtherActor == TargetActor &&  bAttackClicked)
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
-		//UE_LOG(LogCEBaseCharacter, Warning, TEXT("Begin Overlap %i"), AttackReachRadius->GetScaledSphereRadius());
 		RequestLightAttack();
 		bAttackClicked = false;
 	}
@@ -232,7 +231,7 @@ void ACEBaseCharacter::OnReachAttackRadius(UPrimitiveComponent* OverlappedCompon
 void ACEBaseCharacter::OnClickAttack()
 {
 	bAttackClicked = true;
-	UE_LOG(LogCEBaseCharacter, Warning, TEXT("%s"), *FString::SanitizeFloat(GetDistanceTo(TargetActor)));
+	//UE_LOG(LogCEBaseCharacter, Warning, TEXT("%s"), *FString::SanitizeFloat(GetDistanceTo(TargetActor)));
 	if (GetDistanceTo(TargetActor) <= AttackRadius)
 	{
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), GetActorLocation());
@@ -242,7 +241,7 @@ void ACEBaseCharacter::OnClickAttack()
 
 void ACEBaseCharacter::IsReceiveHitImpactReset()
 {
-	UE_LOG(LogCEBaseCharacter, Warning, TEXT("RESET IMPACT"))
+	//UE_LOG(LogCEBaseCharacter, Warning, TEXT("RESET IMPACT"))
 	bIsReceiveHitImpact = false;
 	//GetWorldTimerManager().ClearAllTimersForObject(this);
 }
@@ -302,7 +301,7 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, UItemInstance* InIntemInstance
 	}
 	default:
 	{
-		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Default EQUIP case"));
+		//UE_LOG(LogCEBaseCharacter, Warning, TEXT("Default EQUIP case"));
 		break;
 	}
 	}
@@ -330,7 +329,7 @@ void ACEBaseCharacter::OnItemUnequip(UItem* InItem, UItemInstance* InIntemInstan
 	}
 	default:
 	{
-		UE_LOG(LogCEBaseCharacter, Warning, TEXT("Default UNEQUIP case"));
+		//UE_LOG(LogCEBaseCharacter, Warning, TEXT("Default UNEQUIP case"));
 		break;
 	}
 	}

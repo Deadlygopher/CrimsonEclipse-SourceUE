@@ -146,6 +146,10 @@ void UCombatComponent::OnHitDetect()
 			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
 			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 
+		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), CurrentStartSocketLocation, CurrentEndSocketLocation, 
+			20, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true,
+			FLinearColor::Red, FLinearColor::Green, 2.f);
+
 		PrevStartSocketLocation = CurrentStartSocketLocation;
 		PrevMiddleSocketLocation = CurrentMiddleSocketLocation;
 		PrevEndSocketLocation = CurrentEndSocketLocation;

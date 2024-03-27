@@ -19,14 +19,23 @@ void UXPComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UXPComponent::IncreaseCurrentXP(int32 ExpToAdd)
+void UXPComponent::ReceiveExp(int32 ExpToAdd)
 {
 	CurrentExp = FMath::Clamp(CurrentExp + ExpToAdd, 0, INT32_MAX);
-	UE_LOG(LogXPComponent, Warning, TEXT("IncreaseXP, CurrentXP: %d"), CurrentExp);
+
+	for(CurrentExp;CurrentExp>=NextLevelExp;)
+	{
+		UE_LOG(LogXPComponent, Warning, TEXT("NEXT LEVEL"));
+		PrevLevelExp = NextLevelExp;
+		SetExpForNextLevel(1);
+		CurrentLevelRequirment = NextLevelExp - PrevLevelExp;
+		UE_LOG(LogXPComponent, Warning, TEXT("IncreaseXP, CurrentXP: %d"), CurrentExp - PrevLevelExp);
+		UE_LOG(LogXPComponent, Warning, TEXT("CUrrentLevelEXP: %d"), CurrentLevelRequirment);
+	}
 }
 
 void UXPComponent::SetExpForNextLevel(int32 NewLevel)
 {
-	NextLevelExpModifier += RequireGrowCoefficient * NewLevel;
-	NextLevelExp = NextLevelExp * NextLevelExpModifier;
+	NextLevelExpModifier += RequireGrowCoefficient * 2;//NewLevel;
+	NextLevelExp += NextLevelExp * NextLevelExpModifier;
 }

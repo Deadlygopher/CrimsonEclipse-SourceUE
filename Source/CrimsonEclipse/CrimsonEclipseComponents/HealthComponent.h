@@ -7,7 +7,7 @@
 #include "HealthComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float Health, float MaxHealth)
-DECLARE_MULTICAST_DELEGATE(FOnDeath)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeath, AActor* DamageCauser)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CRIMSONECLIPSE_API UHealthComponent : public UActorComponent
@@ -23,10 +23,10 @@ public:
 	bool IsDead() const { return Health <= 0; }
 
 	UFUNCTION(BlueprintCallable)
-	void IncreaseHealth(float HealthToIncrease);
+	void IncreaseHealth(float HealthToIncrease, AActor* DamageCauser);
 
 	UFUNCTION(BlueprintCallable)
-	void DecreaseHealth(float HealthToDecrease);
+	void DecreaseHealth(float HealthToDecrease, AActor* DamageCauser);
 
 protected:
 	

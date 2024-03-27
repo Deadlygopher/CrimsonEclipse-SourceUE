@@ -199,7 +199,7 @@ void ACrimsonEclipsePlayerController::SetNewMoveDestination(const FVector DestLo
 void ACrimsonEclipsePlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
-	UE_LOG(LogTemp, Warning, TEXT("OnSetDestination"));
+	//UE_LOG(LogTemp, Warning, TEXT("OnSetDestination"));
 
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Pawn, false, Hit);

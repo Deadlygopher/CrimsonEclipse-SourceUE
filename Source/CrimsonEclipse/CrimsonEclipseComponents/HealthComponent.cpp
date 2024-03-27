@@ -14,7 +14,7 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UHealthComponent::IncreaseHealth(float HealthToIncrease)
+void UHealthComponent::IncreaseHealth(float HealthToIncrease, AActor* DamageCauser)
 {
 	if (IsDead()) return;
 	Health = FMath::Clamp(Health + HealthToIncrease, 0.f, MaxHealth);
@@ -22,11 +22,11 @@ void UHealthComponent::IncreaseHealth(float HealthToIncrease)
 
 	if (IsDead())
 	{
-		OnDeath.Broadcast();
+		OnDeath.Broadcast(DamageCauser);
 	}
 }
 
-void UHealthComponent::DecreaseHealth(float HealthToDecrease)
+void UHealthComponent::DecreaseHealth(float HealthToDecrease, AActor* DamageCauser)
 {
 	if (IsDead()) return;
 	Health = FMath::Clamp(Health - HealthToDecrease, 0.f, MaxHealth);
@@ -34,6 +34,6 @@ void UHealthComponent::DecreaseHealth(float HealthToDecrease)
 
 	if (IsDead())
 	{
-		OnDeath.Broadcast();
+		OnDeath.Broadcast(DamageCauser);
 	}
 }

@@ -6,6 +6,8 @@
 
 void UAimingAnimNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
+	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime);
+	/*
 	auto Interfaces = MeshComp->GetOwner()->GetComponents();
 	for (auto Interface : Interfaces)
 	{
@@ -14,11 +16,16 @@ void UAimingAnimNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimS
 			HitInterface->OnAiming();
 			break;
 		}
-	}
+	}*/
+	auto FoundInterface = MeshComp->GetOwner()->FindComponentByInterface<UHitDetectInterface>();
+	auto FoundComponent = Cast<IHitDetectInterface>(FoundInterface);
+	if (FoundComponent) FoundComponent->OnAiming();
 }
 
 void UAimingAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
+	Super::NotifyEnd(MeshComp, Animation);
+	/*
 	auto Interfaces = MeshComp->GetOwner()->GetComponents();
 	for (auto Interface : Interfaces)
 	{
@@ -27,5 +34,8 @@ void UAimingAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSe
 			HitInterface->OnProjectileSpawn();
 			break;
 		}
-	}
+	}*/
+	auto FoundInterface = MeshComp->GetOwner()->FindComponentByInterface<UHitDetectInterface>();
+	auto FoundComponent = Cast<IHitDetectInterface>(FoundInterface);
+	if (FoundComponent) FoundComponent->OnProjectileSpawn();
 }

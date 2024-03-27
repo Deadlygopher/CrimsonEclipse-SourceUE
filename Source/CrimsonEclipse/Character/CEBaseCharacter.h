@@ -94,10 +94,11 @@ public:
 	bool GetReadyForAttack() const { return bReadyForAttack; }
 	void SetReadyForAttack(bool bIsReady) { bReadyForAttack = bIsReady; }
 
+
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void OnDeath();
+	virtual void OnDeath(AActor* DamageCauser);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCombatComponent* CombatComponent;
@@ -108,8 +109,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UHealthComponent* HealthComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	UCharacterLevelComponent* CharacterLevelComponent;
+	UPROPERTY(VisibleAnywhere)
+	UCharacterLevelComponent* LevelComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float MaxMoveSpeed = 600;

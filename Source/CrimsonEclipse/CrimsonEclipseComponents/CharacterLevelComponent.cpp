@@ -11,7 +11,7 @@ UCharacterLevelComponent::UCharacterLevelComponent()
 void UCharacterLevelComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CountCurrentExpForKill();
 }
 
 void UCharacterLevelComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -19,3 +19,7 @@ void UCharacterLevelComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UCharacterLevelComponent::CountCurrentExpForKill()
+{
+	CurrentExpForKill = InitExpForKill + InitExpForKill * 0.2 * CurrentLevel;
+}

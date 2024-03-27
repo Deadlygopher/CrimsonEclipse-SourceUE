@@ -15,16 +15,23 @@ class CRIMSONECLIPSE_API UCharacterLevelComponent : public UActorComponent
 public:	
 	UCharacterLevelComponent();
 
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	int32 GetCurrentExpForKill() const { return CurrentExpForKill; }
+
+	int32 GetCurrentLevel() const { return CurrentLevel; }
+
+	void CountCurrentExpForKill();
+
 protected:
 	virtual void BeginPlay() override;
 
-public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-private:
-	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 1))
 	int32 CurrentLevel = 1;
 
-	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1"))
-	int32 ExpForKill = 1;
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 1))
+	int32 InitExpForKill = 1;
+
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 1))
+	int32 CurrentExpForKill = 1;
 };

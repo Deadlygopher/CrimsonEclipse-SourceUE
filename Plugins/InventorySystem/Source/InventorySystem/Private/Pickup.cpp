@@ -128,7 +128,7 @@ void APickup::SetWidgetVisibility(bool bVisible)
 void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
-{
+{/*
 	IInventoryInterface* InventoryInterface = nullptr;
 	auto Components = OtherActor->GetComponents();
 	for (auto Component : Components)
@@ -147,12 +147,16 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 		InventoryInterface->OverlappingItemToArray(this);
 		SizeArray = InventoryInterface->GetOverlappingItems().Num();
 		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
-	}
+	}*/
+	auto InvInterfaceActor = OtherActor->FindComponentByInterface<UInventoryInterface>();
+	auto InvInterface = Cast<IInventoryInterface>(InvInterfaceActor);
+	if (InvInterface)InvInterface->OverlappingItemToArray(this);
 }
 
 void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	/*
 	IInventoryInterface* InventoryInterface = nullptr;
 	auto Components = OtherActor->GetComponents();
 
@@ -167,7 +171,10 @@ void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AA
 	if (InventoryInterface)
 	{
 		InventoryInterface->RemoveItemFromOverlapping(this);
-	}
+	}*/
+	auto InvInterfaceActor = OtherActor->FindComponentByInterface<UInventoryInterface>();
+	auto InvInterface = Cast<IInventoryInterface>(InvInterfaceActor);
+	if (InvInterface)InvInterface->RemoveItemFromOverlapping(this);
 }
 
 void APickup::OnCursorStartOverlap(UPrimitiveComponent* TouchedComponent)
