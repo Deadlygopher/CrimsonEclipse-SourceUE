@@ -12,6 +12,7 @@ UXPComponent::UXPComponent()
 void UXPComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	//SetExpForNextLevel(CurrentLevel);
 }
 
 void UXPComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -23,19 +24,46 @@ void UXPComponent::ReceiveExp(int32 ExpToAdd)
 {
 	CurrentExp = FMath::Clamp(CurrentExp + ExpToAdd, 0, INT32_MAX);
 
-	for(CurrentExp;CurrentExp>=NextLevelExp;)
+	UE_LOG(LogXPComponent, Warning, TEXT("EXPtoAdd: %d"), ExpToAdd);
+
+	while(CurrentExp>=NextLevelExp)
 	{
 		UE_LOG(LogXPComponent, Warning, TEXT("NEXT LEVEL"));
-		PrevLevelExp = NextLevelExp;
-		SetExpForNextLevel(1);
-		CurrentLevelRequirment = NextLevelExp - PrevLevelExp;
-		UE_LOG(LogXPComponent, Warning, TEXT("IncreaseXP, CurrentXP: %d"), CurrentExp - PrevLevelExp);
-		UE_LOG(LogXPComponent, Warning, TEXT("CUrrentLevelEXP: %d"), CurrentLevelRequirment);
+
+		++CurrentLevel;
+		SetExpForNextLevel(CurrentLevel);
+		OnLevelUp.Broadcast(CurrentLevel);
+		//OnReceiveExp.Broadcast(CurrentLevelRequirment, CurrentExp - PrevLevelExp);
+
+		//UE_LOG(LogXPComponent, Warning, TEXT("IncreaseXP, CurrentXP: %d"), CurrentExp - PrevLevelExp);
+		//UE_LOG(LogXPComponent, Warning, TEXT("CUrrentLevelEXP: %d"), CurrentLevelRequirment);
 	}
+	OnReceiveExp.Broadcast(CurrentLevelRequirment, CurrentExp - PrevLevelExp);
 }
 
 void UXPComponent::SetExpForNextLevel(int32 NewLevel)
 {
-	NextLevelExpModifier += RequireGrowCoefficient * 2;//NewLevel;
-	NextLevelExp += NextLevelExp * NextLevelExpModifier;
+	/*
+	if (NewLevel <= 1)
+	{
+		NextLevelExp = InitLevelExp;
+		PrevLevelExp = 0;
+		return;
+	}*/
+
+	NextLevelExpModifier = 1+RequireGrowCoefficient * NewLevel;
+	NextLevelExp = NextLevelExpModifier* NextLevelExpModifier* NextLevelExpModifier * InitLevelExp * NewLevel;
+
+	float PrevLevelExpModifier = 1+RequireGrowCoefficient * (NewLevel - 1);
+	PrevLevelExp = PrevLevelExpModifier * PrevLevelExpModifier * PrevLevelExpModifier * InitLevelExp * (NewLevel - 1);
+
+	CurrentLevelRequirment = NextLevelExp - PrevLevelExp;
+}
+
+void UXPComponent::SetCurrentLevel(int32 LevelToSet)
+{
+	CurrentLevel = LevelToSet;
+	OnLevelUp.Broadcast(CurrentLevel);
+	SetExpForNextLevel(CurrentLevel);
+	OnReceiveExp.Broadcast(CurrentLevelRequirment, CurrentExp - PrevLevelExp);
 }

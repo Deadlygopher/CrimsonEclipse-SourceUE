@@ -21,6 +21,7 @@ public:
 
 	int32 GetCurrentLevel() const { return CurrentLevel; }
 
+	void LevelUp() { ++CurrentLevel; }
 	void CountCurrentExpForKill();
 
 protected:

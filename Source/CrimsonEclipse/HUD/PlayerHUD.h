@@ -18,10 +18,12 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void UpdateHUDHealth(float Health, float MaxHealth);
+	virtual void UpdateHUDExpBar(int32 CurrentLevelMaxExp, int32 CurrentLevelExp);
+	virtual void UpdateHUDLevelText(int32 NewLevel);
 
 private:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf <UPlayerStatsWidget> PlayerStatsWidget;
+	TSubclassOf <UPlayerStatsWidget> PlayerStatsWidgetClass;
 
 	UPlayerStatsWidget* PlayerStats;
 };

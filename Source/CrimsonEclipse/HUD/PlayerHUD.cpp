@@ -10,7 +10,7 @@
 
 void APlayerHUD::BeginPlay()
 {
-	PlayerStats = Cast<UPlayerStatsWidget>(CreateWidget(GetOwningPlayerController(), PlayerStatsWidget, "PlayerStats"));
+	PlayerStats = Cast<UPlayerStatsWidget>(CreateWidget(GetOwningPlayerController(), PlayerStatsWidgetClass, "PlayerStats"));
 	PlayerStats->AddToViewport();
 	PlayerStats->SetVisibility(ESlateVisibility::HitTestInvisible);
 }
@@ -21,5 +21,28 @@ void APlayerHUD::UpdateHUDHealth(float Health, float MaxHealth)
 	{
 		PlayerStats->PlayerHealthBar->SetPercent(Health / MaxHealth);
 		PlayerStats->PlayerHealthText->SetText(FText::FromString(FString::FromInt(Health)));
+	}
+}
+
+void APlayerHUD::UpdateHUDExpBar(int32 CurrentLevelMaxExp, int32 CurrentLevelExp)
+{
+	if (PlayerStats && PlayerStats->ExpProgressBar)
+	{
+		float MaxExp = CurrentLevelMaxExp;
+		float CurentExp = CurrentLevelExp;
+		PlayerStats->ExpProgressBar->SetPercent(CurentExp / MaxExp);
+	}
+	if (PlayerStats && PlayerStats->MaxExpForLevel && PlayerStats->CurrentExpForLevel)
+	{
+		PlayerStats->MaxExpForLevel->SetText(FText::FromString(FString::FromInt(CurrentLevelMaxExp)));
+		PlayerStats->CurrentExpForLevel->SetText(FText::FromString(FString::FromInt(CurrentLevelExp)));
+	}
+}
+
+void APlayerHUD::UpdateHUDLevelText(int32 NewLevel)
+{
+	if (PlayerStats && PlayerStats->CurrentLevelText)
+	{
+		PlayerStats->CurrentLevelText->SetText(FText::FromString(FString::FromInt(NewLevel)));
 	}
 }

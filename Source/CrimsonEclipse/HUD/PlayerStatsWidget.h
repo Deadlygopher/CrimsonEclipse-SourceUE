@@ -20,4 +20,16 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* PlayerHealthText;
+
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* ExpProgressBar;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* CurrentLevelText;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* CurrentExpForLevel;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* MaxExpForLevel;
 };

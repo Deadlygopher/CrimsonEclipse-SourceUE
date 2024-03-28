@@ -13,11 +13,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CombatComponent.h"
-//#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "CrimsonEclipse/HUD/PlayerHUD.h"
 
 #include "CrimsonEclipse/CrimsonEclipseComponents/XPComponent.h"
+#include "CrimsonEclipse/CrimsonEclipseComponents/CharacterLevelComponent.h"
 
 
 
@@ -71,6 +71,12 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 void ACrimsonEclipseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	XPComponent->OnReceiveExp.AddUObject(this, &ACrimsonEclipseCharacter::SetExpProgressHUD);
+	XPComponent->OnLevelUp.AddUObject(this, &ACrimsonEclipseCharacter::SetNewLevelHUD);
+
+	XPComponent->SetCurrentLevel(LevelComponent->GetCurrentLevel());
+	SetNewLevelHUD(LevelComponent->GetCurrentLevel());
+	//SetExpProgressHUD(XPComponent->GetCurre)
 }
 
 void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -152,6 +158,36 @@ void ACrimsonEclipseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHea
 			if (HUD)
 			{
 				Cast<APlayerHUD>(HUD)->UpdateHUDHealth(NewHealth, MaxHealth);
+			}
+		}
+	}
+}
+
+void ACrimsonEclipseCharacter::SetExpProgressHUD(int32 CurrentLevelMaxExp, int32 CurrentLevelExp)
+{
+	if (GetController())
+	{
+		if (Cast<APlayerController>(GetController())->GetHUD())
+		{
+			auto HUD = Cast<APlayerController>(GetController())->GetHUD();
+			if (HUD)
+			{
+				Cast<APlayerHUD>(HUD)->UpdateHUDExpBar(CurrentLevelMaxExp, CurrentLevelExp);
+			}
+		}
+	}
+}
+
+void ACrimsonEclipseCharacter::SetNewLevelHUD(int32 NewLevel)
+{
+	if (GetController())
+	{
+		if (Cast<APlayerController>(GetController())->GetHUD())
+		{
+			auto HUD = Cast<APlayerController>(GetController())->GetHUD();
+			if (HUD)
+			{
+				Cast<APlayerHUD>(HUD)->UpdateHUDLevelText(NewLevel);
 			}
 		}
 	}

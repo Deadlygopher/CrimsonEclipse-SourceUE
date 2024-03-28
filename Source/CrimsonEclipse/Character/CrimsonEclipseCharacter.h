@@ -53,6 +53,9 @@ protected:
 
 	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth) override;
 
+	void SetExpProgressHUD(int32 CurrentLevelMaxExp, int32 CurrentLevelExp);
+	void SetNewLevelHUD(int32 NewLevel);
+
 public:
 	virtual void StartRoll() override;
 	virtual void RequestLightAttack() override;
