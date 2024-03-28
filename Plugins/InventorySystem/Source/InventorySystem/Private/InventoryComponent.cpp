@@ -1542,15 +1542,12 @@ void UInventoryComponent::EquipItemOnSlot(const FSlot& Slot)
 
 void UInventoryComponent::EquipItem(UItem* Item)
 {
+	if (!Item) return;
+
 	if (EquipmentSlots.Num() <= 0)
 	{
 		return;
 	}
-
-	/*if (!Slot.IsValid() || Slot.IsEmpty())
-	{
-		return;
-	}*/
 
 	if (!Item->GetItemCanBeEquipped())
 	{
@@ -1566,8 +1563,6 @@ void UInventoryComponent::EquipItem(UItem* Item)
 	{
 		return;
 	}
-
-
 
 	switch (Item->GetItemType())
 	{

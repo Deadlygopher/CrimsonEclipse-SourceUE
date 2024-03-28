@@ -33,6 +33,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 1))
 	int32 InitExpForKill = 1;
 
-	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 1))
+	UPROPERTY(meta = (ClampMin = 1))
 	int32 CurrentExpForKill = 1;
 };

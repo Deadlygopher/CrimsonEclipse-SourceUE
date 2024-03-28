@@ -65,5 +65,6 @@ void UXPComponent::SetCurrentLevel(int32 LevelToSet)
 	CurrentLevel = LevelToSet;
 	OnLevelUp.Broadcast(CurrentLevel);
 	SetExpForNextLevel(CurrentLevel);
+	CurrentExp = PrevLevelExp;
 	OnReceiveExp.Broadcast(CurrentLevelRequirment, CurrentExp - PrevLevelExp);
 }
