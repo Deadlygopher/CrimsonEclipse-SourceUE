@@ -8,6 +8,8 @@
 #include "PlayerHUD.generated.h"
 
 class UPlayerStatsWidget;
+class UPlayerStatPoints;
+
 
 UCLASS()
 class CRIMSONECLIPSE_API APlayerHUD : public AHUD
@@ -21,9 +23,19 @@ public:
 	virtual void UpdateHUDExpBar(int32 CurrentLevelMaxExp, int32 CurrentLevelExp);
 	virtual void UpdateHUDLevelText(int32 NewLevel);
 
+	virtual void CreatePlayerStatPointsWidget();
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf <UPlayerStatsWidget> PlayerStatsWidgetClass;
 
+	UPROPERTY()
 	UPlayerStatsWidget* PlayerStats;
+
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UPlayerStatPoints> PlayerStatPointsClass;
+
+	UPROPERTY()
+	UPlayerStatPoints* PlayerStatPoints;
 };

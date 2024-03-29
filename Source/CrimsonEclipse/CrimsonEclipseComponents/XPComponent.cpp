@@ -33,10 +33,6 @@ void UXPComponent::ReceiveExp(int32 ExpToAdd)
 		++CurrentLevel;
 		SetExpForNextLevel(CurrentLevel);
 		OnLevelUp.Broadcast(CurrentLevel);
-		//OnReceiveExp.Broadcast(CurrentLevelRequirment, CurrentExp - PrevLevelExp);
-
-		//UE_LOG(LogXPComponent, Warning, TEXT("IncreaseXP, CurrentXP: %d"), CurrentExp - PrevLevelExp);
-		//UE_LOG(LogXPComponent, Warning, TEXT("CUrrentLevelEXP: %d"), CurrentLevelRequirment);
 	}
 	OnReceiveExp.Broadcast(CurrentLevelRequirment, CurrentExp - PrevLevelExp);
 }
@@ -63,7 +59,7 @@ void UXPComponent::SetExpForNextLevel(int32 NewLevel)
 void UXPComponent::SetCurrentLevel(int32 LevelToSet)
 {
 	CurrentLevel = LevelToSet;
-	OnLevelUp.Broadcast(CurrentLevel);
+	//OnLevelUp.Broadcast(CurrentLevel);
 	SetExpForNextLevel(CurrentLevel);
 	CurrentExp = PrevLevelExp;
 	OnReceiveExp.Broadcast(CurrentLevelRequirment, CurrentExp - PrevLevelExp);

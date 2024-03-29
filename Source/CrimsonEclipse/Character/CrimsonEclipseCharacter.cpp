@@ -71,12 +71,18 @@ ACrimsonEclipseCharacter::ACrimsonEclipseCharacter()
 void ACrimsonEclipseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	XPComponent->OnReceiveExp.AddUObject(this, &ACrimsonEclipseCharacter::SetExpProgressHUD);
-	XPComponent->OnLevelUp.AddUObject(this, &ACrimsonEclipseCharacter::SetNewLevelHUD);
-
-	XPComponent->SetCurrentLevel(LevelComponent->GetCurrentLevel());
-	SetNewLevelHUD(LevelComponent->GetCurrentLevel());
-	//SetExpProgressHUD(XPComponent->GetCurre)
+	if (XPComponent) 
+	{
+		XPComponent->OnReceiveExp.AddUObject(this, &ACrimsonEclipseCharacter::SetExpProgressHUD);
+		XPComponent->OnLevelUp.AddUObject(this, &ACrimsonEclipseCharacter::SetNewLevelHUD);
+		XPComponent->OnLevelUp.AddUObject(this, &ACrimsonEclipseCharacter::SetNewLevelForLvlComp);
+	}
+	if (XPComponent && LvlComponent)
+	{
+		XPComponent->SetCurrentLevel(LvlComponent->GetCurrentLevel());
+		SetNewLevelHUD(LvlComponent->GetCurrentLevel());
+		//SetExpProgressHUD(XPComponent->GetCurre)
+	}
 }
 
 void ACrimsonEclipseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -191,6 +197,11 @@ void ACrimsonEclipseCharacter::SetNewLevelHUD(int32 NewLevel)
 			}
 		}
 	}
+}
+
+void ACrimsonEclipseCharacter::SetNewLevelForLvlComp(int32 NewLevel)
+{
+	if (LvlComponent) LvlComponent->LevelUp();
 }
 
 void ACrimsonEclipseCharacter::StartRoll()

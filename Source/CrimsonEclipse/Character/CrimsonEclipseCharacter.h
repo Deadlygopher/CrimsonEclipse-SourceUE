@@ -53,8 +53,12 @@ protected:
 
 	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth) override;
 
+	UFUNCTION(BlueprintCallable)
 	void SetExpProgressHUD(int32 CurrentLevelMaxExp, int32 CurrentLevelExp);
+	UFUNCTION(BlueprintCallable)
 	void SetNewLevelHUD(int32 NewLevel);
+	UFUNCTION(BlueprintCallable)
+	void SetNewLevelForLvlComp(int32 NewLevel);
 
 public:
 	virtual void StartRoll() override;

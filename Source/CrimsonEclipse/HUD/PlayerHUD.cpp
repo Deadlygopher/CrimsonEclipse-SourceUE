@@ -6,6 +6,7 @@
 #include "PlayerStatsWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "PlayerStatPoints.h"
 
 
 void APlayerHUD::BeginPlay()
@@ -13,6 +14,7 @@ void APlayerHUD::BeginPlay()
 	PlayerStats = Cast<UPlayerStatsWidget>(CreateWidget(GetOwningPlayerController(), PlayerStatsWidgetClass, "PlayerStats"));
 	PlayerStats->AddToViewport();
 	PlayerStats->SetVisibility(ESlateVisibility::HitTestInvisible);
+	GetOwningPlayerController()->InputComponent->BindAction("OpenCharacterStats", IE_Pressed, this, &APlayerHUD::CreatePlayerStatPointsWidget);
 }
 
 void APlayerHUD::UpdateHUDHealth(float Health, float MaxHealth)
@@ -44,5 +46,32 @@ void APlayerHUD::UpdateHUDLevelText(int32 NewLevel)
 	if (PlayerStats && PlayerStats->CurrentLevelText)
 	{
 		PlayerStats->CurrentLevelText->SetText(FText::FromString(FString::FromInt(NewLevel)));
+	}
+}
+
+void APlayerHUD::CreatePlayerStatPointsWidget()
+{
+	if (!PlayerStatPoints && PlayerStatPointsClass)
+	{
+		PlayerStatPoints = Cast<UPlayerStatPoints>(CreateWidget(GetOwningPlayerController(), PlayerStatPointsClass, "PlayerStatPoints"));
+	}
+	if (PlayerStatPoints)
+	{
+		if (!PlayerStatPoints->IsInViewport())
+		{
+			PlayerStatPoints->AddToViewport();
+		}
+		else
+		{
+			if (!PlayerStatPoints->IsVisible())
+			{
+				PlayerStatPoints->UpdateWidget();
+				PlayerStatPoints->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				PlayerStatPoints->SetVisibility(ESlateVisibility::Collapsed);
+			}
+		}
 	}
 }

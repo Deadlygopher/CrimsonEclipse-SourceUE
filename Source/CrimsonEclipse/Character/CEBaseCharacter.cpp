@@ -33,7 +33,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidgetComponent->SetupAttachment(RootComponent);
 
-	LevelComponent = CreateDefaultSubobject<UCharacterLevelComponent>(TEXT("Level"));
+	LvlComponent = CreateDefaultSubobject<UCharacterLevelComponent>(TEXT("Character Level"));
 
 	GetCharacterMovement()->MaxWalkSpeed = MaxMoveSpeed;
 
@@ -82,7 +82,7 @@ void ACEBaseCharacter::OnDeath(AActor* DamageCauser)
 
 	auto FoundInterface = DamageCauser->FindComponentByInterface<UXPComponentInterface>();
 	auto FoundComponent = Cast<IXPComponentInterface>(FoundInterface);
-	if (FoundComponent)FoundComponent->ReceiveExp(LevelComponent->GetCurrentExpForKill());
+	if (FoundComponent)FoundComponent->ReceiveExp(LvlComponent->GetCurrentExpForKill());
 
 	FTimerHandle DeathAnimationTimer;
 	GetWorldTimerManager().SetTimer(DeathAnimationTimer, this, &ACEBaseCharacter::AfterDeathAnimation, 0.5f, false); //TODO MAgic Number

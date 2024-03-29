@@ -10,6 +10,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCEBaseCharacter, Log, All);
 
+class UCharacterLevelComponent;
 class UCombatComponent;
 class UHealthComponent;
 class UWidgetComponent;
@@ -17,7 +18,6 @@ class UInventoryComponent;
 class USphereComponent;
 class UItem;
 class UItemInstance;
-class UCharacterLevelComponent;
 
 UCLASS()
 class CRIMSONECLIPSE_API ACEBaseCharacter : public ACharacter, public IEvadeAnimInterface
@@ -70,6 +70,7 @@ private:
 public:
 	bool GetIsRollPressed() const { return bPressedRoll; }
 
+
 	UFUNCTION(BlueprintCallable)
 	virtual void StartRoll();
 
@@ -109,8 +110,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UHealthComponent* HealthComponent;
 
-	UPROPERTY(VisibleAnywhere)
-	UCharacterLevelComponent* LevelComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UCharacterLevelComponent* LvlComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float MaxMoveSpeed = 600;

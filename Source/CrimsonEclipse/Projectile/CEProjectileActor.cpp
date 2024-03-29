@@ -46,6 +46,7 @@ void ACEProjectileActor::Tick(float DeltaTime)
 void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	//UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *SweepResult.ToString());
 	if(GetOwner() != OtherActor)
 	{
 		if (OtherActor->IsA(APawn::StaticClass()))
@@ -65,7 +66,6 @@ void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponen
 			FAttachmentTransformRules AttachmentTransform{ EAttachmentRule::KeepWorld, true };
 			AttachToComponent(SkeletalMesh, AttachmentTransform, ClosestBone);
 			//UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *GetInstigator()->GetName());
-			UE_LOG(LogProjectileActor, Warning, TEXT("%s"), *ClosestBone.ToString());
 		}
 		else
 		{
