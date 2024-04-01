@@ -19,10 +19,11 @@ void APlayerHUD::BeginPlay()
 
 void APlayerHUD::UpdateHUDHealth(float Health, float MaxHealth)
 {
-	if (MaxHealth > 0 && PlayerStats && PlayerStats->PlayerHealthBar && PlayerStats->PlayerHealthText)
+	if (MaxHealth > 0 && PlayerStats && PlayerStats->PlayerHealthBar && PlayerStats->PlayerHealthText && PlayerStats->PlayerMaxHealthText)
 	{
 		PlayerStats->PlayerHealthBar->SetPercent(Health / MaxHealth);
 		PlayerStats->PlayerHealthText->SetText(FText::FromString(FString::FromInt(Health)));
+		PlayerStats->PlayerMaxHealthText->SetText(FText::FromString(FString::FromInt(MaxHealth)));
 	}
 }
 

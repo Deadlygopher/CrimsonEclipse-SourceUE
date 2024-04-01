@@ -198,12 +198,12 @@ void UCombatComponent::OnProjectileSpawn()
 			FVector ProjectileVector{ HitResult.Location.X - SocketTransform.GetLocation().X,
 				HitResult.Location.Y - SocketTransform.GetLocation().Y, ArrowDirection.Z };
 
-			LeftHandEquippedWeapon->SpawnProjectile(Character, ProjectileVector); //ArrowDirection);
+			LeftHandEquippedWeapon->SpawnProjectile(Character, ProjectileVector, LeftHandDamage); //ArrowDirection);
 		}
 		else
 		{
 			const FVector ArrowDirection = Character->GetActorForwardVector();
-			LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection);
+			LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection, LeftHandDamage);
 		}
 	}
 }

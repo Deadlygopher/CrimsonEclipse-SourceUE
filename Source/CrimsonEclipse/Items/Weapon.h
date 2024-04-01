@@ -47,7 +47,7 @@ public:
 	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
 	EWeaponType GetWeaponType() { return WeaponType; }
 
-	void SpawnProjectile(APawn* SpawnInstigator, FVector AimVector);
+	void SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage);
 
 protected:
 	// Called when the game starts or when spawned

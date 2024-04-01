@@ -15,6 +15,14 @@ void UOverheadWidget::UpdateHealthBar(float Health, float MaxHealth) const
 	}
 }
 
+void UOverheadWidget::SetOverheadWidgetLevel(int32 CurrentLevel)
+{
+	if (LevelText)
+	{
+		LevelText->SetText(FText::FromString(FString::FromInt(CurrentLevel)));
+	}
+}
+
 
 void UOverheadWidget::NativeDestruct()
 {

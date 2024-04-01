@@ -21,6 +21,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
+	void SetWeaponDamage(float BaseDamage) { ProjectileDamage = BaseDamage * DamageModifier; }
+
+	UFUNCTION()
 	void OnProjectileHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 
@@ -35,4 +38,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	UCapsuleComponent* CapsuleComponent;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	float DamageModifier = 1.1;
+
+	UPROPERTY()
+	float ProjectileDamage = 1;
 };

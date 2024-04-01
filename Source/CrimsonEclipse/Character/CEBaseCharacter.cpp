@@ -50,14 +50,18 @@ void ACEBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LvlComponent->UpdateAllStats();
 	SetHealthWidgetInfo(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
+	SetLevelWidgetInfo();
 
 	if (IsPlayerControlled())
 	{
 		OverheadWidgetComponent->SetVisibility(false);
 	}
+
 	OnTakeAnyDamage.AddDynamic(this, &ACEBaseCharacter::ReceiveDamage);
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ACEBaseCharacter::ResetReadyForAttack);
+
 	//GetMesh()->GetAnimInstance()->OnMontageStarted.
 	if (HealthComponent)
 	{
@@ -91,6 +95,7 @@ void ACEBaseCharacter::OnDeath(AActor* DamageCauser)
 void ACEBaseCharacter::AfterDeathAnimation()
 {
 	//UE_LOG(LogCEBaseCharacter, Warning, TEXT("DEAD!!!"))
+	OverheadWidgetComponent->SetVisibility(false);
 	GetMesh()->SetSimulatePhysics(true);
 }
 
@@ -251,9 +256,20 @@ void ACEBaseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
 	if (OverheadWidgetComponent)
 	{
 		auto Widget = Cast<UOverheadWidget>(OverheadWidgetComponent->GetWidget());
-
 		if (!Widget) return;
 		Widget->UpdateHealthBar(NewHealth, MaxHealth);
+	}
+}
+
+void ACEBaseCharacter::SetLevelWidgetInfo()
+{
+	if (OverheadWidgetComponent)
+	{
+		auto Widget = Cast<UOverheadWidget>(OverheadWidgetComponent->GetWidget());
+		if (Widget && LvlComponent)
+		{
+			Widget->SetOverheadWidgetLevel(LvlComponent->GetCurrentLevel());
+		}
 	}
 }
 

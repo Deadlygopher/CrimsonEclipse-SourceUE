@@ -25,8 +25,8 @@ ACEProjectileActor::ACEProjectileActor()
 	CapsuleComponent->SetupAttachment(ProjectileMesh);
 	CapsuleComponent->SetCapsuleHalfHeight(100);
 	CapsuleComponent->SetCapsuleRadius(10);
-
 }
+
 
 void ACEProjectileActor::BeginPlay()
 {
@@ -56,7 +56,7 @@ void ACEProjectileActor::OnProjectileHit(UPrimitiveComponent* OverlappedComponen
 			CapsuleComponent->Deactivate();
 			ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			UGameplayStatics::ApplyDamage(OtherActor, 10.f, GetInstigator()->GetController(),
+			UGameplayStatics::ApplyDamage(OtherActor, ProjectileDamage, GetInstigator()->GetController(),
 				GetInstigator(), UDamageType::StaticClass());
 
 			auto SkeletalMesh = Cast<USkeletalMeshComponent>(SweepResult.Component);

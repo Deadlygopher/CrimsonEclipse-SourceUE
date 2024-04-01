@@ -14,6 +14,13 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UHealthComponent::SetMaxHealth(float NewMaxHealth)
+{
+	//if (IsDead()) return;
+	if (NewMaxHealth > 0) MaxHealth = NewMaxHealth;
+	OnHealthChange.Broadcast(Health, MaxHealth);
+}
+
 void UHealthComponent::IncreaseHealth(float HealthToIncrease, AActor* DamageCauser)
 {
 	if (IsDead()) return;

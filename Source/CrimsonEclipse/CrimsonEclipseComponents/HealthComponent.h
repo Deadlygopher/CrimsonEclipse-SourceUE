@@ -18,9 +18,13 @@ public:
 	UHealthComponent();
 	virtual void BeginPlay() override;
 
+	float GetInitMaxHealth() const { return InitMaxHealth; }
 	float GetHealth() const { return Health; }
 	float GetMaxHealth() const { return MaxHealth; }
 	bool IsDead() const { return Health <= 0; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetMaxHealth(float HealthToAdd);
 
 	UFUNCTION(BlueprintCallable)
 	void IncreaseHealth(float HealthToIncrease, AActor* DamageCauser);
@@ -31,7 +35,10 @@ public:
 protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float MaxHealth;
+	float InitMaxHealth = 100;
+
+	UPROPERTY(/*EditDefaultsOnly,*/ BlueprintReadWrite)
+	float MaxHealth = InitMaxHealth;
 
 private:
 	UPROPERTY(EditAnywhere)

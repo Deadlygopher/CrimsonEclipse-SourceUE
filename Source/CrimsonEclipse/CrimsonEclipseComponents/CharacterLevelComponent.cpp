@@ -2,10 +2,16 @@
 
 
 #include "CharacterLevelComponent.h"
+#include "HealthComponent.h"
 
 UCharacterLevelComponent::UCharacterLevelComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+}
+
+void UCharacterLevelComponent::UpdateAllStats()
+{
+	UpdateHealthPointsDependencies();
 }
 
 void UCharacterLevelComponent::CountFreeStatsPoints()
@@ -37,4 +43,21 @@ void UCharacterLevelComponent::LevelUp()
 void UCharacterLevelComponent::CountCurrentExpForKill()
 {
 	CurrentExpForKill = InitExpForKill + InitExpForKill * 0.2 * CurrentLevel;
+}
+
+
+void UCharacterLevelComponent::AddHealthPoints(int32 NewHealthPoints)
+{
+	HealthPoints += NewHealthPoints;
+	UpdateHealthPointsDependencies();
+}
+
+void UCharacterLevelComponent::UpdateHealthPointsDependencies()
+{
+	auto HealthComp = GetOwner()->FindComponentByClass<UHealthComponent>();
+	if (HealthComp)
+	{
+		auto NewMaxHealth = HealthComp->GetInitMaxHealth() + HealthComp->GetInitMaxHealth() * 0.1 * HealthPoints;
+		HealthComp->SetMaxHealth(NewMaxHealth);
+	}
 }

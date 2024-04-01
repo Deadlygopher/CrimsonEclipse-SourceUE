@@ -117,6 +117,7 @@ protected:
 	float MaxMoveSpeed = 600;
 
 	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth);
+	virtual void SetLevelWidgetInfo();
 
 private:
 	UFUNCTION(BlueprintCallable)

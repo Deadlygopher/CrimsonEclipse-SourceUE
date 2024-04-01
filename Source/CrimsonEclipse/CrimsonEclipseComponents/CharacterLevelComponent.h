@@ -28,11 +28,15 @@ public:
 	int32 GetDexterityPoints() const { return DexterityPoints; }
 	int32 GetIntelligencePoints() const { return IntelligencePoints; }
 
-	void AddHealthPoints(int32 NewHealthPoints) { HealthPoints += NewHealthPoints; }
+	void AddHealthPoints(int32 NewHealthPoints);
+	void UpdateHealthPointsDependencies();
+
 	void AddStaminaPoints(int32 NewStaminaPoints) { StaminaPoints += NewStaminaPoints; }
 	void AddStrengthPoints(int32 NewStrengthPoints) { StrengthPoints += NewStrengthPoints; }
 	void AddDexterityPoints(int32 NewDexterityPoints) { DexterityPoints += NewDexterityPoints; }
 	void AddIntelligencePoints(int32 NewIntelligencePoints) { IntelligencePoints += NewIntelligencePoints; }
+
+	void UpdateAllStats();
 
 	void AddFreeStatsPoints(int32 PointsToAdd) { FreeStatsPoints += PointsToAdd; }
 	void CountFreeStatsPoints();

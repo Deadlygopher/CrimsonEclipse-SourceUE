@@ -17,6 +17,7 @@ class CRIMSONECLIPSE_API UOverheadWidget : public UUserWidget
 public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateHealthBar(float Health, float MaxHealth) const;
+	void SetOverheadWidgetLevel(int32 CurrentLevel);
 
 
 protected:
@@ -24,6 +25,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* DisplayHealth;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* LevelText;
 
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* HealthBar;

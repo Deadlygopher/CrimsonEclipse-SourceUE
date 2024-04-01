@@ -6,6 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/Projectile/CEProjectileActor.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AWeapon::AWeapon()
@@ -51,14 +52,20 @@ void AWeapon::OnRep_WeaponState()
 }*/
 
 
-void AWeapon::SpawnProjectile(APawn* SpawnInstigator, FVector AimVector)
+void AWeapon::SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage)
 {
 	const FVector SocketLocation = WeaponMesh->GetSocketLocation("ProjectileSocket");
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.Instigator = SpawnInstigator;
 	SpawnParameters.Owner = SpawnInstigator;
 	FVector SpawnLocation = SocketLocation;
-	GetWorld()->SpawnActor<ACEProjectileActor>(ProjectileClass, SpawnLocation, AimVector.Rotation(), SpawnParameters);
+	//GetWorld()->SpawnActor<ACEProjectileActor>(ProjectileClass, SpawnLocation, AimVector.Rotation(), SpawnParameters);
+
+	FTransform SpawnTransform(AimVector.Rotation(), SpawnLocation, FVector(1));
+	auto Projectile = GetWorld()->SpawnActorDeferred<ACEProjectileActor>(ProjectileClass, SpawnTransform,
+		SpawnInstigator, SpawnInstigator);
+	Projectile->SetWeaponDamage(BaseDamage);
+	UGameplayStatics::FinishSpawningActor(Projectile, SpawnTransform);
 }
 
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

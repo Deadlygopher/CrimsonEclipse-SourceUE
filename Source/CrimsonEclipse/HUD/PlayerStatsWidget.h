@@ -22,6 +22,9 @@ public:
 	UTextBlock* PlayerHealthText;
 
 	UPROPERTY(meta = (BindWidget))
+	UTextBlock* PlayerMaxHealthText;
+
+	UPROPERTY(meta = (BindWidget))
 	UProgressBar* ExpProgressBar;
 
 	UPROPERTY(meta = (BindWidget))
