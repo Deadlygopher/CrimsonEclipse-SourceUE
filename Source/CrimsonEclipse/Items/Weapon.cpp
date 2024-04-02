@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"
 #include "CrimsonEclipse/Projectile/CEProjectileActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 
 AWeapon::AWeapon()
@@ -30,7 +31,6 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("WEAPON SPAWNED"));
 	checkf(WeaponMesh, TEXT("MeaponMesh Assertion"));
 	checkf(ProjectileClass || WeaponType == EWeaponType::EWT_Melee, TEXT("ProjectileClass Assertion"));
 }
@@ -66,6 +66,11 @@ void AWeapon::SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float B
 		SpawnInstigator, SpawnInstigator);
 	Projectile->SetWeaponDamage(BaseDamage);
 	UGameplayStatics::FinishSpawningActor(Projectile, SpawnTransform);
+}
+
+void AWeapon::MakeLightAttackSound() const
+{
+	UGameplayStatics::PlaySoundAtLocation(this, LightAttackSound, GetActorLocation());
 }
 
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

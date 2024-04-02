@@ -28,7 +28,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
 
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	CharHealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("CharHealthComponent"));
 
 	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidgetComponent->SetupAttachment(RootComponent);
@@ -51,7 +51,7 @@ void ACEBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	LvlComponent->UpdateAllStats();
-	SetHealthWidgetInfo(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
+	SetHealthWidgetInfo(CharHealthComponent->GetHealth(), CharHealthComponent->GetMaxHealth());
 	SetLevelWidgetInfo();
 
 	if (IsPlayerControlled())
@@ -63,10 +63,10 @@ void ACEBaseCharacter::BeginPlay()
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ACEBaseCharacter::ResetReadyForAttack);
 
 	//GetMesh()->GetAnimInstance()->OnMontageStarted.
-	if (HealthComponent)
+	if (CharHealthComponent)
 	{
-		HealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
-		HealthComponent->OnDeath.AddUObject(this, &ACEBaseCharacter::OnDeath);
+		CharHealthComponent->OnHealthChange.AddUObject(this, &ACEBaseCharacter::SetHealthWidgetInfo);
+		CharHealthComponent->OnDeath.AddUObject(this, &ACEBaseCharacter::OnDeath);
 	}
 	AttackReachRadius->SetGenerateOverlapEvents(true);
 	AttackReachRadius->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -82,7 +82,9 @@ void ACEBaseCharacter::OnDeath(AActor* DamageCauser)
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	GetCharacterMovement()->StopActiveMovement();
-	PlayAnimMontage(DeathAnimation);
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode, false);
+	GetMesh()->PlayAnimation(DeathAnimation, false);
+
 
 	auto FoundInterface = DamageCauser->FindComponentByInterface<UXPComponentInterface>();
 	auto FoundComponent = Cast<IXPComponentInterface>(FoundInterface);
@@ -154,17 +156,17 @@ void ACEBaseCharacter::SetMaxWalkSpeed(float NewSpeed)
 
 UHealthComponent* ACEBaseCharacter::GetHealthComponent()
 {
-	return HealthComponent;
+	return CharHealthComponent;
 }
 
 float ACEBaseCharacter::GetHealth() const
 {
-	return HealthComponent->GetHealth();
+	return CharHealthComponent->GetHealth();
 }
 
 float ACEBaseCharacter::GetMaxHealth() const
 {
-	return HealthComponent->GetMaxHealth();
+	return CharHealthComponent->GetMaxHealth();
 }
 
 void ACEBaseCharacter::RotateToCursorDirecion()
@@ -206,7 +208,7 @@ void ACEBaseCharacter::StopRoll()
 void ACEBaseCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatorController, AActor* DamageCauser)
 {
-	HealthComponent->DecreaseHealth(Damage, DamageCauser);
+	CharHealthComponent->DecreaseHealth(Damage, DamageCauser);
 
 	bIsReceiveHitImpact = true;
 

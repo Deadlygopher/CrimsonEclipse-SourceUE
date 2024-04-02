@@ -65,7 +65,7 @@ private:
 	float RollSpeed = 1000;
 
 	UPROPERTY(EditDefaultsOnly)
-	UAnimMontage* DeathAnimation;
+	UAnimationAsset* DeathAnimation;
 
 public:
 	bool GetIsRollPressed() const { return bPressedRoll; }
@@ -108,7 +108,7 @@ protected:
 	UWidgetComponent* OverheadWidgetComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	UHealthComponent* HealthComponent;
+	UHealthComponent* CharHealthComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCharacterLevelComponent* LvlComponent;

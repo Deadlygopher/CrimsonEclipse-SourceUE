@@ -50,6 +50,9 @@ protected:
 	UFUNCTION()
 	virtual void ResetTracingVectors() override;
 
+	UFUNCTION()
+	virtual void WeaponMakeSound() override;
+
 private:
 	
 	UPROPERTY()
@@ -63,6 +66,9 @@ private:
 
 	UPROPERTY()
 	TArray<AActor*> ActorsToIgnore;
+
+	//UPROPERTY()
+	//class USoundCue* Sound;
 
 	//Tracing Sockets for weapon
 	FVector HalfSize{ 5.f, 5.f, 5.f };

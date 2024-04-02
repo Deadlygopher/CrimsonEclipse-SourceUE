@@ -110,6 +110,14 @@ void UCombatComponent::ResetTracingVectors()
 	ActorsToIgnore.Add(Character);
 }
 
+void UCombatComponent::WeaponMakeSound()
+{
+	if (RightHandEquippedWeapon)
+	{
+		RightHandEquippedWeapon->MakeLightAttackSound();
+	}
+}
+
 void UCombatComponent::OnHitDetect()
 {
 	if (RightHandEquippedWeapon)

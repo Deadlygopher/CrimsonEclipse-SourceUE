@@ -13,9 +13,8 @@ class UHitDetectInterface : public UInterface
 	GENERATED_BODY()
 };
 
-/**
- * 
- */
+class AWeapon;
+
 class CRIMSONECLIPSE_API IHitDetectInterface
 {
 	GENERATED_BODY()
@@ -31,4 +30,6 @@ public:
 	virtual void OnAiming();
 	virtual void OnProjectileSpawn();
 	// Range Weapon
+
+	virtual void WeaponMakeSound();
 };

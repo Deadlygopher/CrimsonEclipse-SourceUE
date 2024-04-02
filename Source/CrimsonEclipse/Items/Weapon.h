@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class ACEProjectileActor;
+class USoundCue;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -16,7 +17,7 @@ enum class EWeaponState : uint8
 	EWS_Equipped	UMETA(DisplayName = "Equipped"),
 	EWS_Dropped		UMETA(DisplayName = "Dropped"),
 
-	EWS_MAX UMETA(DisplayName= "DefaultMax")
+	EWS_MAX			UMETA(DisplayName= "DefaultMax")
 };
 
 UENUM(BlueprintType)
@@ -48,6 +49,7 @@ public:
 	EWeaponType GetWeaponType() { return WeaponType; }
 
 	void SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage);
+	void MakeLightAttackSound() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -81,4 +83,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
 	TSubclassOf<ACEProjectileActor> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Sounds")
+	USoundCue* LightAttackSound;
 };

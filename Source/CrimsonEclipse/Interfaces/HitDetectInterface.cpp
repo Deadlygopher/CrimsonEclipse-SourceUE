@@ -20,3 +20,7 @@ void IHitDetectInterface::OnAiming()
 void IHitDetectInterface::OnProjectileSpawn()
 {
 }
+
+void IHitDetectInterface::WeaponMakeSound()
+{
+}
