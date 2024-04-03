@@ -8,6 +8,8 @@
 #include "CrimsonEclipse/Projectile/CEProjectileActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 
 AWeapon::AWeapon()
@@ -71,6 +73,23 @@ void AWeapon::SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float B
 void AWeapon::MakeLightAttackSound() const
 {
 	UGameplayStatics::PlaySoundAtLocation(this, LightAttackSound, GetActorLocation());
+}
+
+void AWeapon::SpawnWeaponTrail()
+{
+	auto NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(WeaponNiagaraTrail, WeaponMesh, "WeaponAttachPoint",
+		WeaponMesh->GetSocketLocation("MiddleTrackingSocket"), WeaponMesh->GetSocketRotation("MiddleTrackingSocket"),
+		EAttachLocation::KeepWorldPosition, true, true);
+
+	float TrailWidth = (WeaponMesh->GetSocketLocation("StartTrackingSocket") - WeaponMesh->GetSocketLocation("EndTrackingSocket")).Length();
+	float TrailDuration = WeaponLightAttackAnimMontage->GetPlayLength();
+	UE_LOG(LogTemp, Warning, TEXT("%f"), TrailDuration);
+	NiagaraComponent->SetFloatParameter("TrailWidth", TrailWidth);
+}
+
+void AWeapon::CompleteSpawnWeaponTrail()
+{
+	//if (WeaponNiagaraTrail) WeaponNiagaraTrail->BeginDestroy();
 }
 
 void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -24,3 +24,7 @@ void IHitDetectInterface::OnProjectileSpawn()
 void IHitDetectInterface::WeaponMakeSound()
 {
 }
+
+void IHitDetectInterface::WeaponCompleteSpawnTrail()
+{
+}

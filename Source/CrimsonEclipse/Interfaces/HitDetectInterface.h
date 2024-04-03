@@ -32,4 +32,5 @@ public:
 	// Range Weapon
 
 	virtual void WeaponMakeSound();
+	virtual void WeaponCompleteSpawnTrail();
 };

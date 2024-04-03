@@ -53,6 +53,9 @@ protected:
 	UFUNCTION()
 	virtual void WeaponMakeSound() override;
 
+	UFUNCTION()
+	virtual void WeaponCompleteSpawnTrail() override;
+
 private:
 	
 	UPROPERTY()

@@ -9,6 +9,7 @@
 class USphereComponent;
 class ACEProjectileActor;
 class USoundCue;
+class UNiagaraSystem;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -50,6 +51,8 @@ public:
 
 	void SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage);
 	void MakeLightAttackSound() const;
+	void SpawnWeaponTrail();
+	void CompleteSpawnWeaponTrail();
 
 protected:
 	// Called when the game starts or when spawned
@@ -86,4 +89,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Sounds")
 	USoundCue* LightAttackSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Effects")
+	UNiagaraSystem* WeaponNiagaraTrail;
 };

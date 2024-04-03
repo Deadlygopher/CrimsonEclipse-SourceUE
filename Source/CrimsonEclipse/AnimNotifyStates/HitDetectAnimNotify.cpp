@@ -26,3 +26,14 @@ void UHitDetectAnimNotify::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSe
 		FoundComponent->WeaponMakeSound();
 	}
 }
+
+void UHitDetectAnimNotify::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	Super::NotifyEnd(MeshComp, Animation);
+	auto FoundInterface = MeshComp->GetOwner()->FindComponentByInterface<UHitDetectInterface>();
+	auto FoundComponent = Cast<IHitDetectInterface>(FoundInterface);
+	if (FoundComponent)
+	{
+		FoundComponent->WeaponCompleteSpawnTrail();
+	}
+}

@@ -22,6 +22,7 @@ public class CrimsonEclipse : ModuleRules
 															"Json",
 															"JsonUtilities",
 															"GameplayTasks",
+                                                            "Niagara",
 															/*"UMG"*/});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

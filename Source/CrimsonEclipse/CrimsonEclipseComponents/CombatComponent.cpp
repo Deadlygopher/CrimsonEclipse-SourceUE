@@ -115,6 +115,15 @@ void UCombatComponent::WeaponMakeSound()
 	if (RightHandEquippedWeapon)
 	{
 		RightHandEquippedWeapon->MakeLightAttackSound();
+		RightHandEquippedWeapon->SpawnWeaponTrail();
+	}
+}
+
+void UCombatComponent::WeaponCompleteSpawnTrail()
+{
+	if (RightHandEquippedWeapon)
+	{
+		RightHandEquippedWeapon->CompleteSpawnWeaponTrail();
 	}
 }
 
@@ -139,24 +148,24 @@ void UCombatComponent::OnHitDetect()
 		CurrentEndSocketLocation = EndSocketLocation;
 
 		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevStartSocketLocation, CurrentStartSocketLocation,
-			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::None,
+			HitResult, true /*, FLinearColor::Red, FLinearColor::Green, 2.f*/);
 
 		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevMiddleSocketLocation, CurrentMiddleSocketLocation,
-			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::None,
+			HitResult, true /*, FLinearColor::Red, FLinearColor::Green, 2.f*/);
 
 		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevEndSocketLocation, CurrentEndSocketLocation,
-			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::None,
+			HitResult, true /*, FLinearColor::Red, FLinearColor::Green, 2.f*/);
 
 		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), PrevEndSocketLocation, CurrentStartSocketLocation,
-			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration,
-			HitResult, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+			QueryArray, false, ActorsToIgnore, EDrawDebugTrace::None,
+			HitResult, true/*, FLinearColor::Red, FLinearColor::Green, 2.f */);
 
 		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), CurrentStartSocketLocation, CurrentEndSocketLocation, 
-			20, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResult, true,
-			FLinearColor::Red, FLinearColor::Green, 2.f);
+			20, QueryArray, false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true/*,
+			FLinearColor::Red, FLinearColor::Green, 2.f*/); //TODO MAGIC NUMBER
 
 		PrevStartSocketLocation = CurrentStartSocketLocation;
 		PrevMiddleSocketLocation = CurrentMiddleSocketLocation;
