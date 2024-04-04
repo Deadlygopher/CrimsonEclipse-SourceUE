@@ -216,6 +216,9 @@ void ACrimsonEclipseCharacter::RequestLightAttack()
 	Super::RequestLightAttack();
 }
 
+
+/// ROTATE TO CURSOR IMPLEMENTATION ///
+
 void ACrimsonEclipseCharacter::RotateToCursorDirecion()
 {
 	Super::RotateToCursorDirecion();
@@ -223,5 +226,26 @@ void ACrimsonEclipseCharacter::RotateToCursorDirecion()
 	Cast<APlayerController>(GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_MAX, false, HitResult);
 	FVector LastLocation = GetCharacterMovement()->GetLastUpdateLocation();
 	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(LastLocation, HitResult.Location);
+
+	if (HasAuthority())
+	{
+		Multicast_RotateToCursorDirecion(NewRotation);
+	}
+	else
+	{
+		Server_RotateToCursorDirecion(NewRotation);
+		Multicast_RotateToCursorDirecion(NewRotation);
+	}
+}
+
+void ACrimsonEclipseCharacter::Multicast_RotateToCursorDirecion_Implementation(FRotator NewRotation)
+{
 	GetCharacterMovement()->MoveUpdatedComponent(FVector{ 0 }, FRotator{ 0.f,NewRotation.Yaw, NewRotation.Roll }, true);
 }
+
+void ACrimsonEclipseCharacter::Server_RotateToCursorDirecion_Implementation(FRotator NewRotation)
+{
+	GetCharacterMovement()->MoveUpdatedComponent(FVector{ 0 }, FRotator{ 0.f,NewRotation.Yaw, NewRotation.Roll }, true);
+}
+
+/// ROTATE TO CURSOR IMPLEMENTATION ///

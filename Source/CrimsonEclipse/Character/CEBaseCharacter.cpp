@@ -15,6 +15,7 @@
 #include "Components/CapsuleComponent.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CharacterLevelComponent.h"
 #include "CrimsonEclipse/Interfaces/XPComponentInterface.h"
+#include "AIController.h" //TODO Delete
 
 #include "Blueprint/AIBlueprintHelperLibrary.h" //TODO Delete
 
@@ -24,6 +25,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+	//replicate
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	CombatComponent->SetIsReplicated(true);
@@ -32,6 +34,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 
 	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidgetComponent->SetupAttachment(RootComponent);
+	//OverheadWidgetComponent->SetVisibility(true);
 
 	LvlComponent = CreateDefaultSubobject<UCharacterLevelComponent>(TEXT("Character Level"));
 
@@ -54,12 +57,17 @@ void ACEBaseCharacter::BeginPlay()
 	SetHealthWidgetInfo(CharHealthComponent->GetHealth(), CharHealthComponent->GetMaxHealth());
 	SetLevelWidgetInfo();
 
-	if (IsPlayerControlled())
+	if (GetController())
 	{
 		OverheadWidgetComponent->SetVisibility(false);
+		if (GetController()->IsA<AAIController>())
+		{
+			OverheadWidgetComponent->SetVisibility(true);
+		}
 	}
 
 	OnTakeAnyDamage.AddDynamic(this, &ACEBaseCharacter::ReceiveDamage);
+	if(GetMesh()->GetAnimInstance())
 	GetMesh()->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ACEBaseCharacter::ResetReadyForAttack);
 
 	//GetMesh()->GetAnimInstance()->OnMontageStarted.
@@ -85,10 +93,12 @@ void ACEBaseCharacter::OnDeath(AActor* DamageCauser)
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode, false);
 	GetMesh()->PlayAnimation(DeathAnimation, false);
 
-
-	auto FoundInterface = DamageCauser->FindComponentByInterface<UXPComponentInterface>();
-	auto FoundComponent = Cast<IXPComponentInterface>(FoundInterface);
-	if (FoundComponent)FoundComponent->ReceiveExp(LvlComponent->GetCurrentExpForKill());
+	if (DamageCauser)
+	{
+		auto FoundInterface = DamageCauser->FindComponentByInterface<UXPComponentInterface>();
+		auto FoundComponent = Cast<IXPComponentInterface>(FoundInterface);
+		if (FoundComponent)FoundComponent->ReceiveExp(LvlComponent->GetCurrentExpForKill());
+	}
 
 	FTimerHandle DeathAnimationTimer;
 	GetWorldTimerManager().SetTimer(DeathAnimationTimer, this, &ACEBaseCharacter::AfterDeathAnimation, 0.5f, false); //TODO MAgic Number

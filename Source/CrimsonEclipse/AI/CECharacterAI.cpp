@@ -22,5 +22,6 @@ ACECharacterAI::ACECharacterAI()
 void ACECharacterAI::OnItemEquip(UItem* InItem, UItemInstance* InItemInstance, EEquipmentSlotType Type, int32 InQuantity)
 {
 	Super::OnItemEquip(InItem, InItemInstance, Type, InQuantity);
+	if(HasAuthority())
 	Cast<ACEAIController>(GetController())->SetWeaponTypeKey(GetIsRangeWeapon());
 }

@@ -63,5 +63,15 @@ protected:
 public:
 	virtual void StartRoll() override;
 	virtual void RequestLightAttack() override;
+
+	
+	/// ROTATE TO CURSOR IMPLEMENTATION ///
 	virtual void RotateToCursorDirecion() override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_RotateToCursorDirecion(FRotator NewRotation);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RotateToCursorDirecion(FRotator NewRotation);
+	/// ROTATE TO CURSOR IMPLEMENTATION ///
 };
