@@ -44,6 +44,19 @@ private:
 
 	bool bIsCameraRotate = false;
 
+
+	/// SHOW / HIDE OVERHEAD WIDGET REPLICATION ///
+	UFUNCTION()
+	void ShowHideSelfHealthOverhead();
+
+	UFUNCTION(Client, Unreliable)
+	void Client_ShowHideSelfHealthOverhead();
+
+	UFUNCTION(Server, Unreliable)
+	void Server_ShowHideSelfHealthOverhead();
+	/// SHOW / HIDE OVERHEAD WIDGET REPLICATION ///
+
+
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	void CameraRotateON();
@@ -51,7 +64,14 @@ protected:
 	void ChangeCameraAngle(float Value);
 	void CameraZoom(float Value);
 
+
+	/// ON HEALTH CHANGE REPLICATE ///
 	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth) override;
+
+	UFUNCTION(Client, Reliable)
+	void Client_SetHealthWidgetInfo(float NewHealth, float MaxHealth);
+	/// ON HEALTH CHANGE REPLICATE ///
+
 
 	UFUNCTION(BlueprintCallable)
 	void SetExpProgressHUD(int32 CurrentLevelMaxExp, int32 CurrentLevelExp);

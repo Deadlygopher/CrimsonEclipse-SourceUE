@@ -15,6 +15,7 @@
 #include "Components/CapsuleComponent.h"
 #include "CrimsonEclipse/CrimsonEclipseComponents/CharacterLevelComponent.h"
 #include "CrimsonEclipse/Interfaces/XPComponentInterface.h"
+#include "Net/UnrealNetwork.h"
 #include "AIController.h" //TODO Delete
 
 #include "Blueprint/AIBlueprintHelperLibrary.h" //TODO Delete
@@ -34,7 +35,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 
 	OverheadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidgetComponent->SetupAttachment(RootComponent);
-	//OverheadWidgetComponent->SetVisibility(true);
+	OverheadWidgetComponent->SetVisibility(true);
 
 	LvlComponent = CreateDefaultSubobject<UCharacterLevelComponent>(TEXT("Character Level"));
 
@@ -57,14 +58,14 @@ void ACEBaseCharacter::BeginPlay()
 	SetHealthWidgetInfo(CharHealthComponent->GetHealth(), CharHealthComponent->GetMaxHealth());
 	SetLevelWidgetInfo();
 
-	if (GetController())
+	/*if (GetController())
 	{
 		OverheadWidgetComponent->SetVisibility(false);
 		if (GetController()->IsA<AAIController>())
 		{
 			OverheadWidgetComponent->SetVisibility(true);
 		}
-	}
+	}*/
 
 	OnTakeAnyDamage.AddDynamic(this, &ACEBaseCharacter::ReceiveDamage);
 	if(GetMesh()->GetAnimInstance())
@@ -86,6 +87,10 @@ void ACEBaseCharacter::BeginPlay()
 void ACEBaseCharacter::OnDeath(AActor* DamageCauser)
 {
 	GetController()->UnPossess();
+	Multicast_OnDeath(DamageCauser);
+
+	/*
+	GetController()->UnPossess();
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
@@ -102,7 +107,49 @@ void ACEBaseCharacter::OnDeath(AActor* DamageCauser)
 
 	FTimerHandle DeathAnimationTimer;
 	GetWorldTimerManager().SetTimer(DeathAnimationTimer, this, &ACEBaseCharacter::AfterDeathAnimation, 0.5f, false); //TODO MAgic Number
+*/
 }
+
+void ACEBaseCharacter::Server_OnDeath_Implementation(AActor* DamageCauser)
+{
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	GetCharacterMovement()->StopActiveMovement();
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode, false);
+	GetMesh()->PlayAnimation(DeathAnimation, false);
+
+	if (DamageCauser)
+	{
+		auto FoundInterface = DamageCauser->FindComponentByInterface<UXPComponentInterface>();
+		auto FoundComponent = Cast<IXPComponentInterface>(FoundInterface);
+		if (FoundComponent)FoundComponent->ReceiveExp(LvlComponent->GetCurrentExpForKill());
+	}
+
+	FTimerHandle DeathAnimationTimer;
+	GetWorldTimerManager().SetTimer(DeathAnimationTimer, this, &ACEBaseCharacter::AfterDeathAnimation, 0.5f, false);
+}
+
+void ACEBaseCharacter::Multicast_OnDeath_Implementation(AActor* DamageCauser)
+{
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	GetCharacterMovement()->StopActiveMovement();
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode, false);
+	GetMesh()->PlayAnimation(DeathAnimation, false);
+
+	if (DamageCauser)
+	{
+		auto FoundInterface = DamageCauser->FindComponentByInterface<UXPComponentInterface>();
+		auto FoundComponent = Cast<IXPComponentInterface>(FoundInterface);
+		if (FoundComponent)FoundComponent->ReceiveExp(LvlComponent->GetCurrentExpForKill());
+	}
+
+	FTimerHandle DeathAnimationTimer;
+	GetWorldTimerManager().SetTimer(DeathAnimationTimer, this, &ACEBaseCharacter::AfterDeathAnimation, 0.5f, false);
+}
+
 
 void ACEBaseCharacter::AfterDeathAnimation()
 {
@@ -265,6 +312,11 @@ void ACEBaseCharacter::IsReceiveHitImpactReset()
 
 void ACEBaseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
 {
+	Multicast_SetHealthWidgetInfo(NewHealth, MaxHealth);
+}
+
+void ACEBaseCharacter::Multicast_SetHealthWidgetInfo_Implementation(float NewHealth, float MaxHealth)
+{
 	if (OverheadWidgetComponent)
 	{
 		auto Widget = Cast<UOverheadWidget>(OverheadWidgetComponent->GetWidget());
@@ -283,6 +335,11 @@ void ACEBaseCharacter::SetLevelWidgetInfo()
 			Widget->SetOverheadWidgetLevel(LvlComponent->GetCurrentLevel());
 		}
 	}
+}
+
+void ACEBaseCharacter::SetOverheadWidgetVisibility(bool bVisibility)
+{
+	OverheadWidgetComponent->SetVisibility(bVisibility);
 }
 
 void ACEBaseCharacter::OnItemEquip(UItem* InItem, UItemInstance* InIntemInstance, EEquipmentSlotType Type, int32 InQuantity)
@@ -361,4 +418,14 @@ void ACEBaseCharacter::OnItemUnequip(UItem* InItem, UItemInstance* InIntemInstan
 		break;
 	}
 	}
+}
+
+
+void ACEBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ACEBaseCharacter, bPressedRoll, COND_None);
+	DOREPLIFETIME_CONDITION(ACEBaseCharacter, RollSpeed, COND_None);
+	DOREPLIFETIME_CONDITION(ACEBaseCharacter, bIsReceiveHitImpact, COND_None);
 }

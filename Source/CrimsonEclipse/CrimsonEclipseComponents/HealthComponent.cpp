@@ -2,6 +2,7 @@
 
 
 #include "HealthComponent.h"
+#include "Net/UnrealNetwork.h"
 
 UHealthComponent::UHealthComponent()
 {
@@ -43,4 +44,12 @@ void UHealthComponent::DecreaseHealth(float HealthToDecrease, AActor* DamageCaus
 	{
 		OnDeath.Broadcast(DamageCauser);
 	}
+}
+
+void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(UHealthComponent, Health, COND_None);
+	DOREPLIFETIME_CONDITION(UHealthComponent, MaxHealth, COND_None);
 }

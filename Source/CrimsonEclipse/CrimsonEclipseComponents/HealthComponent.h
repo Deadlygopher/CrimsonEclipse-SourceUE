@@ -37,14 +37,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float InitMaxHealth = 100;
 
-	UPROPERTY(/*EditDefaultsOnly,*/ BlueprintReadWrite)
+	UPROPERTY(/*EditDefaultsOnly,*/ BlueprintReadWrite, Replicated)
 	float MaxHealth = InitMaxHealth;
 
 private:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Replicated)
 	float Health = 50.f;
 
 public:
 	FOnHealthChange OnHealthChange;
 	FOnDeath OnDeath;
+
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

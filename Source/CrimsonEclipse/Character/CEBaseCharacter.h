@@ -56,12 +56,14 @@ public:
 	bool GetIsRangeWeapon() {return bIsRangeWeapon;	};
 	bool bIsRangeWeapon = false;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	/// Roll variables
 private:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(Replicated)
 	bool bPressedRoll = false;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Replicated)
 	float RollSpeed = 1000;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -99,7 +101,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+
+	/// ON DEATH REPPLICATION ///
 	virtual void OnDeath(AActor* DamageCauser);
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnDeath(AActor* DamageCauser);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnDeath(AActor* DamageCauser);
+	/// ON DEATH REPPLICATION ///
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCombatComponent* CombatComponent;
@@ -116,8 +127,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	float MaxMoveSpeed = 600;
 
+
+	/// ON DEATH REPPLICATION ///
 	virtual void SetHealthWidgetInfo(float NewHealth, float MaxHealth);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetHealthWidgetInfo(float NewHealth, float MaxHealth);
+	/// ON DEATH REPPLICATION ///
+
+
 	virtual void SetLevelWidgetInfo();
+	void SetOverheadWidgetVisibility(bool bVisibility);
 
 private:
 	UFUNCTION(BlueprintCallable)
@@ -148,6 +168,7 @@ private:
 	//bool bWeaponRadiusReached = false;
 	bool bAttackClicked = false;
 
+	UPROPERTY(Replicated)
 	bool bIsReceiveHitImpact;
 	//UFUNCTION()
 	void IsReceiveHitImpactReset();

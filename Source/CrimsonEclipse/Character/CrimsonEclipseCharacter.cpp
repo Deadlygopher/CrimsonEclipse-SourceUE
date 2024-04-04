@@ -110,6 +110,29 @@ void ACrimsonEclipseCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+
+/// SHOW / HIDE OVERHEAD WIDGET REPLICATION ///
+void ACrimsonEclipseCharacter::ShowHideSelfHealthOverhead()
+{
+	/*if (HasAuthority())
+	{
+		Server_ShowHideSelfHealthOverhead();
+	}
+	else*/ Client_ShowHideSelfHealthOverhead();
+}
+
+void ACrimsonEclipseCharacter::Client_ShowHideSelfHealthOverhead_Implementation()
+{
+	SetOverheadWidgetVisibility(false);
+}
+
+void ACrimsonEclipseCharacter::Server_ShowHideSelfHealthOverhead_Implementation()
+{
+	SetOverheadWidgetVisibility(false);
+}
+/// SHOW / HIDE OVERHEAD WIDGET REPLICATION ///
+
+
 void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -117,6 +140,8 @@ void ACrimsonEclipseCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	PlayerInputComponent->BindAction("CameraRotation", IE_Pressed, this, &ACrimsonEclipseCharacter::CameraRotateON);
 	PlayerInputComponent->BindAction("CameraRotation", IE_Released, this, &ACrimsonEclipseCharacter::CameraRotateOFF);
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ACEBaseCharacter::StartRoll);
+
+	PlayerInputComponent->BindAction("ShowHideSelfHealth", IE_Pressed, this, &ACrimsonEclipseCharacter::ShowHideSelfHealthOverhead);
 
 	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::RequestLightAttack);
 	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ACrimsonEclipseCharacter::RequestHeavyAttack);
@@ -153,9 +178,16 @@ void ACrimsonEclipseCharacter::CameraZoom(float Value)
 	}
 }
 
+
+/// ON HEALTH CHANGE IMPPLEMENTATION ///
 void ACrimsonEclipseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHealth)
 {
 	Super::SetHealthWidgetInfo(NewHealth, MaxHealth);
+	Client_SetHealthWidgetInfo(NewHealth, MaxHealth);
+}
+
+void ACrimsonEclipseCharacter::Client_SetHealthWidgetInfo_Implementation(float NewHealth, float MaxHealth)
+{
 	if (GetController())
 	{
 		if (Cast<APlayerController>(GetController())->GetHUD())
@@ -168,6 +200,8 @@ void ACrimsonEclipseCharacter::SetHealthWidgetInfo(float NewHealth, float MaxHea
 		}
 	}
 }
+/// ON HEALTH CHANGE IMPPLEMENTATION ///
+
 
 void ACrimsonEclipseCharacter::SetExpProgressHUD(int32 CurrentLevelMaxExp, int32 CurrentLevelExp)
 {
