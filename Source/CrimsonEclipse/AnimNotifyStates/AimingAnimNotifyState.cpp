@@ -36,6 +36,9 @@ void UAimingAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSe
 		}
 	}*/
 	auto FoundInterface = MeshComp->GetOwner()->FindComponentByInterface<UHitDetectInterface>();
-	auto FoundComponent = Cast<IHitDetectInterface>(FoundInterface);
-	if (FoundComponent) FoundComponent->OnProjectileSpawn();
+	if (FoundInterface)
+	{
+		auto FoundComponent = Cast<IHitDetectInterface>(FoundInterface);
+		if (FoundComponent) FoundComponent->OnProjectileSpawn();
+	}
 }

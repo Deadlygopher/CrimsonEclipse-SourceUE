@@ -28,6 +28,7 @@ public:
 	ACEBaseCharacter();
 	virtual void PostInitializeComponents() override;
 
+
 	UFUNCTION(BlueprintCallable)
 	virtual void RequestLightAttack();
 
@@ -112,7 +113,7 @@ protected:
 	void Multicast_OnDeath(AActor* DamageCauser);
 	/// ON DEATH REPPLICATION ///
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UCombatComponent* CombatComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

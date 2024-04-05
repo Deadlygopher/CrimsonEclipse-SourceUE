@@ -54,6 +54,7 @@ void AWeapon::OnRep_WeaponState()
 }*/
 
 
+// SPAWN PROJECTILE REPLICATION //
 void AWeapon::SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage)
 {
 	const FVector SocketLocation = WeaponMesh->GetSocketLocation("ProjectileSocket");
@@ -69,6 +70,9 @@ void AWeapon::SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float B
 	Projectile->SetWeaponDamage(BaseDamage);
 	UGameplayStatics::FinishSpawningActor(Projectile, SpawnTransform);
 }
+
+// SPAWN PROJECTILE REPLICATION //
+
 
 void AWeapon::MakeLightAttackSound() const
 {

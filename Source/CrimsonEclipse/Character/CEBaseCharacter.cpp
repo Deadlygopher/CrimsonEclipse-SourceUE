@@ -28,8 +28,8 @@ ACEBaseCharacter::ACEBaseCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	//replicate
 
-	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	CombatComponent->SetIsReplicated(true);
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
+	//CombatComponent->SetIsReplicated(true);
 
 	CharHealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("CharHealthComponent"));
 
@@ -174,7 +174,6 @@ void ACEBaseCharacter::RequestLightAttack()
 	if (!CombatComponent) return;
 	CombatComponent->LightAttack();
 }
-
 
 void ACEBaseCharacter::RequestHeavyAttack()
 {

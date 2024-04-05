@@ -26,7 +26,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 												FString::Printf(TEXT("%s has joined the game!"), *PlayerName));
 			}
 		}
-		if (NumberOfPlayers >= 2)
+		if (NumberOfPlayers >= 4)
 		{
 			UWorld* World = GetWorld();
 			if (World)

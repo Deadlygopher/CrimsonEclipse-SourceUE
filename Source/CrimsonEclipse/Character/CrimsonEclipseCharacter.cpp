@@ -257,9 +257,13 @@ void ACrimsonEclipseCharacter::RotateToCursorDirecion()
 {
 	Super::RotateToCursorDirecion();
 	FHitResult HitResult;
-	Cast<APlayerController>(GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_MAX, false, HitResult);
-	FVector LastLocation = GetCharacterMovement()->GetLastUpdateLocation();
-	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(LastLocation, HitResult.Location);
+	//FRotator NewRotation = FRotator(0);
+	//if (GetController())
+	//{
+		Cast<APlayerController>(GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_MAX, false, HitResult);
+		FVector LastLocation = GetCharacterMovement()->GetLastUpdateLocation();
+		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(LastLocation, HitResult.Location);
+	//}
 
 	if (HasAuthority())
 	{

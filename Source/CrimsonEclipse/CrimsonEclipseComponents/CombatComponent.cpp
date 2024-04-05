@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 //#include "CrimsonEclipse/Projectile/CEProjectileActor.h"
 
 #include "DrawDebugHelpers.h"
@@ -17,10 +18,16 @@ DEFINE_LOG_CATEGORY(LogCombatComponent);
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	//SetIsReplicated(true);
+	SetIsReplicated(true);
 	//ReplicateSubobjects();
 }
 
+
+void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+}
 
 void UCombatComponent::BeginPlay()
 {
@@ -120,14 +127,6 @@ void UCombatComponent::WeaponMakeSound()
 	}
 }
 
-void UCombatComponent::WeaponCompleteSpawnTrail()
-{
-	if (RightHandEquippedWeapon)
-	{
-		RightHandEquippedWeapon->CompleteSpawnWeaponTrail();
-	}
-}
-
 void UCombatComponent::OnHitDetect()
 {
 	if (RightHandEquippedWeapon)
@@ -174,57 +173,137 @@ void UCombatComponent::OnHitDetect()
 
 		if (HitResult.bBlockingHit)
 		{
+			Server_ApplyDamageToActor(HitResult);
+			Client_ApplyDamageToActor(HitResult);
+			/*
 			UGameplayStatics::ApplyDamage(HitResult.GetActor(), RightHandDamage,
 				Cast<APawn>(GetOwner())->GetController(), GetOwner(), UDamageType::StaticClass());
-			ActorsToIgnore.Add(HitResult.GetActor());
+			ActorsToIgnore.Add(HitResult.GetActor());*/
 		}
 	}
 }
 
+void UCombatComponent::Server_ApplyDamageToActor_Implementation(const FHitResult &HitResult)
+{
+	UGameplayStatics::ApplyDamage(HitResult.GetActor(), RightHandDamage,
+		Cast<APawn>(GetOwner())->GetController(), GetOwner(), UDamageType::StaticClass());
+	ActorsToIgnore.Add(HitResult.GetActor());
+}
+
+void UCombatComponent::Client_ApplyDamageToActor_Implementation(const FHitResult& HitResult)
+{
+	ActorsToIgnore.Add(HitResult.GetActor());
+}
+
+
+// ON AIMING IMPLEMENTATION //
 void UCombatComponent::OnAiming()
 {
 	if (LeftHandEquippedWeapon)
 	{
-		if (Character->IsPlayerControlled())
+		if (Character->GetController() && Character->IsPlayerControlled())
 		{
-			Character->RotateToCursorDirecion();
-			/*
-			const FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
-			const FVector TraceStart = FVector(Character->GetActorLocation().X, Character->GetActorLocation().Y, Character->GetActorLocation().Z+40);// Magic number
-
-			const FVector ArrowDirection = Character->GetActorForwardVector();
-			const FVector TraceEnd = TraceStart + ArrowDirection * 1000; // Magic number
-
-			DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 3.f, 0, 3.f);
-			*/
+			//Character->RotateToCursorDirecion();
+			//Server_OnAiming();
+			Client_OnAiming();
 		}
 	}
 }
 
+void UCombatComponent::Client_OnAiming_Implementation()
+{
+	Character->RotateToCursorDirecion();
+}
+
+void UCombatComponent::Server_OnAiming_Implementation()
+{
+	Character->RotateToCursorDirecion();
+}
+// ON AIMING IMPLEMENTATION //
+
+
+// ON PROJECTILE SPAWN REPLICATION //
 void UCombatComponent::OnProjectileSpawn()
+{
+	if(!Character->HasAuthority())
+	{
+		Client_ProjectileVector();
+		Server_OnProjectileSpawn(ProjectileVector);
+	}
+	if (Character->HasAuthority() && Character->GetController()->IsLocalPlayerController())
+	{
+		Client_ProjectileVector();
+		Server_OnProjectileSpawn(ProjectileVector);
+	}
+
+	/*
+	if (GetOwner()->HasAuthority())
+	{
+		if (LeftHandEquippedWeapon)
+		{
+			if (Character->IsPlayerControlled())
+			{
+				FHitResult HitResult;
+				Cast<APlayerController>(Character->GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_MAX, false, HitResult);
+				
+				FVector ArrowDirection = Character->GetActorForwardVector();
+				FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
+
+				FVector ProjectileVector{ HitResult.Location.X - SocketTransform.GetLocation().X,
+					HitResult.Location.Y - SocketTransform.GetLocation().Y, ArrowDirection.Z };
+				UE_LOG(LogTemp, Warning, TEXT("%f , %f"), ProjectileVector.X, ProjectileVector.Y);
+
+				LeftHandEquippedWeapon->SpawnProjectile(Character, ProjectileVector, LeftHandDamage); //ArrowDirection);
+			}
+			else
+			{
+				const FVector ArrowDirection = Character->GetActorForwardVector();
+				LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection, LeftHandDamage);
+			}
+		}
+	}
+	*/
+}
+
+void UCombatComponent::MC_OnProjectileSpawn(FVector VectorToSpawn)
 {
 	if (LeftHandEquippedWeapon)
 	{
-		if (Character->IsPlayerControlled())
+		LeftHandEquippedWeapon->SpawnProjectile(Character, VectorToSpawn, LeftHandDamage);
+	}
+}
+
+void UCombatComponent::Server_OnProjectileSpawn_Implementation(FVector VectorToSpawn)
+{
+	if (Character->GetController())
+	{
+		if (LeftHandEquippedWeapon)
+		{
+			LeftHandEquippedWeapon->SpawnProjectile(Character, VectorToSpawn, LeftHandDamage);
+		}
+	}
+}
+
+void UCombatComponent::Client_ProjectileVector_Implementation()
+{
+	if (Character->GetController())
+	{
+		if (LeftHandEquippedWeapon)
 		{
 			FHitResult HitResult;
 			Cast<APlayerController>(Character->GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_MAX, false, HitResult);
 
-			const FVector ArrowDirection = Character->GetActorForwardVector();
-			const FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
+			FVector ArrowDirection = Character->GetActorForwardVector();
+			FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
 
-			FVector ProjectileVector{ HitResult.Location.X - SocketTransform.GetLocation().X,
+			ProjectileVector = FVector{ HitResult.Location.X - SocketTransform.GetLocation().X,
 				HitResult.Location.Y - SocketTransform.GetLocation().Y, ArrowDirection.Z };
-
-			LeftHandEquippedWeapon->SpawnProjectile(Character, ProjectileVector, LeftHandDamage); //ArrowDirection);
-		}
-		else
-		{
-			const FVector ArrowDirection = Character->GetActorForwardVector();
-			LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection, LeftHandDamage);
+			UE_LOG(LogTemp, Warning, TEXT("%f , %f"), ProjectileVector.X, ProjectileVector.Y);
 		}
 	}
 }
+// ON PROJECTILE SPAWN REPLICATION //
+
 
 void UCombatComponent::LightAttack()
 {
@@ -234,8 +313,15 @@ void UCombatComponent::LightAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->PlayAnimMontage(AnimMontage);
-		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		//Character->PlayAnimMontage(AnimMontage);
+		if (GetOwner()->HasAuthority())
+		{
+			Multicast_PlayAttackMontage(AnimMontage);
+		}
+		else
+		{
+			Server_PlayAttackMontage(AnimMontage);
+		}
 	}
 	if (Character->GetReadyForAttack() && LeftHandEquippedWeapon)
 	{
@@ -243,8 +329,15 @@ void UCombatComponent::LightAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->PlayAnimMontage(AnimMontage);
-		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		//Character->PlayAnimMontage(AnimMontage);
+		if (GetOwner()->HasAuthority())
+		{
+			Multicast_PlayAttackMontage(AnimMontage);
+		}
+		else
+		{
+			Server_PlayAttackMontage(AnimMontage);
+		}
 	}
 }
 
@@ -256,8 +349,15 @@ void UCombatComponent::HeavyAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->PlayAnimMontage(AnimMontage);
-		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		//Character->PlayAnimMontage(AnimMontage);
+		if (GetOwner()->HasAuthority())
+		{
+			Multicast_PlayAttackMontage(AnimMontage);
+		}
+		else
+		{
+			Server_PlayAttackMontage(AnimMontage);
+		}
 	}
 	if (Character->GetReadyForAttack() && LeftHandEquippedWeapon)
 	{
@@ -265,9 +365,26 @@ void UCombatComponent::HeavyAttack()
 		if (!AnimMontage) return;
 		Character->SetReadyForAttack(false);
 		Character->SetMaxWalkSpeed(InAttackMoveSpeed);
-		Character->PlayAnimMontage(AnimMontage);
-		//Character->GetMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		//Character->PlayAnimMontage(AnimMontage);
+		if (GetOwner()->HasAuthority())
+		{
+			Multicast_PlayAttackMontage(AnimMontage);
+		}
+		else
+		{
+			Server_PlayAttackMontage(AnimMontage);
+		}
 	}
+}
+
+void UCombatComponent::Multicast_PlayAttackMontage_Implementation(UAnimMontage* AnimMontage)
+{
+	if(Character) Character->PlayAnimMontage(AnimMontage);
+}
+void UCombatComponent::Server_PlayAttackMontage_Implementation(UAnimMontage* AnimMontage)
+{
+	if (Character) Character->PlayAnimMontage(AnimMontage);
+	Multicast_PlayAttackMontage(AnimMontage);
 }
 
 

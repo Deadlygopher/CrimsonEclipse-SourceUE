@@ -49,7 +49,11 @@ public:
 	USkeletalMeshComponent* GetWeaponMesh() { return WeaponMesh; }
 	EWeaponType GetWeaponType() { return WeaponType; }
 
+	// SPAWN PROJECTILE REPLICATION //
 	void SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage);
+
+	// SPAWN PROJECTILE REPLICATION //
+
 	void MakeLightAttackSound() const;
 	void SpawnWeaponTrail();
 	void CompleteSpawnWeaponTrail();
