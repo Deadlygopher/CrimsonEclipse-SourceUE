@@ -67,15 +67,22 @@ private:
 	UPROPERTY(EditDefaultsOnly, Replicated)
 	float RollSpeed = 1000;
 
-	UPROPERTY(EditDefaultsOnly)
-	UAnimationAsset* DeathAnimation;
-
 public:
 	bool GetIsRollPressed() const { return bPressedRoll; }
 
 
+	// START ROLL REPLICATION //
 	UFUNCTION(BlueprintCallable)
 	virtual void StartRoll();
+
+	UFUNCTION(Server, Reliable)
+	void Server_StartRoll();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StartRoll();
+	// START ROLL REPLICATION //
+
+
 
 	virtual void RollInProcess() override;
 	virtual void StopRoll() override;
@@ -114,7 +121,7 @@ protected:
 	/// ON DEATH REPPLICATION ///
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UCombatComponent* CombatComponent;
+	UCombatComponent* CombatComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* OverheadWidgetComponent;
@@ -146,6 +153,9 @@ private:
 		AController* InstigatorController, AActor* DamageCauser);
 
 	bool bReadyForAttack = true;
+
+	UPROPERTY(EditDefaultsOnly)
+	UAnimationAsset* DeathAnimation;
 
 	//UFUNCTION()
 	void AfterDeathAnimation();

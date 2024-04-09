@@ -78,11 +78,28 @@ void ACrimsonEclipsePlayerController::MoveToTouchLocation(const ETouchIndex::Typ
 
 void ACrimsonEclipsePlayerController::PickupItem()
 {
-	//TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
-	//QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Visibility));
 	FHitResult Hit;
-
-	//GetHitResultUnderCursorForObjects(QueryArray, false, Hit);
+	GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, false, Hit);
+	APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
+	if (ActorToPickup)
+	{
+		auto ControlledCharacter = GetPawn();
+		if (ControlledCharacter)
+		{
+			auto FoundInterface = ControlledCharacter->FindComponentByInterface<UInventoryInterface>();
+			if (FoundInterface)
+			{
+				auto FoundComponent = Cast<IInventoryInterface>(FoundInterface);
+				auto ItemsToLoot = FoundComponent->GetOverlappingItems();
+				if (ItemsToLoot.Contains(ActorToPickup))
+				{
+					FoundComponent->LootItem(ActorToPickup, ActorToPickup->Quantity);
+				}
+			}
+		}
+	}
+	/*
+	FHitResult Hit;
 	GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, false, Hit);
 	APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
 	if (ActorToPickup)
@@ -106,7 +123,7 @@ void ACrimsonEclipsePlayerController::PickupItem()
 				}
 			}
 		}
-	}
+	}*/
 }
 
 void ACrimsonEclipsePlayerController::ShowPickupWidget()
@@ -207,14 +224,20 @@ void ACrimsonEclipsePlayerController::OnSetDestinationPressed()
 	APawn* TargetActor = Cast<APawn>(Hit.GetActor());
 	if (TargetActor && TargetActor != GetCharacter())
 	{
-		UAIBlueprintHelperLibrary::SimpleMoveToActor(this, TargetActor);
-		Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(TargetActor);
-		Cast<ACrimsonEclipseCharacter>(GetCharacter())->OnClickAttack();
+		if (GetCharacter())
+		{
+			UAIBlueprintHelperLibrary::SimpleMoveToActor(this, TargetActor);
+			Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(TargetActor);
+			Cast<ACrimsonEclipseCharacter>(GetCharacter())->OnClickAttack();
+		}
 	}
 	else
 	{
 		bMoveToMouseCursor = true;
-		Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(nullptr);
+		if (GetCharacter())
+		{
+			Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(nullptr);
+		}
 	}
 }
 

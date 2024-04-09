@@ -94,4 +94,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_RotateToCursorDirecion(FRotator NewRotation);
 	/// ROTATE TO CURSOR IMPLEMENTATION ///
+
+	void OnDeath(AActor* DamageCauser) override;
 };

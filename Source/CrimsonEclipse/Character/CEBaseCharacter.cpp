@@ -28,7 +28,7 @@ ACEBaseCharacter::ACEBaseCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	//replicate
 
-	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComp"));
 	//CombatComponent->SetIsReplicated(true);
 
 	CharHealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("CharHealthComponent"));
@@ -162,23 +162,23 @@ void ACEBaseCharacter::AfterDeathAnimation()
 void ACEBaseCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	if (CombatComponent)
+	if (CombatComp)
 	{
-		CombatComponent->SetCharacter(this);
+		CombatComp->SetCharacter(this);
 	}
 }
 
 
 void ACEBaseCharacter::RequestLightAttack()
 {
-	if (!CombatComponent) return;
-	CombatComponent->LightAttack();
+	if (!CombatComp) return;
+	CombatComp->LightAttack();
 }
 
 void ACEBaseCharacter::RequestHeavyAttack()
 {
-	if (!CombatComponent) return;
-	CombatComponent->HeavyAttack();
+	if (!CombatComp) return;
+	CombatComp->HeavyAttack();
 }
 
 
@@ -237,8 +237,23 @@ void ACEBaseCharacter::SetAttackRadius(float RadiusForSet)
 	//UE_LOG(LogCEBaseCharacter, Warning, TEXT("%f"), AttackReachRadius->GetScaledSphereRadius());
 }
 
-
+// START ROLL REPLICATION //
 void ACEBaseCharacter::StartRoll()
+{
+	if (HasAuthority()) Multicast_StartRoll();
+	else Server_StartRoll();
+	/*
+	if (bReadyForAttack != false)
+	{
+		bReadyForAttack = false;
+		GetCharacterMovement()->MaxWalkSpeed = RollSpeed;
+		GetCharacterMovement()->Velocity = GetActorForwardVector() * RollSpeed;
+		bPressedRoll = true;
+	}
+	*/
+}
+
+void ACEBaseCharacter::Multicast_StartRoll_Implementation()
 {
 	if (bReadyForAttack != false)
 	{
@@ -248,6 +263,19 @@ void ACEBaseCharacter::StartRoll()
 		bPressedRoll = true;
 	}
 }
+
+void ACEBaseCharacter::Server_StartRoll_Implementation()
+{
+	if (bReadyForAttack != false)
+	{
+		bReadyForAttack = false;
+		GetCharacterMovement()->MaxWalkSpeed = RollSpeed;
+		GetCharacterMovement()->Velocity = GetActorForwardVector() * RollSpeed;
+		bPressedRoll = true;
+	}
+}
+// START ROLL REPLICATION //
+
 
 void ACEBaseCharacter::RollInProcess()
 {
@@ -347,16 +375,16 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, UItemInstance* InIntemInstance
 	{
 	case EEquipmentSlotType::PrimaryWeapon:
 	{
-		if (InItem->GetWeaponType() && CombatComponent)
+		if (InItem->GetWeaponType() && CombatComp)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
 			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
-			CombatComponent->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
-			CombatComponent->SetRightHandDamage(InIntemInstance->ItemInstanceDamage);
-			if (CombatComponent->GetRightHandWeapon())
+			CombatComp->EquipRightWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			CombatComp->SetRightHandDamage(InIntemInstance->ItemInstanceDamage);
+			if (CombatComp->GetRightHandWeapon())
 			{
-				if (CombatComponent->GetRightHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range || 
-					CombatComponent->GetRightHandWeapon()->GetWeaponType() == EWeaponType::EWT_Magic)
+				if (CombatComp->GetRightHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range || 
+					CombatComp->GetRightHandWeapon()->GetWeaponType() == EWeaponType::EWT_Magic)
 				{
 					SetIsRangeWeapon(true);
 				}
@@ -366,16 +394,16 @@ void ACEBaseCharacter::OnItemEquip(UItem* InItem, UItemInstance* InIntemInstance
 	}
 	case EEquipmentSlotType::SecondaryWeapon:
 	{
-		if (InItem->GetWeaponType() && CombatComponent)
+		if (InItem->GetWeaponType() && CombatComp)
 		{
 			FActorSpawnParameters WeaponSpawnParameters;
 			checkf(InItem->GetWeaponType()->IsChildOf(AWeapon::StaticClass()), TEXT("Wrong Weapon Class in ItemAsset"));
-			CombatComponent->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
-			CombatComponent->SetLeftHandDamage(InIntemInstance->ItemInstanceDamage);
-			if (CombatComponent->GetLeftHandWeapon())
+			CombatComp->EquipLeftWeapon(GetWorld()->SpawnActor<AWeapon>(InItem->GetWeaponType(), WeaponSpawnParameters));
+			CombatComp->SetLeftHandDamage(InIntemInstance->ItemInstanceDamage);
+			if (CombatComp->GetLeftHandWeapon())
 			{
-				if (CombatComponent->GetLeftHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range ||
-					CombatComponent->GetLeftHandWeapon()->GetWeaponType() == EWeaponType::EWT_Magic)
+				if (CombatComp->GetLeftHandWeapon()->GetWeaponType() == EWeaponType::EWT_Range ||
+					CombatComp->GetLeftHandWeapon()->GetWeaponType() == EWeaponType::EWT_Magic)
 				{
 					SetIsRangeWeapon(true);
 				}
@@ -397,17 +425,17 @@ void ACEBaseCharacter::OnItemUnequip(UItem* InItem, UItemInstance* InIntemInstan
 	{
 	case EEquipmentSlotType::PrimaryWeapon:
 	{
-		if (CombatComponent->GetRightHandWeapon())
+		if (CombatComp->GetRightHandWeapon())
 		{
-			CombatComponent->UnequipRightWeapon();
+			CombatComp->UnequipRightWeapon();
 		}
 		break;
 	}
 	case EEquipmentSlotType::SecondaryWeapon:
 	{
-		if (CombatComponent->GetLeftHandWeapon())
+		if (CombatComp->GetLeftHandWeapon())
 		{
-			CombatComponent->UnequipLeftWeapon();
+			CombatComp->UnequipLeftWeapon();
 		}
 		break;
 	}

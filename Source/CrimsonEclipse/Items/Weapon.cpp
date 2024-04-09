@@ -57,22 +57,20 @@ void AWeapon::OnRep_WeaponState()
 // SPAWN PROJECTILE REPLICATION //
 void AWeapon::SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage)
 {
-	const FVector SocketLocation = WeaponMesh->GetSocketLocation("ProjectileSocket");
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.Instigator = SpawnInstigator;
 	SpawnParameters.Owner = SpawnInstigator;
-	FVector SpawnLocation = SocketLocation;
-	//GetWorld()->SpawnActor<ACEProjectileActor>(ProjectileClass, SpawnLocation, AimVector.Rotation(), SpawnParameters);
+	FVector SpawnLocation = FVector (WeaponMesh->GetSocketLocation("ProjectileSocket"));
 
 	FTransform SpawnTransform(AimVector.Rotation(), SpawnLocation, FVector(1));
 	auto Projectile = GetWorld()->SpawnActorDeferred<ACEProjectileActor>(ProjectileClass, SpawnTransform,
 		SpawnInstigator, SpawnInstigator);
 	Projectile->SetWeaponDamage(BaseDamage);
-	UGameplayStatics::FinishSpawningActor(Projectile, SpawnTransform);
+	Projectile->FinishSpawning(SpawnTransform);
+	//UGameplayStatics::FinishSpawningActor(Projectile, SpawnTransform);
 }
 
 // SPAWN PROJECTILE REPLICATION //
-
 
 void AWeapon::MakeLightAttackSound() const
 {
@@ -101,5 +99,6 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	//DOREPLIFETIME(AWeapon, WeaponState);
+	//DOREPLIFETIME(AWeapon, SpawnLocation);
 }
 

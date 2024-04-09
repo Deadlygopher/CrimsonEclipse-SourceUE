@@ -51,7 +51,6 @@ public:
 
 	// SPAWN PROJECTILE REPLICATION //
 	void SpawnProjectile(APawn* SpawnInstigator, FVector AimVector, float BaseDamage);
-
 	// SPAWN PROJECTILE REPLICATION //
 
 	void MakeLightAttackSound() const;

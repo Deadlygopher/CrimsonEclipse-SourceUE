@@ -69,7 +69,7 @@ private:
 	UPROPERTY()
 	TArray<AActor*> ActorsToIgnore;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	FVector ProjectileVector;
 
 	//Tracing Sockets for weapon

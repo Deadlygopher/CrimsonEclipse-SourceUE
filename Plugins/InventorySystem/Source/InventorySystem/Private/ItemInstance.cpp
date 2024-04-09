@@ -3,8 +3,8 @@
 
 #include "ItemInstance.h"
 #include "Item.h"
-//#include "InventoryComponent.h"
-//#include "InventoryTypes.h"
+#include "InventoryComponent.h"
+//#include "Kismet/KismetMathLibrary.h"
 
 UItemInstance::UItemInstance()
 {
@@ -64,4 +64,38 @@ void UItemInstance::NotifyItemRotated()
 {
 	OnRotated();
 	OnItemRotated.Broadcast();
+}
+
+
+
+void UItemInstance::GenerateRarity()
+{
+	auto RarityChance = FMath::RandHelper(100);
+	UE_LOG(LogTemp, Warning, TEXT("RARITY: %d"), RarityChance);
+
+	if (RarityChance >= 99)
+	{
+		ItemRarity = EItemRarity::EIR_Legendary;
+		return;
+	}
+	else if (RarityChance >= 95)
+	{
+		ItemRarity = EItemRarity::EIR_Epic;
+		return;
+	}
+	else if (RarityChance >= 85)
+	{
+		ItemRarity = EItemRarity::EIR_Rare;
+		return;
+	}
+	else if (RarityChance >= 70)
+	{
+		ItemRarity = EItemRarity::EIR_Uncommon;
+		return;
+	}
+	else if (RarityChance >= 0)
+	{
+		ItemRarity = EItemRarity::EIR_Common;
+		return;
+	}
 }

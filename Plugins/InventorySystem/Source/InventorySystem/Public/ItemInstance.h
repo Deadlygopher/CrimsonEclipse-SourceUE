@@ -3,18 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InventoryComponent.h"
+//#include "InventoryComponent.h"
 #include "UObject/NoExportTypes.h"
 #include "InventoryTypes.h"
 #include "ItemInstance.generated.h"
 
 class UItem;
+class UInventoryComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FItemEvent);
 
-/**
- * UItemInstance
- */
+
 UCLASS(Abstract, BlueprintType, Blueprintable)
 class INVENTORYSYSTEM_API UItemInstance : public UObject
 {
@@ -23,8 +22,6 @@ class INVENTORYSYSTEM_API UItemInstance : public UObject
 public:
 
 	UItemInstance();
-
-
 
 	void NativeOnConstruct();
 
@@ -46,9 +43,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ItemInstance")
 	void ResetRotation();
 	
+	UFUNCTION(BlueprintCallable, Category = "ItemInstance")
+	void GenerateRarity();
 
 	void NotifyItemRotated();
-	
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "ItemInstance")
 	UItem* Item;
@@ -74,4 +72,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float ItemInstanceDamage = 0;
 	
+	UPROPERTY(BlueprintReadWrite)
+	EItemRarity ItemRarity;
 };

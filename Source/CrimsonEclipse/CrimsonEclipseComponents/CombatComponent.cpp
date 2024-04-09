@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 //#include "CrimsonEclipse/Projectile/CEProjectileActor.h"
+#include "CrimsonEclipse/AI/CEAIController.h"/// TODO DELETE
 
 #include "DrawDebugHelpers.h"
 
@@ -18,7 +19,7 @@ DEFINE_LOG_CATEGORY(LogCombatComponent);
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	SetIsReplicated(true);
+	//SetIsReplicated(true);
 	//ReplicateSubobjects();
 }
 
@@ -27,6 +28,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION(UCombatComponent, ProjectileVector, COND_None);
 }
 
 void UCombatComponent::BeginPlay()
@@ -225,15 +227,24 @@ void UCombatComponent::Server_OnAiming_Implementation()
 // ON PROJECTILE SPAWN REPLICATION //
 void UCombatComponent::OnProjectileSpawn()
 {
-	if(!Character->HasAuthority())
+	if (!Character->GetController()) return;
+	if (!Cast<ACEAIController>(Character->GetController()))
 	{
-		Client_ProjectileVector();
-		Server_OnProjectileSpawn(ProjectileVector);
+		if (!Character->HasAuthority())
+		{
+			Client_ProjectileVector();
+			Server_OnProjectileSpawn(ProjectileVector);
+		}
+		if (Character->HasAuthority() && Character->GetController()->IsLocalPlayerController())
+		{
+			Client_ProjectileVector();
+			Server_OnProjectileSpawn(ProjectileVector);
+		}
 	}
-	if (Character->HasAuthority() && Character->GetController()->IsLocalPlayerController())
+	else
 	{
-		Client_ProjectileVector();
-		Server_OnProjectileSpawn(ProjectileVector);
+		const FVector ArrowDirection = Character->GetActorForwardVector();
+		LeftHandEquippedWeapon->SpawnProjectile(Character, ArrowDirection, LeftHandDamage);
 	}
 
 	/*
@@ -294,11 +305,10 @@ void UCombatComponent::Client_ProjectileVector_Implementation()
 			Cast<APlayerController>(Character->GetController())->GetHitResultUnderCursor(ECollisionChannel::ECC_MAX, false, HitResult);
 
 			FVector ArrowDirection = Character->GetActorForwardVector();
-			FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ArrowSocket");
+			FTransform SocketTransform = LeftHandEquippedWeapon->GetWeaponMesh()->GetSocketTransform("ProjectileSocket");
 
 			ProjectileVector = FVector{ HitResult.Location.X - SocketTransform.GetLocation().X,
 				HitResult.Location.Y - SocketTransform.GetLocation().Y, ArrowDirection.Z };
-			UE_LOG(LogTemp, Warning, TEXT("%f , %f"), ProjectileVector.X, ProjectileVector.Y);
 		}
 	}
 }

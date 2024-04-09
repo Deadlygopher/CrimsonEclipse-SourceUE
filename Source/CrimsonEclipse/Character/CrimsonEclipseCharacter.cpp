@@ -285,5 +285,11 @@ void ACrimsonEclipseCharacter::Server_RotateToCursorDirecion_Implementation(FRot
 {
 	GetCharacterMovement()->MoveUpdatedComponent(FVector{ 0 }, FRotator{ 0.f,NewRotation.Yaw, NewRotation.Roll }, true);
 }
-
 /// ROTATE TO CURSOR IMPLEMENTATION ///
+
+
+void ACrimsonEclipseCharacter::OnDeath(AActor* DamageCauser)
+{
+	//InputComponent->Disable
+	Super::OnDeath(DamageCauser);
+}

@@ -70,6 +70,7 @@ void APickup::BeginPlay()
 	if (!ItemInstance && InitItemInstance)
 	{
 		ItemInstance = NewObject<UItemInstance>(this, InitItemInstance);
+		ItemInstance->GenerateRarity();
 		ItemInstance->NativeOnConstruct();
 		Quantity = InitQuantity;
 	}
