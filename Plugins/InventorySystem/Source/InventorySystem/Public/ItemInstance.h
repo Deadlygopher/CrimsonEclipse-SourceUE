@@ -46,6 +46,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ItemInstance")
 	void GenerateRarity();
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	void NotifyItemRotated();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = true), Category = "ItemInstance")
@@ -72,6 +74,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float ItemInstanceDamage = 0;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	EItemRarity ItemRarity;
 };

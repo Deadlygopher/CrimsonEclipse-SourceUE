@@ -31,6 +31,7 @@ public:
 	virtual void BeginPlay() override;
 	void OnPickupDataReceived() const;
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(BlueprintCallable, Category = Pickup)
@@ -45,7 +46,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	TSubclassOf<UItemInstance> InitItemInstance;
 
-	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Category = Pickup)
+	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Replicated, Category = Pickup)
 	UItemInstance* ItemInstance = nullptr;
 
 	UPROPERTY(/*EditAnywhere, */BlueprintReadWrite, Category = Pickup)
@@ -53,10 +54,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, /*Meta = (AllowPrivateAccess = true),*/ Category = "Pickup")
 	UStaticMeshComponent* PickupMesh;
-
-	//Initialize in open world items
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
-	//TSubclassOf<UItemInstance> InitItemInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pickup)
 	int32 InitQuantity;

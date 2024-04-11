@@ -98,13 +98,13 @@ void APickup::OnPickupDataReceived() const
 	}
 }
 
-/*
+
 void APickup::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(APickup, PickupWidget);
-}*/
+	DOREPLIFETIME(APickup, ItemInstance);
+}
 
 void APickup::SetPickupData(UItemInstance* InItemInstance, const int32 InQuantity)
 {
@@ -129,26 +129,7 @@ void APickup::SetWidgetVisibility(bool bVisible)
 void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
-{/*
-	IInventoryInterface* InventoryInterface = nullptr;
-	auto Components = OtherActor->GetComponents();
-	for (auto Component : Components)
-	{
-		InventoryInterface = Cast<IInventoryInterface>(Component);
-		if (InventoryInterface)
-		{
-			break;
-		}
-	}
-	if (InventoryInterface)
-	{
-		int32 SizeArray = InventoryInterface->GetOverlappingItems().Num();
-		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
-
-		InventoryInterface->OverlappingItemToArray(this);
-		SizeArray = InventoryInterface->GetOverlappingItems().Num();
-		UE_LOG(LogTemp, Display, TEXT("%d"), SizeArray);
-	}*/
+{
 	auto InvInterfaceActor = OtherActor->FindComponentByInterface<UInventoryInterface>();
 	auto InvInterface = Cast<IInventoryInterface>(InvInterfaceActor);
 	if (InvInterface)InvInterface->OverlappingItemToArray(this);
@@ -157,22 +138,6 @@ void APickup::OnOverlapComponentStart(UPrimitiveComponent* OverlappedComponent, 
 void APickup::OnOverlapComponentEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	/*
-	IInventoryInterface* InventoryInterface = nullptr;
-	auto Components = OtherActor->GetComponents();
-
-	for (auto Component : Components)
-	{
-		InventoryInterface = Cast<IInventoryInterface>(Component);
-		if (InventoryInterface)
-		{
-			break;
-		}
-	}
-	if (InventoryInterface)
-	{
-		InventoryInterface->RemoveItemFromOverlapping(this);
-	}*/
 	auto InvInterfaceActor = OtherActor->FindComponentByInterface<UInventoryInterface>();
 	auto InvInterface = Cast<IInventoryInterface>(InvInterfaceActor);
 	if (InvInterface)InvInterface->RemoveItemFromOverlapping(this);

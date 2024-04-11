@@ -223,7 +223,6 @@ bool UInventoryComponent::DoesItemExist(const UItem* Item)
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -599,7 +598,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 		{
 			for (FSlot& Slot: Slots)
 			{
-				const bool bCanStack = !Slot.IsOnMaxStackSize() && Slot.ItemInstance->Item == Item;
+				const bool bCanStack = !Slot.IsOnMaxStackSize() && Slot.ItemInstance == ItemInstance;
 				if (bCanStack)
 				{
 					const int32 MissingStackQuantity = Slot.GetMissingStackQuantity();
@@ -639,7 +638,8 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 	
 		while (RemainingQuantity >= Item->GetItemMaxStackSize())
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			//UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			UItemInstance* NewItemInstance = ItemInstance;
 			check(NewItemInstance != nullptr);
 	
 			FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -689,7 +689,8 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 		
 		if (RemainingQuantity > 0)
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			//UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			UItemInstance* NewItemInstance = ItemInstance;
 			check(NewItemInstance != nullptr);
 	
 			const FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -2110,7 +2111,7 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 		{
 			for (FSlot& Slot: Slots)
 			{
-				const bool bCanStack = !Slot.IsOnMaxStackSize() && Slot.ItemInstance->Item == Item;
+				const bool bCanStack = !Slot.IsOnMaxStackSize() && Slot.ItemInstance == ItemInstance;
 				if (bCanStack)
 				{
 					const int32 MissingStackQuantity = Slot.GetMissingStackQuantity();
@@ -2145,7 +2146,8 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 	
 		while (RemainingQuantity >= Item->GetItemMaxStackSize())
 		{
-			UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			//UItemInstance* NewItemInstance = CreateItemInstance(Item->GetItemInstanceClass());
+			UItemInstance* NewItemInstance = ItemInstance;
 			check(NewItemInstance != nullptr);
 	
 			FInvPoint2D CoordsWhereItemCanFit = GetFreeCellWhereItemCanFit(NewItemInstance->SizeInCells);
@@ -2293,7 +2295,6 @@ bool UInventoryComponent::AddExistingItem_Internal(UItemInstance* ItemInstance, 
 			}
 		}
 	}
-
 	return true;
 }
 

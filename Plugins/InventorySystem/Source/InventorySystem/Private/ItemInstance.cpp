@@ -4,6 +4,7 @@
 #include "ItemInstance.h"
 #include "Item.h"
 #include "InventoryComponent.h"
+#include "Net/UnrealNetwork.h"
 //#include "Kismet/KismetMathLibrary.h"
 
 UItemInstance::UItemInstance()
@@ -98,4 +99,11 @@ void UItemInstance::GenerateRarity()
 		ItemRarity = EItemRarity::EIR_Common;
 		return;
 	}
+}
+
+void UItemInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(UItemInstance, ItemRarity, COND_None);
 }
