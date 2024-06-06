@@ -5,9 +5,9 @@
 
 // Add default functionality here for any IInventoryInterface functions that are not pure virtual.
 
-bool IInventoryInterface::LootItem(APickup* Pickup, int32& LootedQuantity)
+void IInventoryInterface::LootItem(APickup* Pickup, int32& LootedQuantity)
 {
-	return false;
+	//return;// false;
 }
 
 void IInventoryInterface::OverlappingItemToArray(APickup* LastPickup)

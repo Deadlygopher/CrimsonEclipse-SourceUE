@@ -38,7 +38,7 @@ void ACrimsonEclipsePlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACrimsonEclipsePlayerController::OnSetDestinationReleased);
 
 	// set key for pickup items from inventory component
-	InputComponent->BindAction("PickupItem", IE_Pressed, this, &ACrimsonEclipsePlayerController::PickupButtonPressed);
+	InputComponent->BindAction("PickupItem", IE_Pressed, this, &ACrimsonEclipsePlayerController::PickupItem);
 
 	// set key for show/hide pickup widget
 	InputComponent->BindAction("ShowPickupWidget", IE_Pressed, this, &ACrimsonEclipsePlayerController::ShowPickupWidget);
@@ -78,6 +78,41 @@ void ACrimsonEclipsePlayerController::MoveToTouchLocation(const ETouchIndex::Typ
 
 void ACrimsonEclipsePlayerController::PickupItem()
 {
+	if (!HasAuthority())
+	{
+		Client_PickupItem();
+		return;
+	}
+
+	else
+	{
+		FHitResult Hit;
+		GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, false, Hit);
+		APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
+		if (ActorToPickup)
+		{
+			auto ControlledCharacter = GetPawn();
+			if (ControlledCharacter)
+			{
+				auto FoundInterface = ControlledCharacter->FindComponentByInterface<UInventoryInterface>();
+				if (FoundInterface)
+				{
+					auto FoundComponent = Cast<IInventoryInterface>(FoundInterface);
+					auto ItemsToLoot = FoundComponent->GetOverlappingItems();
+					if (ItemsToLoot.Contains(ActorToPickup))
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Server LOOT"))
+						FoundComponent->LootItem(ActorToPickup, ActorToPickup->Quantity);
+						//Server_PickupItem(FoundComponent, ActorToPickup, ActorToPickup->Quantity);
+					}
+				}
+			}
+		}
+	}
+}
+
+void ACrimsonEclipsePlayerController::Client_PickupItem_Implementation()
+{
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, false, Hit);
 	APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
@@ -89,63 +124,18 @@ void ACrimsonEclipsePlayerController::PickupItem()
 			auto FoundInterface = ControlledCharacter->FindComponentByInterface<UInventoryInterface>();
 			if (FoundInterface)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("LOOT"));
 				auto FoundComponent = Cast<IInventoryInterface>(FoundInterface);
 				auto ItemsToLoot = FoundComponent->GetOverlappingItems();
 				if (ItemsToLoot.Contains(ActorToPickup))
 				{
+					UE_LOG(LogTemp, Warning, TEXT("FINALLY"));
 					FoundComponent->LootItem(ActorToPickup, ActorToPickup->Quantity);
+						//Server_PickupItem(FoundComponent, ActorToPickup, ActorToPickup->Quantity);
 				}
 			}
 		}
 	}
-	/*
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel1, false, Hit);
-	APickup* ActorToPickup = Cast<APickup>(Hit.GetActor());
-	if (ActorToPickup)
-	{
-		ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
-		if (ControlledCharacter)
-		{
-			IInventoryInterface* InventoryInterface = nullptr;
-			auto Components = ControlledCharacter->GetComponents();
-			for (auto Component : Components)
-			{
-				InventoryInterface = Cast<IInventoryInterface>(Component);
-				if (InventoryInterface != nullptr)
-				{
-					auto ItemsToLoot = InventoryInterface->GetOverlappingItems();
-					if (ItemsToLoot.Contains(ActorToPickup))
-					{
-						InventoryInterface->LootItem(ActorToPickup, ActorToPickup->Quantity);
-						break;
-					}
-				}
-			}
-		}
-	}*/
-}
-
-void ACrimsonEclipsePlayerController::ShowPickupWidget()
-{
-	bShowWidget = !bShowWidget;
-	ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
-	IInventoryInterface* InventoryInterface = nullptr;
-
-	auto Components = ControlledCharacter->GetComponents();
-	for (auto Component : Components)
-	{
-		InventoryInterface = Cast<IInventoryInterface>(Component);
-		if (InventoryInterface != nullptr)
-		{
-			InventoryInterface->SwitchItemWidgetVisibility(bShowWidget);
-		}
-	}
-}
-
-void ACrimsonEclipsePlayerController::ServerPickupButtonPressed_Implementation()
-{
-	PickupItem();
 }
 
 void ACrimsonEclipsePlayerController::PickupButtonPressed()
@@ -156,27 +146,10 @@ void ACrimsonEclipsePlayerController::PickupButtonPressed()
 	}
 	else
 	{
-		ServerPickupButtonPressed();
+		//Server_PickupItem();
 	}
 }
 
-/*
-void ACrimsonEclipsePlayerController::ClickAttack()
-{
-	TArray<TEnumAsByte<EObjectTypeQuery>> QueryArray;
-	QueryArray.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-	FHitResult Hit;
-
-	GetHitResultUnderCursorForObjects(QueryArray, false, Hit);
-	APawn* TargetActor = Cast<APawn>(Hit.GetActor());
-	if (TargetActor && TargetActor!= GetCharacter())
-	{
-		UAIBlueprintHelperLibrary::SimpleMoveToActor(this, TargetActor);
-
-		Cast<ACrimsonEclipseCharacter>(GetCharacter())->SetTargetActor(TargetActor);
-		Cast<ACrimsonEclipseCharacter>(GetCharacter())->OnClickAttack();
-	}
-}*/
 
 // Requests a destination set for the client and server.
 void ACrimsonEclipsePlayerController::RequestSetNewMoveDestination(const FVector DestLocation)
@@ -245,4 +218,31 @@ void ACrimsonEclipsePlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void ACrimsonEclipsePlayerController::ShowPickupWidget()
+{
+	bShowWidget = !bShowWidget;
+	ACrimsonEclipseCharacter* ControlledCharacter = Cast<ACrimsonEclipseCharacter>(GetPawn());
+	IInventoryInterface* InventoryInterface = nullptr;
+	/*
+	auto Components = ControlledCharacter->GetComponents();
+	for (auto Component : Components)
+	{
+		InventoryInterface = Cast<IInventoryInterface>(Component);
+		if (InventoryInterface != nullptr)
+		{
+			InventoryInterface->SwitchItemWidgetVisibility(bShowWidget);
+		}
+	}
+	*/
+	auto FoundInterface = ControlledCharacter->FindComponentByInterface<UInventoryInterface>();
+	if (FoundInterface)
+	{
+		auto FoundComponent = Cast<IInventoryInterface>(FoundInterface);
+		if (FoundComponent)
+		{
+			FoundComponent->SwitchItemWidgetVisibility(bShowWidget);
+		}
+	}
 }

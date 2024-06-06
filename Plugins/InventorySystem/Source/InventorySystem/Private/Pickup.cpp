@@ -152,5 +152,5 @@ void APickup::OnCursorStartOverlap(UPrimitiveComponent* TouchedComponent)
 void APickup::OnCursorEndOverlap(UPrimitiveComponent* TouchedComponent)
 {
 	Cast<UStaticMeshComponent>(TouchedComponent)->SetScalarParameterValueOnMaterials(FName("Value"), 0.f);
-	SetWidgetVisibility(false);
+	//SetWidgetVisibility(false);
 }

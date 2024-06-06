@@ -7,6 +7,9 @@
 
 #include "CrimsonEclipsePlayerController.generated.h"
 
+class APickup;
+class IInventoryInterface;
+
 UCLASS()
 class ACrimsonEclipsePlayerController : public APlayerController
 {
@@ -55,14 +58,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void PickupItem();
 
-	UFUNCTION(BlueprintCallable)
-	void ShowPickupWidget();
-
-	UFUNCTION(Server, Reliable)
-	void ServerPickupButtonPressed();
+	UFUNCTION(Client, Reliable)
+	void Client_PickupItem();
 
 	void PickupButtonPressed();
 
+	UFUNCTION(BlueprintCallable)
+	void ShowPickupWidget();
 
 private:
 	bool bShowWidget = false;

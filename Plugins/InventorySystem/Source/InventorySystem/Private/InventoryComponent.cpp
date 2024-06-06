@@ -574,8 +574,10 @@ bool UInventoryComponent::AddNewItem(UItem* Item, const int32 Quantity, int32& A
 	return true;
 }
 
+// ADD ITEM IMPLEMENTATION//
 bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int32 Quantity, int32& AddedQuantity)
 {
+	//if (!GetOwner()->HasAuthority()) Client_AddNewItem(ItemInstance, Quantity, AddedQuantity);
 	AddedQuantity = 0;
 	UItem* Item = ItemInstance->Item;
 	
@@ -766,6 +768,7 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 		{
 			NewItemInstance->TopLeftCoordinates = CoordsWhereItemCanFit;
 	
+			
 			const FSlot NewSlot = FSlot(NewItemInstance, 1, this);
 			Slots.Add(NewSlot);
 	
@@ -805,13 +808,15 @@ bool UInventoryComponent::AddExistingItem(UItemInstance* ItemInstance, const int
 			}
 		}
 	}
-	
 	NotifyInventoryUpdated();
 	NotifyInventoryWeightChanged();
 	NotifyInventoryItemAdded(Item, AddedQuantity);
 
 	return true;
 }
+
+
+// ADD ITEM IMPLEMENTATION//
 
 bool UInventoryComponent::RemoveItem(UItem* Item, const int32 Quantity, int32& RemovedQuantity)
 {
@@ -1885,36 +1890,75 @@ bool UInventoryComponent::DropItemOnSlot(const FSlot& Slot)
 	return false;
 }
 
-bool UInventoryComponent::LootItem(APickup* Pickup, int32& LootedQuantity)
+
+/// LOOT ITEM IMPLEMENTATION ///
+void UInventoryComponent::LootItem(APickup* Pickup, int32& LootedQuantity)
 {
-	//LootedQuantity = 0; //////?
-	
+	if (!GetOwner()->HasAuthority())
+		Server_LootItem(Pickup, LootedQuantity);
+	else
+	{
+		//LootedQuantity = 0; //////?
+		if (Pickup == nullptr)
+		{
+			return; //false;
+		}
+
+		int32 AddedQuantity = 0;
+		const bool bIsLooted = AddExistingItem(Pickup->ItemInstance, Pickup->Quantity, AddedQuantity);
+
+		LootedQuantity = AddedQuantity;
+
+		if (bIsLooted)
+		{
+			if (Pickup->Quantity - LootedQuantity <= 0)
+			{
+				Pickup->Destroy();
+				//LootedQuantity = 0;
+			}
+			else
+			{
+				Pickup->Quantity = FMath::Clamp((Pickup->Quantity - LootedQuantity), 0, INT32_MAX);
+			}
+
+			return;// true;
+		}
+		return; //false;
+	}
+}
+
+void UInventoryComponent::Server_LootItem_Implementation(APickup* Pickup, int32 LootedQuantity)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CLIENT START LOOT"));
 	if (Pickup == nullptr)
 	{
-		return false;
+		return; //false;
 	}
 
 	int32 AddedQuantity = 0;
 	const bool bIsLooted = AddExistingItem(Pickup->ItemInstance, Pickup->Quantity, AddedQuantity);
 
 	LootedQuantity = AddedQuantity;
-	
+
 	if (bIsLooted)
 	{
 		if (Pickup->Quantity - LootedQuantity <= 0)
 		{
 			Pickup->Destroy();
+			UE_LOG(LogTemp, Warning, TEXT("CLIENT COMPLETE LOOT"));
+			//LootedQuantity = 0;
 		}
 		else
 		{
 			Pickup->Quantity = FMath::Clamp((Pickup->Quantity - LootedQuantity), 0, INT32_MAX);
 		}
 
-		return true;
+		return;// true;
 	}
-	
-	return false;
+	return; //false;
 }
+/// LOOT ITEM IMPLEMENTATION ///
+
 
 void UInventoryComponent::SpawnItem(const UItem* Item, const int32 Quantity, const FTransform& Transform)
 {
@@ -2369,6 +2413,7 @@ void UInventoryComponent::NotifyInventoryItemUsed(UItem* InItem, const int32 InQ
 void UInventoryComponent::OverlappingItemToArray(APickup* LastPickup)
 {
 	OverlappingItems.AddUnique(LastPickup);
+	LastPickup->SetWidgetVisibility(bPickupWidgetVisible);
 }
 
 void UInventoryComponent::RemoveItemFromOverlapping(APickup* PickupToRemove)
@@ -2381,6 +2426,7 @@ void UInventoryComponent::SwitchItemWidgetVisibility(bool bShowWidget)
 {
 	for (auto OverlapItem : OverlappingItems)
 	{
+		bPickupWidgetVisible = bShowWidget;
 		OverlapItem->SetWidgetVisibility(bShowWidget);
 	}
 }
@@ -2391,6 +2437,7 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME(UInventoryComponent, LastOverlappingItem);
-	//DOREPLIFETIME(UInventoryComponent, OverlappingItems);
+	DOREPLIFETIME(UInventoryComponent, Slots);
+	//DOREPLIFETIME(UInventoryComponent, StartupItems);
+	DOREPLIFETIME(UInventoryComponent, OverlappingItems);
 }

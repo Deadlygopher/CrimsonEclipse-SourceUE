@@ -97,7 +97,6 @@ struct INVENTORYSYSTEM_API FStartupItem
 	{
 		return Other.Item != Item && Other.Quantity != Quantity;
 	}
-	
 };
 
 /**
@@ -221,8 +220,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool AddNewItem(UItem* Item, int32 Quantity, int32& AddedQuantity);
 
+
+	// ADD ITEM REPLICATION //
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool AddExistingItem(UItemInstance* ItemInstance, int32 Quantity, int32& AddedQuantity);
+
+	// ADD ITEM REPLICATION //
 	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool RemoveItem(UItem* Item, int32 Quantity, int32& RemovedQuantity);
@@ -245,25 +248,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool DropItemOnSlot(const FSlot& Slot);
 
+
+	/// LOOT ITEM REPLICATION ///
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	virtual bool LootItem(APickup* Pickup, int32& LootedQuantity) override;
+	virtual void LootItem(APickup* Pickup, int32& LootedQuantity) override;
+
+	UFUNCTION(Server, Reliable)
+	void Server_LootItem(APickup* Pickup, int32 LootedQuantity);
+	/// LOOT ITEM REPLICATION ///
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void SpawnItem(const UItem* Item, int32 Quantity, const FTransform& Transform);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void UseItemOnSlot(const FSlot& Slot);
-
-	/*
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddMoney(int32 Value);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void RemoveMoney(int32 Value);
-
-	UFUNCTION(BlueprintPure, Category = "Inventory")
-	int32 GetMoney() const;
-	*/
 
 	UFUNCTION(BlueprintPure, Category = "Inventory")
 	bool IsValidEquipmentSlots();
@@ -283,11 +281,6 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Inventory Initialized"), Category = "Inventory")
 	void K2_OnInventoryInitialized();
-
-	/*
-	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Money Changed"), Category = "Inventory")
-	void K2_OnMoneyChanged();
-	*/
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Inventory Updated"), Category = "Inventory")
 	void K2_OnInventoryUpdated();
@@ -323,7 +316,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	TArray<FInvPoint2D> Cells;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Inventory")
 	TArray<FSlot> Slots;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
@@ -335,18 +328,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 1.0f, UIMin = 1.0f, EditCondition = "!bUseScaledMaxWeight"), Category = "Inventory")
 	float MaxWeight;
 
-	/*
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0, UIMin = 0), Category = "Inventory")
-	int32 DefaultMoney;
-	*/
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 1, UIMin = 1), Category = "Inventory")
 	float PickupSpawnRadiusFromPlayer;
-
-	/*
-	UPROPERTY(BlueprintReadOnly, meta = (ClampMin = 0, UIMin = 0), Category = "Inventory")
-	int32 Money;
-	*/
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
 	TArray<FStartupItem> StartupItems;
@@ -354,28 +337,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
 	TArray<FEquipmentSlot> EquipmentSlots;
 
-	UPROPERTY(BlueprintAssignable)	
+	UPROPERTY(BlueprintAssignable)
 	FInventoryEvent OnInventoryInitialized;
 
-	UPROPERTY(BlueprintAssignable)	
+	UPROPERTY(BlueprintAssignable)
 	FInventoryEvent OnInventoryUpdated;
 
-	UPROPERTY(BlueprintAssignable)	
+	UPROPERTY(BlueprintAssignable)
 	FInventoryEvent OnInsufficientSpace;
 
-	UPROPERTY(BlueprintAssignable)	
+	UPROPERTY(BlueprintAssignable)
 	FInventoryEvent OnWeightChanged;
 
-	UPROPERTY(BlueprintAssignable)	
+	UPROPERTY(BlueprintAssignable)
 	FInventoryItemEvent OnItemAdded;
 
-	UPROPERTY(BlueprintAssignable)	
-	FInventoryItemEvent OnItemRemoved;
-
-	/*
 	UPROPERTY(BlueprintAssignable)
-	FInventoryEvent OnMoneyChanged;
-	*/
+	FInventoryItemEvent OnItemRemoved;
 
 	UPROPERTY(BlueprintAssignable)
 	FInventoryEquipmentEvent OnItemEquipped;
@@ -398,11 +376,6 @@ public:
 	void NotifyInventoryItemUnequipped(UItem* InItem, UItemInstance* InItemInstance,
 		EEquipmentSlotType Type, int32 InQuantity);
 	void NotifyInventoryItemUsed(UItem* InItem, int32 InQuantity);
-	//void NotifyMoneyChanged();
-
-
-
-
 
 
 
@@ -419,6 +392,9 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+	UPROPERTY(Replicated)
 	TArray<APickup*> OverlappingItems;
 
+	UPROPERTY()
+	bool bPickupWidgetVisible;
 };
